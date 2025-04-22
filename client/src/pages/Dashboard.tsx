@@ -21,11 +21,12 @@ export default function Dashboard() {
     queryFn: getDocuments
   });
   
-  useEffect(() => {
-    if (!isLoading && (!documents || documents.length === 0)) {
-      setLocation("/");
-    }
-  }, [documents, isLoading, setLocation]);
+  // Temporarily disabled the redirect to allow viewing the survey
+  // useEffect(() => {
+  //   if (!isLoading && (!documents || documents.length === 0)) {
+  //     setLocation("/");
+  //   }
+  // }, [documents, isLoading, setLocation]);
   
   if (isLoading) {
     return <div>Loading...</div>;
