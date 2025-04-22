@@ -1,13 +1,6 @@
 import type { Express, Request, Response } from "express";
-import type { ParamsDictionary } from "express-serve-static-core";
-import type { ParsedQs } from "qs";
-import multer from "multer";
 import { createServer, type Server } from "http";
-
-// Define a custom interface that extends Express.Request with multer's fields
-interface MulterRequest extends Request {
-  files?: Express.Multer.File[];
-}
+import multer from "multer";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
@@ -20,16 +13,17 @@ import { fromZodError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Document endpoints
-  app.post("/api/documents", upload.array("documents"), async (req: MulterRequest, res: Response) => {
+  app.post("/api/documents", upload.array("documents"), async (req: Request, res: Response) => {
     try {
-      const files = req.files || [];
+      // Cast req.files to any since multer adds this property
+      const files = (req as any).files || [];
       
       if (!files || files.length === 0) {
         return res.status(400).json({ message: "No files uploaded" });
       }
       
       const documents = await Promise.all(
-        files.map(async (file) => {
+        files.map(async (file: any) => {
           // Read file content
           let content = "";
           
