@@ -8,7 +8,8 @@ export const questionTypeEnum = z.enum([
   "radio",
   "checkbox",
   "select",
-  "textarea"
+  "textarea",
+  "scale"
 ]);
 
 export type QuestionType = z.infer<typeof questionTypeEnum>;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Helper function to safely handle options that could be string or string[]
 const getOptionsArray = (options: string | string[] | null): string[] => {
@@ -6,7 +7,6 @@ const getOptionsArray = (options: string | string[] | null): string[] => {
   if (typeof options === 'string') return options.split('\n');
   return options;
 };
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -881,7 +881,7 @@ export default function SurveyAdminTab() {
                           <div className="text-sm text-muted-foreground">
                             <span className="font-medium">Options:</span>
                             <ul className="list-disc list-inside mt-1 pl-2">
-                              {question.options.split('\n').map((option, i) => (
+                              {getOptionsArray(question.options).map((option, i) => (
                                 <li key={i}>{option}</li>
                               ))}
                             </ul>
@@ -964,7 +964,7 @@ export default function SurveyAdminTab() {
                                   <SelectValue placeholder="Select an option" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {question.options.split('\n').map((option, i) => (
+                                  {getOptionsArray(question.options).map((option, i) => (
                                     <SelectItem key={i} value={`option-${i}`}>{option}</SelectItem>
                                   ))}
                                 </SelectContent>
@@ -977,7 +977,7 @@ export default function SurveyAdminTab() {
                             
                             {question.questionType === "radio" && question.options && (
                               <div className="space-y-2 mt-2">
-                                {question.options.split('\n').map((option, i) => (
+                                {getOptionsArray(question.options).map((option, i) => (
                                   <div key={i} className="flex items-center space-x-2">
                                     <input type="radio" id={`option-${question.id}-${i}`} name={`question-${question.id}`} />
                                     <Label htmlFor={`option-${question.id}-${i}`} className="font-normal">
@@ -990,7 +990,7 @@ export default function SurveyAdminTab() {
                             
                             {question.questionType === "checkbox" && question.options && (
                               <div className="space-y-2 mt-2">
-                                {question.options.split('\n').map((option, i) => (
+                                {getOptionsArray(question.options).map((option, i) => (
                                   <div key={i} className="flex items-center space-x-2">
                                     <input type="checkbox" id={`check-${question.id}-${i}`} />
                                     <Label htmlFor={`check-${question.id}-${i}`} className="font-normal">
