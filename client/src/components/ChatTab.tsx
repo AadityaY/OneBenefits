@@ -164,46 +164,76 @@ export default function ChatTab() {
             
             <ScrollArea className="h-[500px] p-4">
               <div className="space-y-4 pb-4">
-                {/* Welcome message */}
+                {/* Welcome message with people faces */}
                 {(!messages || messages.length === 0) && (
                   <div className="flex items-start gap-3 text-center w-full pt-8">
-                    <div className="mx-auto max-w-sm rounded-lg bg-primary/5 p-6">
-                      <Bot className="mx-auto h-12 w-12 text-primary mb-4" />
-                      <h3 className="font-semibold text-lg mb-2 gradient-heading">
-                        Benefits AI Assistant
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        I can answer questions about your employee benefits, company policies, and more. How can I help you today?
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <Button 
-                          variant="outline" 
-                          className="justify-start text-left h-auto py-2 px-3"
-                          onClick={() => setMessageText("What health insurance plans are available?")}
-                        >
-                          <span className="truncate">What health insurance plans are available?</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="justify-start text-left h-auto py-2 px-3"
-                          onClick={() => setMessageText("How many vacation days do I have?")}
-                        >
-                          <span className="truncate">How many vacation days do I have?</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="justify-start text-left h-auto py-2 px-3"
-                          onClick={() => setMessageText("What's the parental leave policy?")}
-                        >
-                          <span className="truncate">What's the parental leave policy?</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="justify-start text-left h-auto py-2 px-3"
-                          onClick={() => setMessageText("Tell me about our 401(k) matching")}
-                        >
-                          <span className="truncate">Tell me about our 401(k) matching</span>
-                        </Button>
+                    <div className="mx-auto max-w-md rounded-xl border-gradient animated-gradient-bg p-0.5">
+                      <div className="bg-background rounded-[calc(0.75rem-1px)] p-6 relative overflow-hidden">
+                        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/5 blur-xl"></div>
+                        <div className="absolute -bottom-12 -left-12 w-40 h-40 rounded-full bg-secondary/10 blur-xl"></div>
+                        
+                        <div className="relative z-10">
+                          {/* Bot avatar with surrounding human avatars */}
+                          <div className="relative mx-auto w-20 h-20 mb-6">
+                            <div className="absolute top-0 left-0 -mt-2 -ml-2 w-8 h-8 rounded-full overflow-hidden border-2 border-background">
+                              <img src={USER_AVATARS[0]} alt="User avatar" />
+                            </div>
+                            <div className="absolute top-0 right-0 -mt-1 -mr-3 w-10 h-10 rounded-full overflow-hidden border-2 border-background">
+                              <img src={USER_AVATARS[1]} alt="User avatar" />
+                            </div>
+                            <div className="absolute bottom-0 right-0 -mb-3 -mr-1 w-9 h-9 rounded-full overflow-hidden border-2 border-background">
+                              <img src={USER_AVATARS[2]} alt="User avatar" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 -mb-2 -ml-3 w-8 h-8 rounded-full overflow-hidden border-2 border-background">
+                              <img src={USER_AVATARS[3]} alt="User avatar" />
+                            </div>
+                            
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                              <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-background">
+                                <img src={AI_AVATAR_URL} alt="AI avatar" />
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <h3 className="font-bold text-xl mb-3 gradient-text">
+                            Your Benefits Assistant
+                          </h3>
+                          <p className="text-muted-foreground text-sm mb-6">
+                            I can answer questions about your employee benefits, company policies, and more. 
+                            Our team is here to help you understand your benefits package!
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <Button 
+                              variant="secondary" 
+                              className="justify-start text-left h-auto py-3 px-4 hover-lift"
+                              onClick={() => setMessageText("What health insurance plans are available?")}
+                            >
+                              <span className="truncate">What health insurance plans are available?</span>
+                            </Button>
+                            <Button 
+                              variant="secondary" 
+                              className="justify-start text-left h-auto py-3 px-4 hover-lift"
+                              onClick={() => setMessageText("How many vacation days do I have?")}
+                            >
+                              <span className="truncate">How many vacation days do I have?</span>
+                            </Button>
+                            <Button 
+                              variant="secondary" 
+                              className="justify-start text-left h-auto py-3 px-4 hover-lift"
+                              onClick={() => setMessageText("What's the parental leave policy?")}
+                            >
+                              <span className="truncate">What's the parental leave policy?</span>
+                            </Button>
+                            <Button 
+                              variant="secondary" 
+                              className="justify-start text-left h-auto py-3 px-4 hover-lift"
+                              onClick={() => setMessageText("Tell me about our 401(k) matching")}
+                            >
+                              <span className="truncate">Tell me about our 401(k) matching</span>
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -222,20 +252,23 @@ export default function ChatTab() {
                         {message.role === "assistant" ? "AI" : "You"}
                       </AvatarFallback>
                       <AvatarImage 
-                        src={message.role === "assistant" ? AI_AVATAR_URL : USER_AVATAR_URL} 
+                        src={message.role === "assistant" 
+                          ? AI_AVATAR_URL 
+                          : USER_AVATARS[message.id % USER_AVATARS.length || 0]} 
                       />
                     </Avatar>
                     <div 
-                      className={`rounded-lg px-4 py-3 max-w-[80%] ${
+                      className={`rounded-xl px-4 py-3 max-w-[80%] ${
                         message.role === "assistant" 
-                          ? "bg-muted/50" 
-                          : "bg-primary/10"
+                          ? "frost-glass shadow-sm border-gradient" 
+                          : "bg-primary/10 shadow-sm"
                       }`}
                     >
                       <div className="whitespace-pre-line text-sm">
                         {message.content}
                       </div>
-                      <div className="mt-2 text-xs text-muted-foreground">
+                      <div className="mt-2 text-xs text-muted-foreground flex items-center justify-end">
+                        <div className="w-2 h-2 rounded-full mr-1.5 bg-primary/40"></div>
                         {new Date(message.timestamp).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit'
