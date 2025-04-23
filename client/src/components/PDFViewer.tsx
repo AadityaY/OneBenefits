@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Viewer, Worker, SpecialZoomLevel } from '@react-pdf-viewer/core';
+import { Viewer, Worker, SpecialZoomLevel, type SpecialZoomLevel as SpecialZoomLevelType } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
 
@@ -200,12 +200,13 @@ export default function PDFViewer({ fileUrl, title, description, onClose }: PDFV
           <div className="flex-1 bg-muted/20">
             <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js`}>
               <div className="h-full w-full">
-                <Viewer
-                  fileUrl={fileUrl}
-                  plugins={[defaultLayoutPluginInstance]}
-                  defaultScale={SpecialZoomLevel.PageFit}
-                  className="customized-viewer"
-                />
+                <div className="customized-viewer">
+                  <Viewer
+                    fileUrl={fileUrl}
+                    plugins={[defaultLayoutPluginInstance]}
+                    defaultScale={SpecialZoomLevel.PageFit}
+                  />
+                </div>
               </div>
             </Worker>
           </div>

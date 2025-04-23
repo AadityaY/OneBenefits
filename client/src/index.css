@@ -176,3 +176,45 @@
   opacity: 1;
 }
 
+/* PDF Viewer customization */
+.customized-viewer .rpv-default-layout__toolbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+}
+
+.customized-viewer .rpv-default-layout__sidebar {
+  background: var(--background);
+  border-right: 1px solid var(--border);
+}
+
+.customized-viewer .rpv-thumbnail__item {
+  background: var(--card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.customized-viewer .rpv-thumbnail__item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.customized-viewer .rpv-thumbnail__item--selected {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+.customized-viewer .rpv-thumbnail__item-label {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.customized-viewer .rpv-core__text-layer {
+  user-select: text;
+}
+
