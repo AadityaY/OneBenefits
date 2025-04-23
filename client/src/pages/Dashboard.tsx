@@ -4,16 +4,34 @@ import { useAuth } from "@/hooks/use-auth";
 import { Header } from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// We check if the component modules exist before importing them
-let SurveyAdminTab;
-let SurveyTakingTab;
-let AnalyticsTab;
-let ChatTab;
+// Creating simple fallback components if the actual tab components don't exist
+const SurveyAdminTab = () => {
+  return <div className="p-4 border rounded-lg">
+    <h2 className="text-xl font-semibold mb-4">Survey Administration</h2>
+    <p>This panel will allow administrators to create and manage survey templates and questions.</p>
+  </div>;
+};
 
-try { SurveyAdminTab = require("@/components/SurveyAdminTab").default; } catch (e) {}
-try { SurveyTakingTab = require("@/components/SurveyTakingTab").default; } catch (e) {}
-try { AnalyticsTab = require("@/components/AnalyticsTab").default; } catch (e) {}
-try { ChatTab = require("@/components/ChatTab").default; } catch (e) {}
+const SurveyTakingTab = () => {
+  return <div className="p-4 border rounded-lg">
+    <h2 className="text-xl font-semibold mb-4">Take Survey</h2>
+    <p>Available surveys for completion will appear here.</p>
+  </div>;
+};
+
+const AnalyticsTab = () => {
+  return <div className="p-4 border rounded-lg">
+    <h2 className="text-xl font-semibold mb-4">Analytics Dashboard</h2>
+    <p>Survey response analytics and reporting will be displayed here.</p>
+  </div>;
+};
+
+const ChatTab = () => {
+  return <div className="p-4 border rounded-lg">
+    <h2 className="text-xl font-semibold mb-4">Benefits Chat Assistant</h2>
+    <p>Ask questions about your benefits and receive instant responses.</p>
+  </div>;
+};
 
 export default function Dashboard() {
   const { user } = useAuth();

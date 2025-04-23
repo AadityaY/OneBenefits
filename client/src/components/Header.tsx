@@ -1,135 +1,161 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { 
+  LogOut, 
+  Menu, 
+  Settings, 
+  User as UserIcon,
+  ChevronDown
+} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useCompanyTheme } from "@/hooks/use-company-theme";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
-  const { settings } = useCompanyTheme();
-  
+  const { companySettings } = useCompanyTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Determine if user is admin or superadmin
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
-  
-  // Get initials for avatar
-  const getInitials = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-    }
-    return user?.username?.substring(0, 2).toUpperCase() || "U";
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
-  
+
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between py-4">
-        <div className="flex items-center gap-4">
-          {/* Logo */}
-          <Link href="/dashboard">
-            <div className="flex items-center gap-2 cursor-pointer">
-              {settings?.logo ? (
-                <img 
-                  src={settings.logo} 
-                  alt={`${settings.name} logo`} 
-                  className="h-8"
-                />
-              ) : (
-                <div className="text-primary font-bold text-2xl">
-                  {settings?.name || "Employee Engage"}
-                </div>
-              )}
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo/Brand */}
+        <div className="flex items-center gap-2">
+          {companySettings?.logo ? (
+            <img 
+              src={companySettings.logo} 
+              alt={`${companySettings.name} logo`}
+              className="h-8 w-auto" 
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+              {companySettings?.name?.substring(0, 1) || "E"}
             </div>
-          </Link>
+          )}
+          <span className="font-semibold text-lg hidden md:inline-block">
+            {companySettings?.name || "Employee Engage"}
+          </span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex items-center gap-4">
-          {user && (
-            <>
-              <Link href="/dashboard">
-                <Button variant="ghost" className="text-sm">
-                  Dashboard
-                </Button>
-              </Link>
-              
-              {isAdmin && (
-                <Link href="/admin">
-                  <Button variant="ghost" className="text-sm">
-                    Admin
-                  </Button>
-                </Link>
-              )}
-              
-              {isAdmin && (
-                <Link href="/company-settings">
-                  <Button variant="ghost" className="text-sm">
-                    Settings
-                  </Button>
-                </Link>
-              )}
-            </>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link to="/dashboard">
+            <Button variant="ghost">Dashboard</Button>
+          </Link>
+          
+          {isAdmin && (
+            <Link to="/admin">
+              <Button variant="ghost">Admin</Button>
+            </Link>
+          )}
+
+          {isAdmin && (
+            <Link to="/settings">
+              <Button variant="ghost">Company Settings</Button>
+            </Link>
           )}
         </nav>
 
-        {/* User Menu */}
-        {user ? (
+        {/* User Menu (Desktop) */}
+        <div className="hidden md:flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="relative h-10 w-10 rounded-full"
-              >
-                <Avatar>
-                  <AvatarFallback>{getInitials()}</AvatarFallback>
-                </Avatar>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <UserIcon className="h-4 w-4" />
+                <span>{user?.firstName || user?.username}</span>
+                <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>
-                <div className="font-medium">
-                  {user.firstName && user.lastName ? 
-                    `${user.firstName} ${user.lastName}` : 
-                    user.username}
-                </div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {user.email}
-                </div>
-              </DropdownMenuLabel>
+              <DropdownMenuItem className="font-medium">
+                Signed in as {user?.email}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+              <DropdownMenuItem asChild>
+                <Link to="/profile">Profile Settings</Link>
               </DropdownMenuItem>
               {isAdmin && (
-                <Link href="/company-settings">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Company Settings</span>
-                  </DropdownMenuItem>
-                </Link>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings">Company Settings</Link>
+                </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                className="cursor-pointer text-destructive focus:text-destructive"
-                onClick={() => logoutMutation.mutate()}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <Link href="/auth">
-            <Button>Sign In</Button>
-          </Link>
-        )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button size="icon" variant="ghost">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[250px] sm:w-[300px]">
+            <div className="flex flex-col h-full">
+              <div className="flex-1 py-4">
+                <div className="mb-4 flex items-center">
+                  <UserIcon className="h-5 w-5 mr-2" />
+                  <span className="font-medium">{user?.firstName || user?.username}</span>
+                </div>
+                <div className="space-y-3">
+                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">Dashboard</Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">Admin</Button>
+                    </Link>
+                  )}
+                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">
+                      <UserIcon className="h-4 w-4 mr-2" />
+                      Profile Settings
+                    </Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Company Settings
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                className="justify-start mt-auto" 
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
