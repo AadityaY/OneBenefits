@@ -104,7 +104,8 @@ export default function SurveyAdminTab() {
     defaultValues: {
       title: "",
       description: "",
-      isPublished: false,
+      status: "draft",
+      companyId: companyId || 0,
     },
   });
   
@@ -336,8 +337,9 @@ export default function SurveyAdminTab() {
     
     templateForm.reset({
       title: selectedTemplate.title,
-      description: selectedTemplate.description,
-      isPublished: selectedTemplate.isPublished,
+      description: selectedTemplate.description || "",
+      status: selectedTemplate.status,
+      companyId: selectedTemplate.companyId,
     });
     
     setIsEditing(true);
@@ -454,20 +456,28 @@ export default function SurveyAdminTab() {
                       
                       <FormField
                         control={templateForm.control}
-                        name="isPublished"
+                        name="status"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                             <div className="space-y-0.5">
-                              <FormLabel>Publish Immediately</FormLabel>
+                              <FormLabel>Publish Status</FormLabel>
                               <FormDescription>
                                 Make this survey available to users right away
                               </FormDescription>
                             </div>
                             <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-[180px]">
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="draft">Draft</SelectItem>
+                                  <SelectItem value="published">Published</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                           </FormItem>
                         )}
@@ -663,10 +673,10 @@ export default function SurveyAdminTab() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={handlePublishTemplate}
-                            disabled={template.isPublished}
+                            disabled={template.status === "published"}
                           >
                             <FilePlus className="h-4 w-4 mr-2" />
-                            {template.isPublished ? "Already Published" : "Publish Template"}
+                            {template.status === "published" ? "Already Published" : "Publish Template"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -681,8 +691,8 @@ export default function SurveyAdminTab() {
                     </div>
                   </CardContent>
                   <CardFooter className="border-t bg-muted/50 p-3 flex justify-between">
-                    <Badge variant={template.isPublished ? "success" : "secondary"}>
-                      {template.isPublished ? "Published" : "Draft"}
+                    <Badge variant="secondary">
+                      {template.status === "published" ? "Published" : "Draft"}
                     </Badge>
                     <Button 
                       variant="outline" 
