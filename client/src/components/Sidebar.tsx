@@ -13,7 +13,9 @@ import {
   MessageSquare, 
   LibraryBig,
   Menu,
-  X
+  X,
+  LogOut,
+  UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -36,7 +38,7 @@ interface SidebarSubItem {
 
 export function Sidebar() {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
   const { companySettings } = useCompanyTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<SidebarItem[]>([
@@ -158,18 +160,20 @@ export function Sidebar() {
                 {item.open && item.submenu && (
                   <div className="pl-10 space-y-1 mt-1">
                     {item.submenu.map((subItem) => (
-                      <Link key={subItem.title} href={subItem.href}>
-                        <a 
-                          className={cn(
-                            "block p-2 rounded-md hover-lift",
-                            location === subItem.href 
-                              ? "bg-primary/10 text-primary gradient-border" 
-                              : "hover:bg-muted/50"
-                          )}
-                        >
-                          {subItem.title}
-                        </a>
-                      </Link>
+                      <div key={subItem.title}>
+                        <Link href={subItem.href}>
+                          <div 
+                            className={cn(
+                              "block p-2 rounded-md hover-lift cursor-pointer",
+                              location === subItem.href 
+                                ? "bg-primary/10 text-primary gradient-border" 
+                                : "hover:bg-muted/50"
+                            )}
+                          >
+                            {subItem.title}
+                          </div>
+                        </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -180,18 +184,29 @@ export function Sidebar() {
 
         {/* User info */}
         <div className="p-4 border-t">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-sm font-medium">
-                {user?.username?.substring(0, 1).toUpperCase()}
-              </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                <span className="text-sm font-medium">
+                  {user?.username?.substring(0, 1).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">{user?.username}</p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {user?.role || "User"}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium">{user?.username}</p>
-              <p className="text-xs text-muted-foreground capitalize">
-                {user?.role || "User"}
-              </p>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => logoutMutation.mutate()}
+              className="hover-lift text-muted-foreground hover:text-destructive"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
