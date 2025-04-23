@@ -134,7 +134,7 @@ export default function ChatTab() {
         </div>
         
         <TabsContent value="chat" className="space-y-4">
-          <Card className="w-full max-w-4xl mx-auto overflow-hidden">
+          <Card className="w-full max-w-4xl mx-auto overflow-hidden glass-effect">
             <CardHeader className="border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
@@ -142,7 +142,7 @@ export default function ChatTab() {
                   <AvatarImage src={AI_AVATAR_URL} />
                 </Avatar>
                 <div>
-                  <CardTitle className="text-base">Benefits Assistant</CardTitle>
+                  <CardTitle className="text-base gradient-heading">Benefits Assistant</CardTitle>
                   <CardDescription className="text-xs">
                     Ask me questions about company benefits and policies
                   </CardDescription>
@@ -157,7 +157,7 @@ export default function ChatTab() {
                   <div className="flex items-start gap-3 text-center w-full pt-8">
                     <div className="mx-auto max-w-sm rounded-lg bg-primary/5 p-6">
                       <Bot className="mx-auto h-12 w-12 text-primary mb-4" />
-                      <h3 className="font-semibold text-lg mb-2">
+                      <h3 className="font-semibold text-lg mb-2 gradient-heading">
                         Benefits AI Assistant
                       </h3>
                       <p className="text-muted-foreground text-sm mb-4">
@@ -281,12 +281,12 @@ export default function ChatTab() {
         </TabsContent>
         
         <TabsContent value="documents" className="space-y-4">
-          <Card className="w-full max-w-4xl mx-auto overflow-hidden">
+          <Card className="w-full max-w-4xl mx-auto overflow-hidden glass-effect">
             <CardHeader className="border-b bg-muted/50 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Search className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <CardTitle className="text-base">Benefits Document Search</CardTitle>
+                  <CardTitle className="text-base gradient-heading">Benefits Document Search</CardTitle>
                   <CardDescription className="text-xs">
                     Search through company benefits documents and policies
                   </CardDescription>
@@ -334,7 +334,7 @@ export default function ChatTab() {
                         date: "Updated Dec 2022"
                       },
                     ].map((doc, i) => (
-                      <div key={i} className="flex items-start border rounded-md p-3 hover:bg-muted/50 transition-colors">
+                      <div key={i} className="flex items-start border rounded-md p-3 hover:bg-muted/50 transition-colors gradient-border card-hover">
                         <div className="mr-3">
                           <div className="h-10 w-10 rounded bg-primary/10 flex items-center justify-center">
                             <FileText className="h-5 w-5 text-primary" />

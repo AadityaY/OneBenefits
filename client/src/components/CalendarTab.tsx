@@ -486,7 +486,7 @@ export default function CalendarTab() {
                   {eventsForSelectedDate
                     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
                     .map((event) => (
-                      <div key={event.id} className="relative border rounded-md p-3 hover:bg-muted/20">
+                      <div key={event.id} className="relative border rounded-md p-3 hover:bg-muted/20 gradient-border card-hover">
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="font-medium">{event.title}</h4>
