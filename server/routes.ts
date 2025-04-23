@@ -4,7 +4,7 @@ import multer from "multer";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
-import { setupAuth } from "./auth";
+import { setupAuth, isAdmin } from "./auth";
 import fs from "fs/promises";
 import path from "path";
 import { 
@@ -13,7 +13,8 @@ import {
   insertChatMessageSchema, 
   insertCalendarEventSchema,
   insertSurveyTemplateSchema,
-  insertSurveyQuestionSchema
+  insertSurveyQuestionSchema,
+  insertCompanySettingsSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ZodError } from "zod";
@@ -481,6 +482,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting calendar event:", error);
       res.status(500).json({ message: "Failed to delete calendar event" });
+    }
+  });
+
+  // Company settings routes
+  app.get("/api/company-settings", async (req: Request, res: Response) => {
+    try {
+      const settings = await storage.getCompanySettings();
+      if (settings) {
+        res.status(200).json(settings);
+      } else {
+        // Return default settings if none exist yet
+        res.status(200).json({
+          id: 0,
+          name: "Benefits Portal",
+          logo: null,
+          primaryColor: "#0f766e",
+          secondaryColor: "#0369a1",
+          accentColor: "#7c3aed",
+          website: null,
+          contactEmail: null,
+          address: null,
+          updatedAt: new Date()
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching company settings:", error);
+      res.status(500).json({ message: "Failed to fetch company settings" });
+    }
+  });
+  
+  app.patch("/api/company-settings", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const settingsData = req.body;
+      // Validate with Zod schema
+      const validatedData = insertCompanySettingsSchema.partial().parse(settingsData);
+      const settings = await storage.updateCompanySettings(validatedData);
+      res.status(200).json(settings);
+    } catch (error) {
+      console.error("Error updating company settings:", error);
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid settings data", errors: fromZodError(error).message });
+      }
+      
+      res.status(500).json({ message: "Failed to update company settings" });
     }
   });
 
