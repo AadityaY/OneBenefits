@@ -232,23 +232,23 @@ export default function SurveyTakingTab() {
         });
         return;
       }
-    
-    setSubmitting(true);
-    
-    // Format responses for submission
-    const formattedResponses = sortedQuestions.map(question => ({
-      questionId: question.id,
-      questionText: question.questionText,
-      questionType: question.questionType,
-      response: responses[question.id] || null
-    }));
-    
-    const surveyResponse = {
-      templateId: selectedTemplate.id,
-      responses: formattedResponses,
-    };
-    
-    submitResponseMutation.mutate(surveyResponse);
+      
+      setSubmitting(true);
+      
+      // Format responses for submission
+      const formattedResponses = sortedQuestions.map(question => ({
+        questionId: question.id,
+        questionText: question.questionText,
+        questionType: question.questionType,
+        response: responses[question.id] || null
+      }));
+      
+      const surveyResponse = {
+        templateId: selectedTemplate.id,
+        responses: formattedResponses,
+      };
+      
+      submitResponseMutation.mutate(surveyResponse);
     } catch (error) {
       console.error('Error during survey submission:', error);
       setSubmitting(false);
