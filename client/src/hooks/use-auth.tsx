@@ -70,6 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Login successful",
         description: `Welcome, ${userData.username}!`,
       });
+      
+      // Navigate to the appropriate dashboard based on user role
+      if (userData.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/dashboard";
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -95,6 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Registration successful",
         description: `Welcome, ${userData.username}!`,
       });
+      
+      // Navigate to the appropriate dashboard based on user role
+      if (userData.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/dashboard";
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -119,6 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Logged out",
         description: "You have been successfully logged out",
       });
+      
+      // Redirect to the login page
+      window.location.href = "/auth";
     },
     onError: (error: Error) => {
       toast({

@@ -25,22 +25,23 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function comparePasswords(supplied: string, stored: string): Promise<boolean> {
-  // For testing, we can use a simplified comparison for the pre-hashed passwords in storage
-  if (stored.includes('.')) {
-    // This is a pre-hashed password with salt from our initializer
-    // For the test users, we know the password is "password"
-    if (supplied === "password") {
-      return true;
-    }
-    return false;
+  // For initial testing users ONLY
+  // For the pre-defined user accounts, we'll just check if the password is "password" directly
+  // This is NOT secure for production - it's just for easy testing
+  if (stored === "password.hash" && supplied === "password") {
+    return true;
   }
   
-  // For actual hashed passwords (from registration)
+  // For actual registered users, use proper password hashing
   try {
-    const [hashed, salt] = stored.split(".");
-    const hashedBuf = Buffer.from(hashed, "hex");
-    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-    return timingSafeEqual(hashedBuf, suppliedBuf);
+    // Only do this for passwords created with proper hashing
+    if (stored.includes('.') && stored !== "password.hash") {
+      const [hashed, salt] = stored.split(".");
+      const hashedBuf = Buffer.from(hashed, "hex");
+      const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+      return timingSafeEqual(hashedBuf, suppliedBuf);
+    }
+    return false;
   } catch (error) {
     console.error("Password comparison error:", error);
     return false;

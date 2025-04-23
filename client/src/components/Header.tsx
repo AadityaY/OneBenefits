@@ -5,10 +5,16 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 export default function Header() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, logoutMutation } = useAuth();
   
   // Get the first letter of the username for the avatar
   const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
+  
+  // Handle logout
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    window.location.href = "/auth";
+  };
   
   return (
     <header className="bg-white border-b border-slate-200 py-4 px-6">
@@ -28,9 +34,17 @@ export default function Header() {
                 <Badge className="bg-primary">Admin</Badge>
               )}
             </div>
-            <Avatar className="h-9 w-9 bg-primary/10 text-primary">
-              <AvatarFallback>{userInitial}</AvatarFallback>
-            </Avatar>
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-9 w-9 bg-primary/10 text-primary">
+                <AvatarFallback>{userInitial}</AvatarFallback>
+              </Avatar>
+              <button 
+                onClick={handleLogout}
+                className="text-sm text-gray-500 hover:text-primary"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         )}
       </div>
