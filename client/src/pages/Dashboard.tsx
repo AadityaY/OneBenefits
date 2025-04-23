@@ -112,14 +112,16 @@ export default function Dashboard() {
                   Document Chat
                 </TabsTrigger>
                 
-                {/* User and Admin tabs */}
-                <TabsTrigger 
-                  value="calendar"
-                  className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
-                >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Calendar
-                </TabsTrigger>
+                {/* Admin only tab */}
+                {isAdmin && (
+                  <TabsTrigger 
+                    value="calendar"
+                    className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Calendar
+                  </TabsTrigger>
+                )}
               </TabsList>
             </div>
             
@@ -147,10 +149,12 @@ export default function Dashboard() {
               <ChatbotTab />
             </TabsContent>
             
-            {/* User and Admin tab content */}
-            <TabsContent value="calendar" className="p-6">
-              <CalendarTab />
-            </TabsContent>
+            {/* Admin only tab content */}
+            {isAdmin && (
+              <TabsContent value="calendar" className="p-6">
+                <CalendarTab />
+              </TabsContent>
+            )}
           </div>
         </Tabs>
       </main>
