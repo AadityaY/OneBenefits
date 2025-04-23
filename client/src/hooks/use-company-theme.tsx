@@ -1,59 +1,62 @@
 import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getQueryFn } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { getQueryFn } from "@/lib/queryClient";
 import { CompanySettings } from "@shared/schema";
 
-interface CompanyThemeContextType {
-  settings: CompanySettings | null;
+type CompanyThemeContextType = {
+  companySettings: CompanySettings | null;
   isLoading: boolean;
-  error: Error | null;
-}
+};
 
-const CompanyThemeContext = createContext<CompanyThemeContextType | null>(null);
+export const CompanyThemeContext = createContext<CompanyThemeContextType | null>(null);
 
 export function CompanyThemeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   
-  const companyId = user?.companyId; // Can be null for superadmin
+  // Only fetch company settings if user is logged in
+  const enabled = !!user;
+  const companyId = user?.companyId;
   
   const {
-    data: settings,
+    data: companySettings,
     isLoading,
-    error,
-  } = useQuery<CompanySettings | null, Error>({
+  } = useQuery<CompanySettings | null>({
     queryKey: ["/api/company-settings", companyId],
     queryFn: getQueryFn({ on401: "returnNull" }),
-    enabled: !!user, // Only fetch if user is logged in
+    enabled,
   });
 
-  // Apply theme to root element when settings change
+  // Apply theme colors when settings change
   useEffect(() => {
-    if (settings) {
-      const root = document.documentElement;
-      
+    if (companySettings) {
       // Apply primary color
-      if (settings.primaryColor) {
-        root.style.setProperty('--primary', settings.primaryColor);
-        root.style.setProperty('--primary-foreground', '#ffffff');
+      if (companySettings.primaryColor) {
+        document.documentElement.style.setProperty('--primary', companySettings.primaryColor);
+        document.documentElement.style.setProperty('--primary-foreground', '#ffffff'); // Assuming white text on primary color
       }
       
       // Apply secondary color
-      if (settings.secondaryColor) {
-        root.style.setProperty('--secondary', settings.secondaryColor);
-        root.style.setProperty('--secondary-foreground', '#ffffff');
+      if (companySettings.secondaryColor) {
+        document.documentElement.style.setProperty('--secondary', companySettings.secondaryColor);
+        document.documentElement.style.setProperty('--secondary-foreground', '#ffffff');
       }
       
       // Apply accent color
-      if (settings.accentColor) {
-        root.style.setProperty('--accent', settings.accentColor);
-        root.style.setProperty('--accent-foreground', '#ffffff');
+      if (companySettings.accentColor) {
+        document.documentElement.style.setProperty('--accent', companySettings.accentColor);
+        document.documentElement.style.setProperty('--accent-foreground', '#ffffff');
       }
     }
-  }, [settings]);
-  
+  }, [companySettings]);
+
   return (
-    <CompanyThemeContext.Provider value={{ settings, isLoading, error }}>
+    <CompanyThemeContext.Provider
+      value={{
+        companySettings: companySettings || null,
+        isLoading,
+      }}
+    >
       {children}
     </CompanyThemeContext.Provider>
   );

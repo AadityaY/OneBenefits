@@ -1,76 +1,120 @@
-import { useState } from "react";
-import { useCompanyTheme } from "@/hooks/use-company-theme";
-import { useAuth } from "@/hooks/use-auth";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCompanyTheme } from "@/hooks/use-company-theme";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { CompanySettings as CompanySettingsType } from "@shared/schema";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import type { CompanySettings as CompanySettingsType } from "@shared/schema";
+import { Loader2, Upload } from "lucide-react";
 
 export default function CompanySettings() {
-  const { settings, isLoading } = useCompanyTheme();
-  const { user } = useAuth();
+  const { companySettings, isLoading } = useCompanyTheme();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("general");
   
+  // Form state
   const [formData, setFormData] = useState<Partial<CompanySettingsType>>({
-    name: settings?.name || '',
-    primaryColor: settings?.primaryColor || '#0f766e',
-    secondaryColor: settings?.secondaryColor || '#0369a1',
-    accentColor: settings?.accentColor || '#7c3aed',
-    website: settings?.website || '',
-    contactEmail: settings?.contactEmail || '',
-    address: settings?.address || '',
+    name: companySettings?.name || "",
+    address: companySettings?.address || "",
+    contactEmail: companySettings?.contactEmail || "",
+    website: companySettings?.website || "",
+    primaryColor: companySettings?.primaryColor || "#4f46e5",
+    secondaryColor: companySettings?.secondaryColor || "#10b981",
+    accentColor: companySettings?.accentColor || "#f59e0b",
+    logo: companySettings?.logo || "",
   });
   
-  const [isSaving, setIsSaving] = useState(false);
+  // Update form data when settings load
+  useEffect(() => {
+    if (companySettings) {
+      setFormData({
+        name: companySettings.name,
+        address: companySettings.address || "",
+        contactEmail: companySettings.contactEmail || "",
+        website: companySettings.website || "",
+        primaryColor: companySettings.primaryColor || "#4f46e5",
+        secondaryColor: companySettings.secondaryColor || "#10b981",
+        accentColor: companySettings.accentColor || "#f59e0b",
+        logo: companySettings.logo || "",
+      });
+    }
+  }, [companySettings]);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle form input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Save settings mutation
+  const updateMutation = useMutation({
+    mutationFn: async (data: Partial<CompanySettingsType>) => {
+      const res = await apiRequest(
+        "PATCH", 
+        `/api/company-settings?companyId=${companySettings?.companyId}`, 
+        data
+      );
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/company-settings"] });
+      toast({
+        title: "Settings updated",
+        description: "Company settings have been successfully updated.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user?.companyId) {
-      toast({
-        title: "Error",
-        description: "Missing company information",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    try {
-      setIsSaving(true);
-      
-      await apiRequest('PATCH', '/api/company-settings', {
-        ...formData,
-        companyId: user.companyId
-      });
-      
-      // Invalidate company settings query to reload data
-      queryClient.invalidateQueries({ queryKey: ['/api/company-settings', user.companyId] });
-      
-      toast({
-        title: "Settings saved",
-        description: "Company settings have been updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error saving settings",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSaving(false);
-    }
+    updateMutation.mutate(formData);
   };
+  
+  // Handle logo upload
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, logo: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (!companySettings) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 className="text-2xl font-bold mb-4">Settings Not Found</h1>
+        <p className="text-muted-foreground mb-8 text-center">
+          Could not load company settings. Please try again later or contact support.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,172 +123,223 @@ export default function CompanySettings() {
       <main className="flex-1 container py-6">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">Company Settings</h1>
         
-        <Tabs defaultValue="general" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="contact">Contact Information</TabsTrigger>
+            <TabsTrigger value="branding">Branding & Theme</TabsTrigger>
+            <TabsTrigger value="contact">Contact Info</TabsTrigger>
           </TabsList>
           
-          {isLoading ? (
+          <form onSubmit={handleSubmit}>
             <Card>
-              <CardContent className="pt-6">
-                <div className="h-[400px] flex items-center justify-center">
-                  <p className="text-muted-foreground">Loading company settings...</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <TabsContent value="general">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>General Settings</CardTitle>
-                    <CardDescription>
-                      Configure basic company information
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Company Name</Label>
-                      <Input 
-                        id="name"
-                        name="name"
-                        value={formData.name || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="website">Website</Label>
-                      <Input 
-                        id="website"
-                        name="website"
-                        value={formData.website || ''}
-                        onChange={handleInputChange}
-                        placeholder="https://example.com"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+              <TabsContent value="general" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>General Settings</CardTitle>
+                  <CardDescription>
+                    Basic company information and configuration
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Company Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter company name"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      name="address"
+                      value={formData.address || ""}
+                      onChange={handleChange}
+                      placeholder="Enter company address"
+                    />
+                  </div>
+                </CardContent>
               </TabsContent>
               
-              <TabsContent value="appearance">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
-                    <CardDescription>
-                      Customize the look and feel of your employee portal
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
+              <TabsContent value="branding" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>Branding & Theme</CardTitle>
+                  <CardDescription>
+                    Customize the look and feel of your company portal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="logo">Company Logo</Label>
+                    <div className="flex items-start space-x-4 mt-2">
+                      {formData.logo && (
+                        <div className="rounded-md overflow-hidden w-24 h-24 flex items-center justify-center border">
+                          <img
+                            src={formData.logo}
+                            alt="Company logo"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <Input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                        />
+                        <Label
+                          htmlFor="logo-upload"
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium bg-white hover:bg-gray-50 cursor-pointer"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Logo
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Recommended size: 256x256px. PNG or JPG format.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                    <div>
                       <Label htmlFor="primaryColor">Primary Color</Label>
-                      <div className="flex items-center gap-2">
-                        <Input 
+                      <div className="flex mt-1">
+                        <Input
                           id="primaryColor"
                           name="primaryColor"
-                          value={formData.primaryColor || ''}
-                          onChange={handleInputChange}
+                          type="color"
+                          value={formData.primaryColor || "#4f46e5"}
+                          onChange={handleChange}
+                          className="w-12 h-10 p-1"
                         />
-                        <input 
-                          type="color" 
-                          value={formData.primaryColor || '#0f766e'} 
-                          onChange={(e) => setFormData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                          className="w-10 h-10 rounded border"
+                        <Input
+                          name="primaryColor"
+                          value={formData.primaryColor || "#4f46e5"}
+                          onChange={handleChange}
+                          className="ml-2 flex-1"
                         />
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div>
                       <Label htmlFor="secondaryColor">Secondary Color</Label>
-                      <div className="flex items-center gap-2">
-                        <Input 
+                      <div className="flex mt-1">
+                        <Input
                           id="secondaryColor"
                           name="secondaryColor"
-                          value={formData.secondaryColor || ''}
-                          onChange={handleInputChange}
+                          type="color"
+                          value={formData.secondaryColor || "#10b981"}
+                          onChange={handleChange}
+                          className="w-12 h-10 p-1"
                         />
-                        <input 
-                          type="color" 
-                          value={formData.secondaryColor || '#0369a1'} 
-                          onChange={(e) => setFormData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                          className="w-10 h-10 rounded border"
+                        <Input
+                          name="secondaryColor"
+                          value={formData.secondaryColor || "#10b981"}
+                          onChange={handleChange}
+                          className="ml-2 flex-1"
                         />
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div>
                       <Label htmlFor="accentColor">Accent Color</Label>
-                      <div className="flex items-center gap-2">
-                        <Input 
+                      <div className="flex mt-1">
+                        <Input
                           id="accentColor"
                           name="accentColor"
-                          value={formData.accentColor || ''}
-                          onChange={handleInputChange}
+                          type="color"
+                          value={formData.accentColor || "#f59e0b"}
+                          onChange={handleChange}
+                          className="w-12 h-10 p-1"
                         />
-                        <input 
-                          type="color" 
-                          value={formData.accentColor || '#7c3aed'} 
-                          onChange={(e) => setFormData(prev => ({ ...prev, accentColor: e.target.value }))}
-                          className="w-10 h-10 rounded border"
+                        <Input
+                          name="accentColor"
+                          value={formData.accentColor || "#f59e0b"}
+                          onChange={handleChange}
+                          className="ml-2 flex-1"
                         />
                       </div>
                     </div>
-                    
-                    <Separator className="my-4" />
-                    
-                    <div className="space-y-2">
-                      <Label>Logo</Label>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Logo upload functionality will be implemented in the future.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="contact">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Contact Information</CardTitle>
-                    <CardDescription>
-                      Set contact information for your company
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="contactEmail">Contact Email</Label>
-                      <Input 
-                        id="contactEmail"
-                        name="contactEmail"
-                        value={formData.contactEmail || ''}
-                        onChange={handleInputChange}
-                        placeholder="contact@example.com"
+                  </div>
+                  
+                  <div className="mt-6 pt-4 border-t">
+                    <h3 className="font-medium mb-2">Theme Preview</h3>
+                    <div className="flex space-x-3">
+                      <div 
+                        className="h-12 w-12 rounded-md"
+                        style={{ backgroundColor: formData.primaryColor || "#4f46e5" }}
+                      />
+                      <div 
+                        className="h-12 w-12 rounded-md"
+                        style={{ backgroundColor: formData.secondaryColor || "#10b981" }}
+                      />
+                      <div 
+                        className="h-12 w-12 rounded-md"
+                        style={{ backgroundColor: formData.accentColor || "#f59e0b" }}
                       />
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Address</Label>
-                      <Input 
-                        id="address"
-                        name="address"
-                        value={formData.address || ''}
-                        onChange={handleInputChange}
-                        placeholder="Company address"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </CardContent>
               </TabsContent>
               
-              <div className="mt-6 flex justify-end">
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save Settings"}
+              <TabsContent value="contact" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                  <CardDescription>
+                    Contact details for your company
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="contactEmail">Contact Email</Label>
+                    <Input
+                      id="contactEmail"
+                      name="contactEmail"
+                      type="email"
+                      value={formData.contactEmail || ""}
+                      onChange={handleChange}
+                      placeholder="contact@example.com"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      name="website"
+                      value={formData.website || ""}
+                      onChange={handleChange}
+                      placeholder="https://www.example.com"
+                    />
+                  </div>
+                </CardContent>
+              </TabsContent>
+              
+              <div className="flex justify-end p-6 pt-2 border-t">
+                <Button 
+                  type="submit" 
+                  disabled={updateMutation.isPending}
+                  className="w-full md:w-auto"
+                >
+                  {updateMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
                 </Button>
               </div>
-            </form>
-          )}
+            </Card>
+          </form>
         </Tabs>
       </main>
     </div>

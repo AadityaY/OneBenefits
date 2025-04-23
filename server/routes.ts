@@ -457,12 +457,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Company settings routes
-  app.get("/api/company-settings", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
+  app.get("/api/company-settings", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const companyId = parseInt(req.query.companyId as string);
+      // For superadmins, allow fetching company settings without a specific companyId
+      const isSuperAdmin = req.user && req.user.role === 'superadmin';
+      let companyId = req.query.companyId ? parseInt(req.query.companyId as string) : null;
       
-      if (!companyId) {
+      // If no companyId specified, use user's companyId (except for superadmin)
+      if (!companyId && req.user && req.user.companyId && !isSuperAdmin) {
+        companyId = req.user.companyId;
+      }
+      
+      // Superadmins can get a default company setting without specifying companyId
+      // Other users must provide a companyId or have one associated with their account
+      if (!companyId && !isSuperAdmin) {
         return res.status(400).json({ message: "Missing company ID" });
+      }
+      
+      // For superadmin without companyId, get the first company's settings
+      if (isSuperAdmin && !companyId) {
+        // Get the first company in the system
+        const companies = await storage.getCompanies();
+        if (companies && companies.length > 0) {
+          companyId = companies[0].id;
+        }
+      }
+      
+      // Now we should have a companyId one way or another
+      if (!companyId) {
+        return res.status(404).json({ message: "No companies found" });
+      }
+      
+      // Ensure the user has access to the requested company
+      if (!isSuperAdmin && req.user && req.user.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied to this company's settings" });
       }
       
       const settings = await storage.getCompanySettings(companyId);
