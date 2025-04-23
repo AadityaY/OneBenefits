@@ -97,6 +97,7 @@ export type CalendarEvent = typeof calendarEvents.$inferSelect;
 // Survey question template schema
 export const surveyQuestions = pgTable("survey_questions", {
   id: serial("id").primaryKey(),
+  templateId: integer("template_id"),
   questionText: text("question_text").notNull(),
   questionType: text("question_type").notNull(),
   required: boolean("required").default(false).notNull(),

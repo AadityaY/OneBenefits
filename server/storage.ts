@@ -38,6 +38,7 @@ export interface IStorage {
   // Survey Question methods
   createSurveyQuestion(question: InsertSurveyQuestion): Promise<SurveyQuestion>;
   getSurveyQuestions(): Promise<SurveyQuestion[]>;
+  getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]>;
   getSurveyQuestion(id: number): Promise<SurveyQuestion | undefined>;
   updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion | undefined>;
   deleteSurveyQuestion(id: number): Promise<boolean>;
@@ -292,6 +293,7 @@ export class MemStorage implements IStorage {
         // Create questions for the template
         const questions: InsertSurveyQuestion[] = [
           {
+            templateId: template.id,
             questionText: "How satisfied are you with the current health insurance options?",
             questionType: "radio",
             required: true,
@@ -300,6 +302,7 @@ export class MemStorage implements IStorage {
             active: true
           },
           {
+            templateId: template.id,
             questionText: "Which of the following benefits are most important to you? (Select up to 3)",
             questionType: "checkbox",
             required: true,
@@ -308,6 +311,7 @@ export class MemStorage implements IStorage {
             active: true
           },
           {
+            templateId: template.id,
             questionText: "How well do you understand your current benefits package?",
             questionType: "select",
             required: true,
@@ -316,6 +320,7 @@ export class MemStorage implements IStorage {
             active: true
           },
           {
+            templateId: template.id,
             questionText: "Do you have any suggestions for improving our benefits program?",
             questionType: "textarea",
             required: false,
@@ -324,6 +329,7 @@ export class MemStorage implements IStorage {
             active: true
           },
           {
+            templateId: template.id,
             questionText: "Would you be interested in attending a benefits information session?",
             questionType: "radio",
             required: true,
@@ -393,6 +399,12 @@ export class MemStorage implements IStorage {
   
   async getSurveyQuestions(): Promise<SurveyQuestion[]> {
     return Array.from(this.surveyQuestions.values())
+      .sort((a, b) => a.order - b.order); // Sort by order
+  }
+  
+  async getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]> {
+    return Array.from(this.surveyQuestions.values())
+      .filter(question => question.templateId === templateId)
       .sort((a, b) => a.order - b.order); // Sort by order
   }
   
