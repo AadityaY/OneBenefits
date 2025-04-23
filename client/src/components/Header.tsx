@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Image } from "@/components/ui/image";
+
 
 export default function Header() {
   const { user, isAdmin, logoutMutation } = useAuth();
@@ -24,8 +24,16 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/">
           <span className="text-xl font-semibold text-primary flex items-center cursor-pointer">
-            <HardHat className="mr-2" />
-            Benefits Portal
+            {logo ? (
+              <img 
+                src={logo} 
+                alt={`${name} Logo`} 
+                className="h-8 w-auto mr-2 object-contain" 
+              />
+            ) : (
+              <HardHat className="mr-2" />
+            )}
+            {name || "Benefits Portal"}
           </span>
         </Link>
         
