@@ -272,6 +272,9 @@ export default function SurveyAdminTab() {
   // Create a new survey question
   const createQuestionMutation = useMutation({
     mutationFn: async (question: z.infer<typeof questionSchema>) => {
+      // Additional debug logging
+      console.log('Question submission received:', JSON.stringify(question));
+
       // Convert options string to array if provided
       const processedQuestion = {
         ...question,
@@ -286,12 +289,19 @@ export default function SurveyAdminTab() {
       
       console.log('Creating question with data:', JSON.stringify(processedQuestion));
       
-      const res = await apiRequest(
-        "POST", 
-        `/api/survey-questions`, 
-        processedQuestion
-      );
-      return res.json();
+      try {
+        const res = await apiRequest(
+          "POST", 
+          `/api/survey-questions`, 
+          processedQuestion
+        );
+        const data = await res.json();
+        console.log('Question creation response:', data);
+        return data;
+      } catch (error) {
+        console.error('Error in question creation:', error);
+        throw error;
+      }
     },
     onSuccess: (createdQuestion) => {
       console.log('Question created successfully:', createdQuestion);
@@ -732,8 +742,15 @@ export default function SurveyAdminTab() {
                         )}
                       />
                       
-                      <SheetFooter>
-                        <Button type="submit" disabled={createQuestionMutation.isPending}>
+                      <div className="flex justify-end mt-6">
+                        <Button 
+                          type="submit" 
+                          disabled={createQuestionMutation.isPending}
+                          onClick={(e) => {
+                            console.log('Submit button clicked');
+                            // Let the form handle the submission
+                          }}
+                        >
                           {createQuestionMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -743,7 +760,7 @@ export default function SurveyAdminTab() {
                             "Add Question"
                           )}
                         </Button>
-                      </SheetFooter>
+                      </div>
                     </form>
                   </Form>
                 </SheetContent>
