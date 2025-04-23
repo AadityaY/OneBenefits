@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import AuthPage from "@/pages/auth-page";
 import CompanySettings from "@/pages/CompanySettings";
+import DocumentViewerPage from "@/pages/DocumentViewerPage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -106,6 +107,14 @@ function Router() {
         <Route path="/admin/company-settings">
           {user && (user.role === "admin" || user.role === "superadmin") ? 
             <CompanySettings /> : <Redirect to="/auth" />}
+        </Route>
+        
+        {/* Document Viewer Page */}
+        <Route path="/documents/:id">
+          {user ? <DocumentViewerPage /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/documents">
+          {user ? <DocumentViewerPage /> : <Redirect to="/auth" />}
         </Route>
         
         {/* Login/Registration page */}
