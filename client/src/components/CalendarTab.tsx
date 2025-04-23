@@ -283,10 +283,10 @@ export default function CalendarTab() {
   }
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold">Events Calendar</h2>
+          <h2 className="text-2xl font-semibold gradient-heading">Events Calendar</h2>
           <p className="text-muted-foreground">
             View and manage company events, holidays, and important dates
           </p>
@@ -297,19 +297,30 @@ export default function CalendarTab() {
             variant="outline" 
             size="sm"
             onClick={() => setViewMode("month")}
-            className={viewMode === "month" ? "bg-primary/10" : ""}
+            className={cn(
+              "hover-lift transition-all", 
+              viewMode === "month" ? "bg-primary/10 border-primary" : ""
+            )}
           >
+            <CalendarIcon className="h-4 w-4 mr-2" />
             Month View
           </Button>
           <Button 
             variant="outline" 
             size="sm"
             onClick={() => setViewMode("day")}
-            className={viewMode === "day" ? "bg-primary/10" : ""}
+            className={cn(
+              "hover-lift transition-all", 
+              viewMode === "day" ? "bg-primary/10 border-primary" : ""
+            )}
           >
+            <Clock className="h-4 w-4 mr-2" />
             Day View
           </Button>
-          <Button onClick={() => handleCreateEvent()}>
+          <Button 
+            onClick={() => handleCreateEvent()}
+            className="animated-gradient-bg hover-lift text-background"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Event
           </Button>
@@ -474,7 +485,7 @@ export default function CalendarTab() {
                   </p>
                   <Button 
                     onClick={() => handleCreateEvent(selectedDate)}
-                    variant="outline"
+                    className="animated-gradient-bg hover-lift text-background"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Event
@@ -559,7 +570,7 @@ export default function CalendarTab() {
                     <div className="pt-4 text-center">
                       <Button 
                         onClick={() => handleCreateEvent(selectedDate)}
-                        variant="outline"
+                        className="animated-gradient-bg hover-lift text-background"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Event
