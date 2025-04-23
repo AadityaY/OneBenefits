@@ -8,11 +8,12 @@ import {
   surveyQuestions, type SurveyQuestion, type InsertSurveyQuestion,
   templateQuestions, type TemplateQuestion, type InsertTemplateQuestion,
   companies, type Company, type InsertCompany,
-  companySettings, type CompanySettings, type InsertCompanySettings
+  companySettings, type CompanySettings, type InsertCompanySettings,
+  notifications, type Notification, type InsertNotification
 } from "@shared/schema";
 
 import { db } from "./db";
-import { eq, and, isNull, inArray, sql } from "drizzle-orm";
+import { eq, and, isNull, inArray, sql, or, desc, count } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
 import { pool } from "./db";

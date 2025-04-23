@@ -612,6 +612,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notification routes
+  
+  // Get user notifications
+  app.get("/api/notifications", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const notifications = await storage.getUserNotifications(userId, companyId);
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Get company-wide notifications (admin only)
+  app.get("/api/company-notifications", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const notifications = await storage.getCompanyNotifications(companyId);
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Get unread notification count
+  app.get("/api/notifications/unread-count", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const count = await storage.getUnreadNotificationCount(userId, companyId);
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Mark notification as read
+  app.patch("/api/notifications/:id/read", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      const success = await storage.markNotificationAsRead(id, userId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found or you don't have permission" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Mark all notifications as read
+  app.patch("/api/notifications/read-all", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const success = await storage.markAllUserNotificationsAsRead(userId, companyId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Create notification (admin only)
+  app.post("/api/notifications", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const notificationData = {
+        ...req.body,
+        companyId
+      };
+      
+      const notification = await storage.createNotification(notificationData);
+      res.status(201).json(notification);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+  
+  // Delete notification (admin only)
+  app.delete("/api/notifications/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const companyId = req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User does not have a company" });
+      }
+      
+      const success = await storage.deleteNotification(id, companyId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+      
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Create and return HTTP server
   const httpServer = createServer(app);
   return httpServer;
