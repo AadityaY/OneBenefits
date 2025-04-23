@@ -346,7 +346,7 @@ export default function SurveyTakingTab() {
                 />
               )}
               
-              {currentQuestion.questionType === "multichoice" && currentQuestion.options && (
+              {currentQuestion.questionType === "radio" && currentQuestion.options && (
                 <RadioGroup
                   value={responses[currentQuestion.id] || ""}
                   onValueChange={(value) => handleResponseChange(currentQuestion.id, value)}

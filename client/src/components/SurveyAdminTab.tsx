@@ -319,11 +319,11 @@ export default function SurveyAdminTab() {
   
   // Handle form submission for new question
   const handleAddQuestion = (data: z.infer<typeof questionSchema>) => {
-    // If the question type is multichoice or select, ensure options are provided
-    if ((data.questionType === "multichoice" || data.questionType === "select") && (!data.options || data.options.trim() === "")) {
+    // If the question type is radio or select, ensure options are provided
+    if ((data.questionType === "radio" || data.questionType === "select") && (!data.options || data.options.trim() === "")) {
       questionForm.setError("options", {
         type: "manual",
-        message: "Options are required for multichoice or select questions",
+        message: "Options are required for radio or select questions",
       });
       return;
     }
@@ -554,7 +554,7 @@ export default function SurveyAdminTab() {
                                 <SelectItem value="textarea">Long Text</SelectItem>
                                 <SelectItem value="number">Number</SelectItem>
                                 <SelectItem value="select">Dropdown Selection</SelectItem>
-                                <SelectItem value="multichoice">Multiple Choice</SelectItem>
+                                <SelectItem value="radio">Multiple Choice</SelectItem>
                                 <SelectItem value="checkbox">Checkboxes</SelectItem>
                                 <SelectItem value="scale">Rating Scale (1-5)</SelectItem>
                                 <SelectItem value="date">Date</SelectItem>
@@ -568,7 +568,7 @@ export default function SurveyAdminTab() {
                         )}
                       />
                       
-                      {(questionType === "select" || questionType === "multichoice" || questionType === "checkbox") && (
+                      {(questionType === "select" || questionType === "radio" || questionType === "checkbox") && (
                         <FormField
                           control={questionForm.control}
                           name="options"
@@ -824,7 +824,7 @@ export default function SurveyAdminTab() {
                   <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
                   <p className="text-sm text-muted-foreground mt-1">{selectedTemplate.description}</p>
                 </div>
-                <Badge variant={selectedTemplate.status === "published" ? "success" : "secondary"}>
+                <Badge variant={selectedTemplate.status === "published" ? "secondary" : "secondary"}>
                   {selectedTemplate.status === "published" ? "Published" : "Draft"}
                 </Badge>
               </div>
@@ -868,7 +868,7 @@ export default function SurveyAdminTab() {
                         </div>
                       </CardHeader>
                       {(question.questionType === "select" || 
-                        question.questionType === "multichoice" || 
+                        question.questionType === "radio" || 
                         question.questionType === "checkbox") && question.options && (
                         <CardContent className="pb-2">
                           <div className="text-sm text-muted-foreground">
@@ -909,7 +909,7 @@ export default function SurveyAdminTab() {
                   <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
                   <p className="text-sm text-muted-foreground mt-1">{selectedTemplate.description}</p>
                 </div>
-                <Badge variant={selectedTemplate.status === "published" ? "success" : "secondary"}>
+                <Badge variant={selectedTemplate.status === "published" ? "secondary" : "secondary"}>
                   {selectedTemplate.status === "published" ? "Published" : "Draft"}
                 </Badge>
               </div>
@@ -968,7 +968,7 @@ export default function SurveyAdminTab() {
                               <Input type="date" className="mt-2" />
                             )}
                             
-                            {question.questionType === "multichoice" && question.options && (
+                            {question.questionType === "radio" && question.options && (
                               <div className="space-y-2 mt-2">
                                 {question.options.split('\n').map((option, i) => (
                                   <div key={i} className="flex items-center space-x-2">
