@@ -116,7 +116,7 @@ export default function SurveyAdminTab() {
     options: z.string().optional(),
     templateId: z.number(),
     order: z.number(),
-    isRequired: z.boolean(),
+    required: z.boolean(),
   });
   
   // Create a form for new questions
@@ -771,7 +771,7 @@ export default function SurveyAdminTab() {
                   
                   <FormField
                     control={templateForm.control}
-                    name="isPublished"
+                    name="status"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                         <div className="space-y-0.5">
@@ -781,10 +781,18 @@ export default function SurveyAdminTab() {
                           </FormDescription>
                         </div>
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger className="w-[120px]">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="draft">Draft</SelectItem>
+                              <SelectItem value="published">Published</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItem>
                     )}
