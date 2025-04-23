@@ -953,7 +953,8 @@ export default function SurveyAdminTab() {
         </TabsContent>
         
         <TabsContent value="questions" className="space-y-4">
-          {selectedTemplate && (
+          {selectedTemplate ? (
+            // Template-specific view
             <div>
               <div className="flex justify-between items-center border-b pb-4">
                 <div>
@@ -965,20 +966,18 @@ export default function SurveyAdminTab() {
                 </Badge>
               </div>
               
-              {activeTab === "questions" && (
-                <div className="flex items-center justify-between mb-4 mt-6">
-                  <div>
-                    <h3 className="text-lg font-semibold">Template Questions</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Manage questions for this template
-                    </p>
-                  </div>
-                  <Button variant="outline" onClick={() => setIsAddingQuestion(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Question
-                  </Button>
+              <div className="flex items-center justify-between mb-4 mt-6">
+                <div>
+                  <h3 className="text-lg font-semibold">Template Questions</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage questions for this template
+                  </p>
                 </div>
-              )}
+                <Button variant="outline" onClick={() => setIsAddingQuestion(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Question
+                </Button>
+              </div>
               
               {(loadingTemplateQuestions || loadingAllQuestions) ? (
                 <div className="py-12 flex justify-center">
@@ -1108,6 +1107,96 @@ export default function SurveyAdminTab() {
                     </div>
                   )}
                 </div>
+              )}
+            </div>
+          ) : (
+            // Standalone question management when no template is selected
+            <div>
+              <div className="flex justify-between items-center border-b pb-4">
+                <div>
+                  <h2 className="text-xl font-semibold">Question Bank</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Create and manage questions that can be added to any survey template
+                  </p>
+                </div>
+                <Button variant="outline" onClick={() => setIsAddingQuestion(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Question
+                </Button>
+              </div>
+              
+              {loadingAllQuestions ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2 text-lg">Loading questions...</span>
+                </div>
+              ) : (
+                <>
+                  {allQuestions && allQuestions.length > 0 ? (
+                    <div className="space-y-3 mt-4">
+                      {allQuestions.map((question) => (
+                        <Card key={question.id}>
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start">
+                              <CardTitle className="text-base">{question.questionText}</CardTitle>
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="outline" className="capitalize">
+                                  {question.questionType}
+                                </Badge>
+                                {question.required && (
+                                  <Badge variant="secondary">Required</Badge>
+                                )}
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => {
+                                      deleteQuestionMutation.mutate(question.id);
+                                    }}>
+                                      <Trash className="h-4 w-4 mr-2" />
+                                      Delete Question
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pb-2">
+                            {(question.questionType === 'radio' || question.questionType === 'select' || question.questionType === 'checkbox') && question.options && (
+                              <div className="mt-2">
+                                <p className="text-sm text-muted-foreground mb-1">Options:</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {getOptionsArray(question.options).map((option, i) => (
+                                    <div key={i} className="text-sm border rounded p-1.5 bg-muted/50">
+                                      {option}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border rounded-lg p-8 text-center mt-4">
+                      <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-lg font-medium mb-2">No Questions Created</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Create your first survey question to get started.
+                      </p>
+                      <Button onClick={() => setIsAddingQuestion(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create First Question
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
