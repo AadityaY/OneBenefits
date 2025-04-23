@@ -11,8 +11,30 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { CompanyThemeProvider } from "@/hooks/use-company-theme";
+import { Header } from "@/components/Header";
+import { Sidebar } from "@/components/Sidebar";
 
 // Router with role-based redirects
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const [location] = useLocation();
+  
+  // Don't show the layout on auth page
+  if (location === '/auth') {
+    return <>{children}</>;
+  }
+  
+  return (
+    <div className="min-h-screen bg-background">
+      {user && <Sidebar />}
+      <div className="flex flex-col md:ml-64">
+        {user && <Header />}
+        <main className="flex-1 p-4">{children}</main>
+      </div>
+    </div>
+  );
+}
+
 function Router() {
   const { user } = useAuth();
   const [location] = useLocation();
@@ -34,22 +56,24 @@ function Router() {
   }
   
   return (
-    <Switch>      
-      {/* Dashboard is protected and requires login */}
-      <ProtectedRoute path="/dashboard" component={Dashboard} />
-      
-      {/* Admin dashboard - only for admins and superadmins */}
-      <ProtectedRoute path="/admin" component={Dashboard} roles={["admin", "superadmin"]} />
-      
-      {/* Company Settings - only for admins and superadmins */}
-      <ProtectedRoute path="/company-settings" component={CompanySettings} roles={["admin", "superadmin"]} />
-      
-      {/* Login/Registration page */}
-      <Route path="/auth" component={AuthPage} />
-      
-      {/* 404 Page */}
-      <Route component={NotFound} />
-    </Switch>
+    <AppLayout>
+      <Switch>
+        {/* Dashboard is protected and requires login */}
+        <ProtectedRoute path="/dashboard" component={Dashboard} />
+        
+        {/* Admin dashboard - only for admins and superadmins */}
+        <ProtectedRoute path="/admin" component={Dashboard} roles={["admin", "superadmin"]} />
+        
+        {/* Company Settings - only for admins and superadmins */}
+        <ProtectedRoute path="/company-settings" component={CompanySettings} roles={["admin", "superadmin"]} />
+        
+        {/* Login/Registration page */}
+        <Route path="/auth" component={AuthPage} />
+        
+        {/* 404 Page */}
+        <Route component={NotFound} />
+      </Switch>
+    </AppLayout>
   );
 }
 
