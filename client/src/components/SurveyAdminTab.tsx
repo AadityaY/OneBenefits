@@ -573,7 +573,7 @@ export default function SurveyAdminTab() {
                       <SelectValue placeholder="All templates" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All templates</SelectItem>
+                      <SelectItem value="all">All templates</SelectItem>
                       {templatesQuery.data?.map(template => (
                         <SelectItem key={template.id} value={template.id.toString()}>
                           {template.title}
