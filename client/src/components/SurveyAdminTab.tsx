@@ -316,19 +316,8 @@ export default function SurveyAdminTab() {
         description: "Survey question has been added successfully.",
       });
       
-      // If a template is selected, automatically add the question to the template
-      if (selectedTemplate && createdQuestion?.id) {
-        // Calculate next order number
-        const nextOrder = templateQuestions && templateQuestions.length > 0
-          ? Math.max(...templateQuestions.map(q => q.order)) + 1
-          : 1;
-        
-        addQuestionToTemplateMutation.mutate({
-          templateId: selectedTemplate.id,
-          questionId: createdQuestion.id,
-          order: nextOrder
-        });
-      }
+      // Note: We've removed the automatic addition of questions to templates
+      // Questions are now created independently and can be added to templates later
     },
     onError: (error: Error) => {
       console.error('Error creating question:', error);
@@ -519,7 +508,7 @@ export default function SurveyAdminTab() {
         <div className="flex justify-between items-center">
           <TabsList>
             <TabsTrigger value="templates">Templates</TabsTrigger>
-            <TabsTrigger value="questions" disabled={!selectedTemplate}>
+            <TabsTrigger value="questions">
               Questions
             </TabsTrigger>
             <TabsTrigger value="preview" disabled={!selectedTemplate}>
@@ -631,7 +620,7 @@ export default function SurveyAdminTab() {
               </Dialog>
             )}
             
-            {activeTab === "questions" && selectedTemplate && (
+            {activeTab === "questions" && (
               <Sheet open={isAddingQuestion} onOpenChange={setIsAddingQuestion}>
                 <SheetTrigger asChild>
                   <Button>
@@ -643,7 +632,9 @@ export default function SurveyAdminTab() {
                   <SheetHeader>
                     <SheetTitle>Add Survey Question</SheetTitle>
                     <SheetDescription>
-                      Add a new question to the "{selectedTemplate.title}" survey template.
+                      {selectedTemplate 
+                        ? `Add a new question to the "${selectedTemplate.title}" survey template.`
+                        : "Create a new survey question that can be added to any template."}
                     </SheetDescription>
                   </SheetHeader>
                   
