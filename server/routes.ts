@@ -4,6 +4,7 @@ import multer from "multer";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
+import { setupAuth } from "./auth";
 import fs from "fs/promises";
 import path from "path";
 import { 
@@ -19,6 +20,8 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
   // Document endpoints
   app.post("/api/documents", upload.array("documents"), async (req: Request, res: Response) => {
     try {
