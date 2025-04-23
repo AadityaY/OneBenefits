@@ -68,27 +68,29 @@ function calculateResponseRate(responses: SurveyResponse[], templateId: number):
   const templateResponses = responses.filter(r => r.templateId === templateId);
   // In a real app, you'd compare to the total number of eligible respondents
   // For demo purposes, we'll assume a fixed number of 100 eligible respondents
-  return (templateResponses.length / 100) * 100;
+  const eligibleRespondents = 100;
+  return (templateResponses.length / eligibleRespondents) * 100;
 }
 
 function getResponsesByQuestionId(responses: SurveyResponse[], questionId: number): any[] {
   // Extract responses for a specific question from all survey responses
-  // In a real app with structured data, this would extract the relevant data
-  // For demo purposes, we'll generate dummy data
   const responseData: Record<string, number> = {};
   
-  // Sample calculation logic - adapt based on your actual data structure
+  // Process each survey response
   responses.forEach(response => {
-    const questionResponse = response.responses?.find(r => r.questionId === questionId);
-    if (questionResponse) {
-      const value = Array.isArray(questionResponse.response) 
-        ? questionResponse.response.join(', ') 
-        : questionResponse.response;
-      
-      if (responseData[value]) {
-        responseData[value]++;
-      } else {
-        responseData[value] = 1;
+    // Ensure response.responses is an array before trying to use find
+    if (Array.isArray(response.responses)) {
+      const questionResponse = response.responses.find(r => r.questionId === questionId);
+      if (questionResponse) {
+        const value = Array.isArray(questionResponse.response) 
+          ? questionResponse.response.join(', ') 
+          : String(questionResponse.response || '');
+        
+        if (responseData[value]) {
+          responseData[value]++;
+        } else {
+          responseData[value] = 1;
+        }
       }
     }
   });

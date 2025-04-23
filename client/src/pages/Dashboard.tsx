@@ -4,10 +4,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DocumentList from "@/components/DocumentList";
 import SurveyAdminTab from "@/components/SurveyAdminTab";
+import SurveyResponseTab from "@/components/SurveyResponseTab";
+import SurveyAnalyticsTab from "@/components/SurveyAnalyticsTab";
 import ChatbotTab from "@/components/ChatbotTab";
 import CalendarTab from "@/components/CalendarTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, MessageSquare, Calendar } from "lucide-react";
+import { FileText, MessageSquare, Calendar, BarChart, ClipboardEdit, FileSpreadsheet } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getDocuments } from "@/lib/documentApi";
 
@@ -46,8 +48,22 @@ export default function Dashboard() {
                   value="survey" 
                   className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
                 >
-                  <FileText className="h-4 w-4 mr-2" />
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
                   Survey Admin
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="surveyResponse"
+                  className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
+                >
+                  <ClipboardEdit className="h-4 w-4 mr-2" />
+                  Take Survey
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="surveyAnalytics"
+                  className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
+                >
+                  <BarChart className="h-4 w-4 mr-2" />
+                  Analytics
                 </TabsTrigger>
                 <TabsTrigger 
                   value="chatbot"
@@ -61,13 +77,21 @@ export default function Dashboard() {
                   className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Engagement Calendar
+                  Calendar
                 </TabsTrigger>
               </TabsList>
             </div>
             
             <TabsContent value="survey" className="p-6">
               <SurveyAdminTab />
+            </TabsContent>
+            
+            <TabsContent value="surveyResponse" className="p-6">
+              <SurveyResponseTab />
+            </TabsContent>
+            
+            <TabsContent value="surveyAnalytics" className="p-6">
+              <SurveyAnalyticsTab />
             </TabsContent>
             
             <TabsContent value="chatbot" className="p-6">
