@@ -25,8 +25,14 @@ import {
 } from "lucide-react";
 import { ChatMessage } from "@shared/schema";
 
-const AI_AVATAR_URL = "https://ui-avatars.com/api/?name=AI&background=6c5ce7&color=fff";
-const USER_AVATAR_URL = "https://ui-avatars.com/api/?name=You&background=0984e3&color=fff";
+// Using fun, colorful AI and human avatars from dicebear API
+const AI_AVATAR_URL = "https://api.dicebear.com/7.x/bottts/svg?seed=Aneka&backgroundColor=b388ff";
+const USER_AVATARS = [
+  "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+  "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", 
+  "https://api.dicebear.com/7.x/avataaars/svg?seed=Bailey",
+  "https://api.dicebear.com/7.x/avataaars/svg?seed=Mia"
+];
 
 export default function ChatTab() {
   const { user } = useAuth();

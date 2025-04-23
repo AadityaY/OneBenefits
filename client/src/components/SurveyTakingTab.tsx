@@ -517,61 +517,142 @@ export default function SurveyTakingTab() {
   }
   
   // Render survey selection list
+  // Avatar images for visual appeal - these are from an open API that generates avatars
+  const avatarImages = [
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Bailey",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Chloe",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Mia",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe"
+  ];
+  
+  // Hero illustration backgrounds for cards
+  const cardBackgrounds = [
+    "https://api.dicebear.com/7.x/shapes/svg?seed=survey1&backgroundColor=edf2ff",
+    "https://api.dicebear.com/7.x/shapes/svg?seed=survey2&backgroundColor=fff0f6",
+    "https://api.dicebear.com/7.x/shapes/svg?seed=survey3&backgroundColor=f3f0ff",
+    "https://api.dicebear.com/7.x/shapes/svg?seed=survey4&backgroundColor=e6fcf5"
+  ];
+  
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Available Surveys</h2>
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold gradient-heading">Available Surveys</h2>
+          <p className="text-muted-foreground mt-1">Complete surveys to help us improve your benefits experience</p>
+        </div>
+        
+        <div className="flex -space-x-3">
+          {avatarImages.slice(0, 4).map((avatar, i) => (
+            <div key={i} className="w-10 h-10 rounded-full border-2 border-background overflow-hidden">
+              <img src={avatar} alt="Team member avatar" />
+            </div>
+          ))}
+          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium border-2 border-background">
+            +12
+          </div>
+        </div>
       </div>
       
       {templates && templates.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-          {templates.map((template) => (
-            <Card key={template.id} className="overflow-hidden card-hover gradient-border">
-              <CardHeader>
-                <CardTitle className="flex justify-between items-start">
-                  <span>{template.title}</span>
-                  <Badge variant="outline">
-                    <FileText className="h-3 w-3 mr-1" />
-                    Survey
-                  </Badge>
-                </CardTitle>
-                <CardDescription>{template.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="pb-0">
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <CalendarClock className="h-3 w-3 mr-1" />
-                  <span>Created: {new Date(template.createdAt).toLocaleDateString()}</span>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+          {templates.map((template, index) => {
+            // Get a consistent background and avatar for each template
+            const bgIndex = template.id % cardBackgrounds.length;
+            const cardBg = cardBackgrounds[bgIndex];
+            
+            return (
+              <Card key={template.id} className="overflow-hidden card-hover border-gradient relative">
+                {/* Decorative gradient circle */}
+                <div className="absolute top-0 right-0 h-32 w-32 opacity-20 -mt-10 -mr-10 rounded-full bg-gradient-to-br from-secondary via-primary to-accent z-0" />
+                
+                <div className="absolute right-0 top-0 h-24 w-24 opacity-10">
+                  <img src={cardBg} alt="" className="object-cover" />
                 </div>
                 
-                {previousResponses?.some(r => r.templateId === template.id) && (
-                  <div className="mt-3 flex items-center p-2 rounded bg-green-50 text-green-700 text-sm">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    <span>You've already completed this survey</span>
+                <CardHeader className="pb-2 relative z-10">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-xl mb-1 gradient-text">{template.title}</CardTitle>
+                    <Badge variant={previousResponses?.some(r => r.templateId === template.id) ? "secondary" : "default"}>
+                      {previousResponses?.some(r => r.templateId === template.id) ? (
+                        <>
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Completed
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-3 w-3 mr-1" />
+                          New
+                        </>
+                      )}
+                    </Badge>
                   </div>
-                )}
-              </CardContent>
-              <CardFooter className="p-4 pt-4">
-                <Button 
-                  className="w-full"
-                  onClick={() => handleStartSurvey(template)}
-                  disabled={loadingPreviousResponses}
-                >
-                  {previousResponses?.some(r => r.templateId === template.id)
-                    ? "View Responses" 
-                    : "Start Survey"}
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                  <CardDescription className="line-clamp-2">{template.description}</CardDescription>
+                </CardHeader>
+                
+                <CardContent className="pb-2 relative z-10">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <CalendarClock className="h-3 w-3 mr-1" />
+                      <span>Added {new Date(template.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    
+                    <div className="flex -space-x-2">
+                      {[0, 1, 2].map((i) => (
+                        <img 
+                          key={i} 
+                          src={avatarImages[(i + bgIndex) % avatarImages.length]}
+                          alt="User avatar" 
+                          className="w-7 h-7 rounded-full border-2 border-background" 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {previousResponses?.some(r => r.templateId === template.id) && (
+                    <div className="mt-3 flex items-center p-2 rounded bg-green-50 text-green-700 text-sm">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <span>You've already completed this survey</span>
+                    </div>
+                  )}
+                </CardContent>
+                
+                <CardFooter className="p-4 pt-2 relative z-10">
+                  <Button 
+                    className="w-full group"
+                    variant={previousResponses?.some(r => r.templateId === template.id) ? "outline" : "default"}
+                    onClick={() => handleStartSurvey(template)}
+                    disabled={loadingPreviousResponses}
+                  >
+                    <span>
+                      {previousResponses?.some(r => r.templateId === template.id)
+                        ? "View Your Responses" 
+                        : "Start Survey"}
+                    </span>
+                    <ChevronRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       ) : (
-        <div className="border rounded-lg p-8 text-center">
-          <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-medium mb-2">No Surveys Available</h3>
-          <p className="text-muted-foreground">
+        <div className="border rounded-lg p-12 text-center glass-effect">
+          <div className="mx-auto mb-6 w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+            <ClipboardCheck className="h-12 w-12 text-primary" />
+          </div>
+          <h3 className="text-xl font-medium mb-2 gradient-text">No Surveys Available</h3>
+          <p className="text-muted-foreground max-w-md mx-auto">
             There are no surveys available for you to take at this time. Please check back later.
           </p>
+          <div className="mt-8 flex justify-center">
+            {avatarImages.slice(0, 3).map((avatar, i) => (
+              <div key={i} className="w-12 h-12 rounded-full border-2 border-background -ml-2 first:ml-0 overflow-hidden">
+                <img src={avatar} alt="Team member avatar" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
