@@ -10,6 +10,7 @@ import CompanySettings from "@/pages/CompanySettings";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { CompanyThemeProvider } from "@/hooks/use-company-theme";
 
 // Router redirects to /auth by default
 function Router() {
@@ -45,10 +46,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light">
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <CompanyThemeProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </CompanyThemeProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

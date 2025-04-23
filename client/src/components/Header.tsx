@@ -1,11 +1,14 @@
 import { HardHat, User } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Image } from "@/components/ui/image";
 
 export default function Header() {
   const { user, isAdmin, logoutMutation } = useAuth();
+  const { name, logo } = useCompanyTheme();
   
   // Get the first letter of the username for the avatar
   const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";

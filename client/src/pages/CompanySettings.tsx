@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, PaintBucket } from "lucide-react";
+import { Loader2, PaintBucket, ArrowLeft } from "lucide-react";
 
 // Extend the schema for validation
 const formSchema = z.object({
@@ -158,7 +158,17 @@ export default function CompanySettings() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Company Settings</h1>
+      <div className="flex items-center gap-4 mb-8">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => window.history.back()}
+          aria-label="Back to Dashboard"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-3xl font-bold">Company Settings</h1>
+      </div>
       
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
