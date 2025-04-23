@@ -45,19 +45,27 @@ export const insertDocumentSchema = createInsertSchema(documents).omit({
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;
 
+// Define a response item schema to store individual question responses
+export const surveyResponseItem = z.object({
+  questionId: z.number(),
+  questionText: z.string(),
+  questionType: z.string(),
+  response: z.union([z.string(), z.array(z.string())])
+});
+
+export type SurveyResponseItem = z.infer<typeof surveyResponseItem>;
+
 export const surveyResponses = pgTable("survey_responses", {
   id: serial("id").primaryKey(),
-  healthSatisfaction: text("health_satisfaction"),
-  importantBenefits: text("important_benefits").array(),
-  benefitsUnderstanding: text("benefits_understanding"),
-  benefitsSuggestions: text("benefits_suggestions"),
-  infoSession: text("info_session"),
+  templateId: integer("template_id").notNull(),
+  responses: jsonb("responses").notNull(),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
 });
 
-export const insertSurveyResponseSchema = createInsertSchema(surveyResponses).omit({
-  id: true,
-  submittedAt: true
+// Create a schema that allows a more flexible response structure
+export const insertSurveyResponseSchema = z.object({
+  templateId: z.number(),
+  responses: z.array(surveyResponseItem)
 });
 
 export type InsertSurveyResponse = z.infer<typeof insertSurveyResponseSchema>;
