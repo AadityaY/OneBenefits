@@ -330,19 +330,19 @@ export default function CalendarTab() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Calendar Section */}
         <Card className={cn(
-          "col-span-1", 
+          "col-span-1 frost-glass shadow-md", 
           viewMode === "month" ? "lg:col-span-3" : "lg:col-span-2"
         )}>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 border-b bg-background/70">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Button variant="ghost" size="sm" onClick={previousMonth}>
+                <Button variant="ghost" size="sm" onClick={previousMonth} className="hover-lift">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="px-2 font-medium">
+                <h3 className="px-2 font-medium gradient-heading text-lg">
                   {format(currentMonth, "MMMM yyyy")}
                 </h3>
-                <Button variant="ghost" size="sm" onClick={nextMonth}>
+                <Button variant="ghost" size="sm" onClick={nextMonth} className="hover-lift">
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -350,7 +350,7 @@ export default function CalendarTab() {
                 const today = new Date();
                 setCurrentMonth(today);
                 setSelectedDate(today);
-              }}>
+              }} className="hover-lift">
                 Today
               </Button>
             </div>
@@ -463,9 +463,9 @@ export default function CalendarTab() {
         
         {/* Daily Events Section - Only show in Day View */}
         {viewMode === "day" && (
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="text-base">
+          <Card className="col-span-1 frost-glass shadow-md">
+            <CardHeader className="border-b bg-background/70">
+              <CardTitle className="gradient-heading text-xl">
                 {selectedDate 
                   ? format(selectedDate, "MMMM d, yyyy") 
                   : "Select a date"}
@@ -497,10 +497,10 @@ export default function CalendarTab() {
                   {eventsForSelectedDate
                     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
                     .map((event) => (
-                      <div key={event.id} className="relative border rounded-md p-3 hover:bg-muted/20 gradient-border card-hover">
+                      <div key={event.id} className="relative border rounded-md p-3 hover:bg-muted/20 gradient-border card-hover frost-glass">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium">{event.title}</h4>
+                            <h4 className="font-medium gradient-heading text-base">{event.title}</h4>
                             <div className="flex items-center text-sm text-muted-foreground mt-1">
                               <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />
                               <span>
@@ -585,9 +585,9 @@ export default function CalendarTab() {
       
       {/* Event Creation/Editing Dialog */}
       <Dialog open={createEventOpen} onOpenChange={setCreateEventOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="sm:max-w-[500px] frost-glass">
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="gradient-heading text-xl">
               {editEventId ? "Edit Event" : "Create New Event"}
             </DialogTitle>
             <DialogDescription>
@@ -778,8 +778,8 @@ export default function CalendarTab() {
                           className={cn(
                             "flex items-center px-3 py-1.5 rounded-full border cursor-pointer",
                             field.value === category.value
-                              ? "ring-2 ring-primary bg-primary/5"
-                              : "hover:bg-muted/30"
+                              ? "ring-2 ring-primary bg-primary/5 frost-glass"
+                              : "hover:bg-muted/30 hover-lift"
                           )}
                           onClick={() => field.onChange(category.value)}
                         >
@@ -801,9 +801,9 @@ export default function CalendarTab() {
                 control={form.control}
                 name="allDay"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between space-x-2 space-y-0 rounded-md border p-3">
+                  <FormItem className="flex flex-row items-center justify-between space-x-2 space-y-0 rounded-md border p-3 frost-glass">
                     <div className="space-y-0.5">
-                      <FormLabel>All Day Event</FormLabel>
+                      <FormLabel className="gradient-heading text-base">All Day Event</FormLabel>
                       <FormDescription>
                         Event will be scheduled for the entire day
                       </FormDescription>
@@ -812,13 +812,13 @@ export default function CalendarTab() {
                       <div 
                         className={cn(
                           "h-6 w-11 rounded-full relative cursor-pointer transition-colors",
-                          field.value ? "bg-primary" : "bg-muted"
+                          field.value ? "animated-gradient-bg" : "bg-muted"
                         )}
                         onClick={() => field.onChange(!field.value)}
                       >
                         <div 
                           className={cn(
-                            "h-5 w-5 rounded-full bg-white absolute top-[2px] transition-transform",
+                            "h-5 w-5 rounded-full bg-white absolute top-[2px] transition-transform shadow-md",
                             field.value ? "translate-x-[22px]" : "translate-x-[2px]"
                           )} 
                         />
@@ -833,12 +833,14 @@ export default function CalendarTab() {
                   variant="outline" 
                   type="button"
                   onClick={() => setCreateEventOpen(false)}
+                  className="hover-lift"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit"
                   disabled={createEventMutation.isPending || updateEventMutation.isPending}
+                  className="animated-gradient-bg hover-lift text-background"
                 >
                   {(createEventMutation.isPending || updateEventMutation.isPending) ? (
                     <>
