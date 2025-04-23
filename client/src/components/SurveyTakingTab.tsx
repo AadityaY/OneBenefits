@@ -282,7 +282,7 @@ export default function SurveyTakingTab() {
         
         {/* Current Question */}
         {currentQuestion && (
-          <Card className="border shadow-sm">
+          <Card className="border shadow-sm card-hover">
             <CardHeader className="pb-3">
               <div className="flex items-start space-x-4">
                 <span className="flex-none w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
@@ -480,7 +480,7 @@ export default function SurveyTakingTab() {
       {templates && templates.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
           {templates.map((template) => (
-            <Card key={template.id} className="overflow-hidden">
+            <Card key={template.id} className="overflow-hidden card-hover gradient-border">
               <CardHeader>
                 <CardTitle className="flex justify-between items-start">
                   <span>{template.title}</span>

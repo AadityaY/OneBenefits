@@ -32,7 +32,7 @@ export default function Dashboard() {
       <Header />
       
       <main className="flex-1 container py-6">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 gradient-heading">
           {showAdminTabs ? "Administration Dashboard" : "Employee Dashboard"}
         </h1>
         
