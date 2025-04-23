@@ -6,7 +6,14 @@ import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
 import fs from "fs/promises";
 import path from "path";
-import { insertDocumentSchema, insertSurveyResponseSchema, insertChatMessageSchema, insertCalendarEventSchema } from "@shared/schema";
+import { 
+  insertDocumentSchema, 
+  insertSurveyResponseSchema, 
+  insertChatMessageSchema, 
+  insertCalendarEventSchema,
+  insertSurveyTemplateSchema,
+  insertSurveyQuestionSchema
+} from "@shared/schema";
 import { z } from "zod";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";

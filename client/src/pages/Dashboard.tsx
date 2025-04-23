@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DocumentList from "@/components/DocumentList";
-import SurveyTab from "@/components/SurveyTab";
+import SurveyAdminTab from "@/components/SurveyAdminTab";
 import ChatbotTab from "@/components/ChatbotTab";
 import CalendarTab from "@/components/CalendarTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -47,7 +47,7 @@ export default function Dashboard() {
                   className="flex items-center data-[state=active]:border-primary data-[state=active]:text-primary border-b-2 border-transparent px-6 py-4 rounded-none"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Benefits Survey
+                  Survey Admin
                 </TabsTrigger>
                 <TabsTrigger 
                   value="chatbot"
@@ -67,7 +67,7 @@ export default function Dashboard() {
             </div>
             
             <TabsContent value="survey" className="p-6">
-              <SurveyTab />
+              <SurveyAdminTab />
             </TabsContent>
             
             <TabsContent value="chatbot" className="p-6">
