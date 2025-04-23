@@ -39,9 +39,7 @@ export default function PDFViewer({ fileUrl, title, description, onClose }: PDFV
   
   // Create plugins
   const thumbnailPluginInstance = thumbnailPlugin();
-  const defaultLayoutPluginInstance = defaultLayoutPlugin({
-    thumbnailPlugin: thumbnailPluginInstance,
-  });
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
   
   // Mock document details
   const documentDetails: DocumentDetails = {
@@ -206,6 +204,7 @@ export default function PDFViewer({ fileUrl, title, description, onClose }: PDFV
                   fileUrl={fileUrl}
                   plugins={[defaultLayoutPluginInstance]}
                   defaultScale={SpecialZoomLevel.PageFit}
+                  className="customized-viewer"
                 />
               </div>
             </Worker>

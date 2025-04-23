@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   LogOut,
-  UserCircle
+  UserCircle,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -51,6 +52,7 @@ export function Sidebar() {
         { title: "Take Survey", href: "/take-survey" },
         { title: "Benefits Chat", href: "/chat" },
         { title: "Calendar", href: "/calendar" },
+        { title: "Benefits Documents", href: "/documents" },
         { title: "Content", href: "/content" },
       ]
     },
@@ -165,7 +167,8 @@ export function Sidebar() {
                           <div 
                             className={cn(
                               "block p-2 rounded-md hover-lift cursor-pointer",
-                              location === subItem.href 
+                              (location === subItem.href || 
+                               (subItem.href === "/documents" && location.startsWith("/documents/"))) 
                                 ? "bg-primary/10 text-primary gradient-border" 
                                 : "hover:bg-muted/50"
                             )}

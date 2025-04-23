@@ -18,7 +18,7 @@ type DocumentItem = {
 };
 
 export default function DocumentViewerPage() {
-  const [_, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
 
   // Sample document data
@@ -85,7 +85,7 @@ export default function DocumentViewerPage() {
   // If a document is selected, show the PDF viewer
   if (selectedDocument) {
     return (
-      <div className="w-full h-screen">
+      <div className="w-full h-[calc(100vh-64px)] absolute inset-0 mt-16 z-10 bg-background">
         <PDFViewer
           fileUrl="/samples/benefits-guide.pdf"
           title={selectedDocument.title}
