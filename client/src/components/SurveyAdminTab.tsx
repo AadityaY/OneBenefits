@@ -131,9 +131,8 @@ export default function SurveyAdminTab() {
     questionText: z.string().min(5, { message: "Question text must be at least 5 characters" }),
     questionType: questionTypeEnum,
     options: z.string().optional(),
-    templateId: z.number(),
-    order: z.number(),
-    required: z.boolean(),
+    required: z.boolean().default(false),
+    companyId: z.number().optional(), // Will be set on the server
   });
 
   // Create a form for new questions
@@ -144,8 +143,8 @@ export default function SurveyAdminTab() {
       questionType: "text",
       options: "",
       required: true,
-      order: 0,
-      templateId: 0,
+      companyId: companyId || undefined,
+      order: 1,
     },
   });
 
