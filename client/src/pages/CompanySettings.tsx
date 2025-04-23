@@ -5,13 +5,14 @@ import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { CompanySettings as CompanySettingsType } from "@shared/schema";
+import { NotificationManagement } from "@/components/NotificationManagement";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, BellRing } from "lucide-react";
 
 export default function CompanySettings() {
   const { companySettings, isLoading } = useCompanyTheme();
@@ -128,6 +129,12 @@ export default function CompanySettings() {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="branding">Branding & Theme</TabsTrigger>
             <TabsTrigger value="contact">Contact Info</TabsTrigger>
+            <TabsTrigger value="notifications">
+              <div className="flex items-center gap-1">
+                <BellRing className="h-4 w-4" />
+                <span>Notifications</span>
+              </div>
+            </TabsTrigger>
           </TabsList>
           
           <form onSubmit={handleSubmit}>
@@ -320,6 +327,10 @@ export default function CompanySettings() {
                     />
                   </div>
                 </CardContent>
+              </TabsContent>
+              
+              <TabsContent value="notifications" className="p-0">
+                <NotificationManagement />
               </TabsContent>
               
               <div className="flex justify-end p-6 pt-2 border-t">
