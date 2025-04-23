@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   BarChart,
@@ -118,7 +119,7 @@ export default function AnalyticsTab() {
           question.questionType === 'select' || 
           question.questionType === 'checkbox') {
         
-        const options = question.options ? getOptionsArray(question.options)('\n') : [];
+        const options = question.options ? getOptionsArray(question.options) : [];
         const optionCounts: Record<string, number> = {};
         
         // Initialize counts
