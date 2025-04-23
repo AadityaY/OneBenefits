@@ -51,7 +51,8 @@ import {
   BarChart,
   CalendarCheck,
   ClipboardCheck,
-  FileText
+  FileText,
+  Check
 } from "lucide-react";
 import { 
   SurveyTemplate as SurveyTemplateType, 
@@ -125,6 +126,9 @@ export default function SurveyAdminTab() {
       companyId: companyId || 0,
     },
   });
+  
+  // Keep track of selected questions during template creation/editing
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<number[]>([]);
 
   // Create a form schema for survey questions
   const questionSchema = insertSurveyQuestionSchema.extend({
@@ -355,8 +359,42 @@ export default function SurveyAdminTab() {
   });
 
   // Handle form submission for new template
-  const handleCreateTemplate = (data: z.infer<typeof templateSchema>) => {
-    createTemplateMutation.mutate(data);
+  const handleCreateTemplate = async (data: z.infer<typeof templateSchema>) => {
+    try {
+      // First create the template
+      const templateResponse = await createTemplateMutation.mutateAsync(data);
+      
+      // Then add selected questions to the template if any are selected
+      if (selectedQuestionIds.length > 0) {
+        // Add each selected question to the newly created template
+        for (let i = 0; i < selectedQuestionIds.length; i++) {
+          await addQuestionToTemplateMutation.mutateAsync({
+            templateId: templateResponse.id, 
+            questionId: selectedQuestionIds[i],
+            order: i + 1
+          });
+        }
+      }
+      
+      // Reset selected questions
+      setSelectedQuestionIds([]);
+      
+      // Provide success feedback
+      toast({
+        title: "Template created",
+        description: `Survey template created with ${selectedQuestionIds.length} questions.`,
+      });
+      
+      // Close the dialog
+      setIsCreatingTemplate(false);
+      templateForm.reset();
+    } catch (error) {
+      toast({
+        title: "Error creating template",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   // Add an existing question to a template
@@ -601,6 +639,88 @@ export default function SurveyAdminTab() {
                           </FormItem>
                         )}
                       />
+                      
+                      {/* Questions Selection Section */}
+                      <div className="space-y-4 mt-6">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-medium">Select Questions</h3>
+                          <Badge variant="outline">{selectedQuestionIds.length} selected</Badge>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground">
+                          Select questions from your question bank to include in this template.
+                          You can also add questions later.
+                        </p>
+                        
+                        {loadingAllQuestions ? (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                            <span className="ml-2">Loading questions...</span>
+                          </div>
+                        ) : allQuestions && allQuestions.length > 0 ? (
+                          <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2">
+                            {allQuestions.map(question => (
+                              <div 
+                                key={question.id} 
+                                className={`border rounded-md p-3 transition-colors cursor-pointer ${
+                                  selectedQuestionIds.includes(question.id) 
+                                    ? 'border-primary bg-primary/5' 
+                                    : 'hover:bg-accent'
+                                }`}
+                                onClick={() => {
+                                  if (selectedQuestionIds.includes(question.id)) {
+                                    setSelectedQuestionIds(selectedQuestionIds.filter(id => id !== question.id));
+                                  } else {
+                                    setSelectedQuestionIds([...selectedQuestionIds, question.id]);
+                                  }
+                                }}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${
+                                        selectedQuestionIds.includes(question.id) 
+                                          ? 'bg-primary border-primary text-primary-foreground' 
+                                          : 'border-input'
+                                      }`}>
+                                        {selectedQuestionIds.includes(question.id) && <Check className="h-3 w-3" />}
+                                      </div>
+                                      <h4 className="font-medium text-sm">{question.questionText}</h4>
+                                    </div>
+                                    <div className="flex gap-2 mt-2">
+                                      <Badge variant="outline" className="text-xs capitalize">
+                                        {question.questionType}
+                                      </Badge>
+                                      {question.required && (
+                                        <Badge variant="secondary" className="text-xs">Required</Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {(question.questionType === 'radio' || 
+                                  question.questionType === 'select' || 
+                                  question.questionType === 'checkbox') && 
+                                 question.options && (
+                                  <div className="mt-2 text-xs text-muted-foreground">
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {getOptionsArray(question.options).map((option, i) => (
+                                        <span key={i} className="px-2 py-1 bg-muted rounded text-xs">
+                                          {option}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-6 border rounded-md">
+                            <p className="text-muted-foreground">No questions available. Create questions first.</p>
+                          </div>
+                        )}
+                      </div>
                       
                       <DialogFooter>
                         <Button type="submit" disabled={createTemplateMutation.isPending}>
