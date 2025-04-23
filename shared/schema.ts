@@ -14,24 +14,37 @@ export const questionTypeEnum = z.enum([
 export type QuestionType = z.infer<typeof questionTypeEnum>;
 
 // Define roles enum
-export const userRoleEnum = z.enum(["user", "admin"]);
+export const userRoleEnum = z.enum(["user", "admin", "superadmin"]);
 export type UserRole = z.infer<typeof userRoleEnum>;
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  companyId: integer("company_id").references(() => companies.id),
   role: text("role").notNull().default("user"),
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users)
   .pick({
     username: true,
     password: true,
+    email: true,
+    firstName: true,
+    lastName: true,
+    companyId: true,
     role: true,
+    active: true,
   })
   .extend({
     role: userRoleEnum.default("user"),
+    active: z.boolean().default(true),
   });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -39,6 +52,7 @@ export type User = typeof users.$inferSelect;
 
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
   fileName: text("file_name").notNull(),
   originalName: text("original_name").notNull(),
   mimeType: text("mime_type").notNull(),
@@ -67,6 +81,8 @@ export type SurveyResponseItem = z.infer<typeof surveyResponseItem>;
 
 export const surveyResponses = pgTable("survey_responses", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   templateId: integer("template_id").notNull(),
   responses: jsonb("responses").notNull(),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
@@ -83,6 +99,8 @@ export type SurveyResponse = typeof surveyResponses.$inferSelect;
 
 export const chatMessages = pgTable("chat_messages", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   role: text("role").notNull(),
   content: text("content").notNull(),
   timestamp: timestamp("timestamp").defaultNow().notNull(),
@@ -98,6 +116,7 @@ export type ChatMessage = typeof chatMessages.$inferSelect;
 
 export const calendarEvents = pgTable("calendar_events", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
   title: text("title").notNull(),
   description: text("description"),
   eventDate: timestamp("event_date").notNull(),
@@ -138,6 +157,7 @@ export type SurveyQuestion = typeof surveyQuestions.$inferSelect;
 // Survey template schema
 export const surveyTemplates = pgTable("survey_templates", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("draft"),
@@ -156,9 +176,28 @@ export const insertSurveyTemplateSchema = createInsertSchema(surveyTemplates).om
 export type InsertSurveyTemplate = z.infer<typeof insertSurveyTemplateSchema>;
 export type SurveyTemplate = typeof surveyTemplates.$inferSelect;
 
+// Companies table to track all tenant companies
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertCompanySchema = createInsertSchema(companies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertCompany = z.infer<typeof insertCompanySchema>;
+export type Company = typeof companies.$inferSelect;
+
 // Company settings schema
 export const companySettings = pgTable("company_settings", {
   id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
   name: text("name").notNull(),
   logo: text("logo"),
   primaryColor: text("primary_color").default("#0f766e"),
