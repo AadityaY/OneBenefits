@@ -9,7 +9,7 @@ import SurveyAnalyticsTab from "@/components/SurveyAnalyticsTab";
 import ChatbotTab from "@/components/ChatbotTab";
 import CalendarTab from "@/components/CalendarTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, MessageSquare, Calendar, BarChart, ClipboardEdit, FileSpreadsheet, LogOut } from "lucide-react";
+import { FileText, MessageSquare, Calendar, BarChart, ClipboardEdit, FileSpreadsheet, LogOut, Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getDocuments } from "@/lib/documentApi";
 import { useAuth } from "@/hooks/use-auth";
@@ -55,14 +55,26 @@ export default function Dashboard() {
               {isAdmin && <Badge className="ml-2 bg-primary">Admin</Badge>}
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            Log Out
-          </Button>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => setLocation('/company-settings')}
+              >
+                <Settings className="h-4 w-4" />
+                Company Settings
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Log Out
+            </Button>
+          </div>
         </div>
 
         {/* Document list only shown to admins */}

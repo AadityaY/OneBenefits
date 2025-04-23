@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,13 +31,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, PaintBucket } from "lucide-react";
 
 // Extend the schema for validation
-const formSchema = insertCompanySettingsSchema
-  .omit({ id: true, updatedAt: true })
-  .extend({
-    website: z.string().url("Please enter a valid URL").nullable().optional(),
-    contactEmail: z.string().email("Please enter a valid email").nullable().optional(),
-  })
-  .partial();
+const formSchema = z.object({
+  name: z.string().min(1, "Company name is required"),
+  logo: z.string().url("Please enter a valid URL").nullable().optional(),
+  primaryColor: z.string().min(1, "Primary color is required"),
+  secondaryColor: z.string().min(1, "Secondary color is required"),
+  accentColor: z.string().min(1, "Accent color is required"),
+  website: z.string().url("Please enter a valid URL").nullable().optional(),
+  contactEmail: z.string().email("Please enter a valid email").nullable().optional(),
+  address: z.string().nullable().optional(),
+});
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -91,7 +94,7 @@ export default function CompanySettings() {
   });
 
   // When settings data is loaded, update form values
-  useState(() => {
+  useEffect(() => {
     if (settings) {
       form.reset({
         name: settings.name || "Benefits Portal",
@@ -104,7 +107,7 @@ export default function CompanySettings() {
         address: settings.address,
       });
     }
-  });
+  }, [settings, form]);
 
   const onSubmit = (values: FormValues) => {
     updateMutation.mutate(values);

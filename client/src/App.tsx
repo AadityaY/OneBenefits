@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import AuthPage from "@/pages/auth-page";
+import CompanySettings from "@/pages/CompanySettings";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -26,6 +27,9 @@ function Router() {
       
       {/* Admin dashboard - same component but with adminOnly flag */}
       <ProtectedRoute path="/admin" component={Dashboard} adminOnly={true} />
+      
+      {/* Company Settings - admin only */}
+      <ProtectedRoute path="/company-settings" component={CompanySettings} adminOnly={true} />
       
       {/* Login/Registration page */}
       <Route path="/auth" component={AuthPage} />
