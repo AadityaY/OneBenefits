@@ -20,7 +20,8 @@ import {
   AlertCircle,
   RefreshCw,
   MessageCircle,
-  User as UserIcon
+  User as UserIcon,
+  FileText
 } from "lucide-react";
 import { ChatMessage } from "@shared/schema";
 
