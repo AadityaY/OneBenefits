@@ -8,29 +8,41 @@ import Dashboard from "@/pages/Dashboard";
 import AuthPage from "@/pages/auth-page";
 import CompanySettings from "@/pages/CompanySettings";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { CompanyThemeProvider } from "@/hooks/use-company-theme";
 
-// Router redirects to /auth by default
+// Router with role-based redirects
 function Router() {
+  const { user } = useAuth();
   const [location] = useLocation();
   
+  // Handle root route redirects based on user role
+  if (location === '/') {
+    // If user is logged in, redirect to appropriate dashboard
+    if (user) {
+      const isAdmin = user.role === "admin" || user.role === "superadmin";
+      if (isAdmin) {
+        return <Redirect to="/admin" />;
+      } else {
+        return <Redirect to="/dashboard" />;
+      }
+    } else {
+      // If not logged in, redirect to auth page
+      return <Redirect to="/auth" />;
+    }
+  }
+  
   return (
-    <Switch>
-      {/* Default route redirects to auth */}
-      <Route path="/">
-        <Redirect to="/auth" />
-      </Route>
-      
+    <Switch>      
       {/* Dashboard is protected and requires login */}
       <ProtectedRoute path="/dashboard" component={Dashboard} />
       
-      {/* Admin dashboard - same component but with adminOnly flag */}
-      <ProtectedRoute path="/admin" component={Dashboard} adminOnly={true} />
+      {/* Admin dashboard - only for admins and superadmins */}
+      <ProtectedRoute path="/admin" component={Dashboard} roles={["admin", "superadmin"]} />
       
-      {/* Company Settings - admin only */}
-      <ProtectedRoute path="/company-settings" component={CompanySettings} adminOnly={true} />
+      {/* Company Settings - only for admins and superadmins */}
+      <ProtectedRoute path="/company-settings" component={CompanySettings} roles={["admin", "superadmin"]} />
       
       {/* Login/Registration page */}
       <Route path="/auth" component={AuthPage} />

@@ -1,62 +1,134 @@
-import { HardHat, User } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, Settings, User } from "lucide-react";
 
-
-export default function Header() {
-  const { user, isAdmin, logoutMutation } = useAuth();
-  const { name, logo } = useCompanyTheme();
+export function Header() {
+  const { user, logoutMutation } = useAuth();
+  const { settings } = useCompanyTheme();
   
-  // Get the first letter of the username for the avatar
-  const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
+  // Determine if user is admin or superadmin
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   
-  // Handle logout
-  const handleLogout = () => {
-    logoutMutation.mutate();
-    window.location.href = "/auth";
+  // Get initials for avatar
+  const getInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    return user?.username?.substring(0, 2).toUpperCase() || "U";
   };
   
   return (
-    <header className="bg-white border-b border-slate-200 py-4 px-6">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/">
-          <span className="text-xl font-semibold text-primary flex items-center cursor-pointer">
-            {logo ? (
-              <img 
-                src={logo} 
-                alt={`${name} Logo`} 
-                className="h-8 w-auto mr-2 object-contain" 
-              />
-            ) : (
-              <HardHat className="mr-2" />
-            )}
-            {name || "Benefits Portal"}
-          </span>
-        </Link>
-        
-        {user && (
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center">
-              <span className="text-sm mr-2">{user.username}</span>
-              {isAdmin && (
-                <Badge className="bg-primary">Admin</Badge>
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between py-4">
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <Link href="/dashboard">
+            <div className="flex items-center gap-2 cursor-pointer">
+              {settings?.logo ? (
+                <img 
+                  src={settings.logo} 
+                  alt={`${settings.name} logo`} 
+                  className="h-8"
+                />
+              ) : (
+                <div className="text-primary font-bold text-2xl">
+                  {settings?.name || "Employee Engage"}
+                </div>
               )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Avatar className="h-9 w-9 bg-primary/10 text-primary">
-                <AvatarFallback>{userInitial}</AvatarFallback>
-              </Avatar>
-              <button 
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-primary"
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex items-center gap-4">
+          {user && (
+            <>
+              <Link href="/dashboard">
+                <Button variant="ghost" className="text-sm">
+                  Dashboard
+                </Button>
+              </Link>
+              
+              {isAdmin && (
+                <Link href="/admin">
+                  <Button variant="ghost" className="text-sm">
+                    Admin
+                  </Button>
+                </Link>
+              )}
+              
+              {isAdmin && (
+                <Link href="/company-settings">
+                  <Button variant="ghost" className="text-sm">
+                    Settings
+                  </Button>
+                </Link>
+              )}
+            </>
+          )}
+        </nav>
+
+        {/* User Menu */}
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="relative h-10 w-10 rounded-full"
               >
-                Logout
-              </button>
-            </div>
-          </div>
+                <Avatar>
+                  <AvatarFallback>{getInitials()}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                <div className="font-medium">
+                  {user.firstName && user.lastName ? 
+                    `${user.firstName} ${user.lastName}` : 
+                    user.username}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              {isAdmin && (
+                <Link href="/company-settings">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Company Settings</span>
+                  </DropdownMenuItem>
+                </Link>
+              )}
+              <DropdownMenuItem
+                className="cursor-pointer text-destructive focus:text-destructive"
+                onClick={() => logoutMutation.mutate()}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link href="/auth">
+            <Button>Sign In</Button>
+          </Link>
         )}
       </div>
     </header>
