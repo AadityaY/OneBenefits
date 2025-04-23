@@ -3,35 +3,11 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Header } from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Creating simple fallback components if the actual tab components don't exist
-const SurveyAdminTab = () => {
-  return <div className="p-4 border rounded-lg">
-    <h2 className="text-xl font-semibold mb-4">Survey Administration</h2>
-    <p>This panel will allow administrators to create and manage survey templates and questions.</p>
-  </div>;
-};
-
-const SurveyTakingTab = () => {
-  return <div className="p-4 border rounded-lg">
-    <h2 className="text-xl font-semibold mb-4">Take Survey</h2>
-    <p>Available surveys for completion will appear here.</p>
-  </div>;
-};
-
-const AnalyticsTab = () => {
-  return <div className="p-4 border rounded-lg">
-    <h2 className="text-xl font-semibold mb-4">Analytics Dashboard</h2>
-    <p>Survey response analytics and reporting will be displayed here.</p>
-  </div>;
-};
-
-const ChatTab = () => {
-  return <div className="p-4 border rounded-lg">
-    <h2 className="text-xl font-semibold mb-4">Benefits Chat Assistant</h2>
-    <p>Ask questions about your benefits and receive instant responses.</p>
-  </div>;
-};
+import SurveyAdminTab from "@/components/SurveyAdminTab";
+import SurveyTakingTab from "@/components/SurveyTakingTab";
+import AnalyticsTab from "@/components/AnalyticsTab";
+import ChatTab from "@/components/ChatTab";
+import CalendarTab from "@/components/CalendarTab";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -77,6 +53,9 @@ export default function Dashboard() {
             
             {/* Always show chat tab for all users */}
             <TabsTrigger value="chat">Benefits Chat</TabsTrigger>
+            
+            {/* Always show calendar tab for all users */}
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
           </TabsList>
           
           {/* Tab contents */}
@@ -98,6 +77,10 @@ export default function Dashboard() {
           
           <TabsContent value="chat" className="space-y-4">
             <ChatTab />
+          </TabsContent>
+          
+          <TabsContent value="calendar" className="space-y-4">
+            <CalendarTab />
           </TabsContent>
         </Tabs>
       </main>
