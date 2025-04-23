@@ -14,6 +14,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function Header() {
   const { user, logoutMutation } = useAuth();
@@ -33,6 +34,7 @@ export function Header() {
 
         {/* User Menu (Right side) */}
         <div className="flex items-center gap-4">
+          <NotificationBell />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 hover-lift border-gradient">
