@@ -549,9 +549,6 @@ export default function SurveyAdminTab() {
             <TabsTrigger value="questions">
               Questions
             </TabsTrigger>
-            <TabsTrigger value="preview" disabled={!selectedTemplate}>
-              Preview
-            </TabsTrigger>
           </TabsList>
           
           <div>
