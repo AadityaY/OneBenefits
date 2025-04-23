@@ -118,7 +118,7 @@ export default function Dashboard() {
             description={descriptions[location]}
           />
           <div className="frost-glass p-8 rounded-lg flex flex-col items-center justify-center min-h-[300px]">
-            <DocumentText className="h-16 w-16 text-primary/50 mb-4" />
+            <FileText className="h-16 w-16 text-primary/50 mb-4" />
             <h3 className="text-xl font-medium mb-2">Coming Soon</h3>
             <p className="text-muted-foreground text-center max-w-md">
               This feature is currently under development. Check back soon for updates.
