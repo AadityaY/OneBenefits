@@ -232,13 +232,26 @@ export class MemStorage implements IStorage {
   async createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse> {
     const id = this.surveyResponseId++;
     const submittedAt = new Date();
-    const newResponse: SurveyResponse = { ...response, id, submittedAt };
+    
+    // Create response object with the flexible responses structure
+    const newResponse: SurveyResponse = { 
+      id, 
+      templateId: response.templateId,
+      responses: response.responses,
+      submittedAt 
+    };
+    
     this.surveyResponses.set(id, newResponse);
     return newResponse;
   }
   
   async getSurveyResponses(): Promise<SurveyResponse[]> {
     return Array.from(this.surveyResponses.values());
+  }
+  
+  async getSurveyResponsesByTemplateId(templateId: number): Promise<SurveyResponse[]> {
+    return Array.from(this.surveyResponses.values())
+      .filter(response => response.templateId === templateId);
   }
   
   // Chat methods

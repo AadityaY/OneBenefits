@@ -1,20 +1,33 @@
 import { apiRequest } from "@/lib/queryClient";
 import { InsertSurveyResponse, SurveyResponse } from "@shared/schema";
 
-export async function submitSurveyResponse(data: InsertSurveyResponse): Promise<SurveyResponse> {
-  const response = await apiRequest('POST', '/api/survey', data);
-  return response.json();
+/**
+ * Get all survey responses
+ */
+export async function getSurveyResponses(): Promise<SurveyResponse[]> {
+  return apiRequest({
+    method: "GET",
+    url: "/api/survey",
+  });
 }
 
-export async function getSurveyResponses(): Promise<SurveyResponse[]> {
-  const response = await fetch('/api/survey', {
-    credentials: 'include',
+/**
+ * Get survey responses for a specific template
+ */
+export async function getSurveyResponsesByTemplateId(templateId: number): Promise<SurveyResponse[]> {
+  return apiRequest({
+    method: "GET",
+    url: `/api/survey?templateId=${templateId}`,
   });
-  
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`${response.status}: ${text || response.statusText}`);
-  }
-  
-  return response.json();
+}
+
+/**
+ * Submit a new survey response
+ */
+export async function submitSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse> {
+  return apiRequest({
+    method: "POST",
+    url: "/api/survey",
+    data: response,
+  });
 }
