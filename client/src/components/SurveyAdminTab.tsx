@@ -148,10 +148,9 @@ export default function SurveyAdminTab() {
     },
   });
 
-  // Initialize question form with template ID when a template is selected
+  // Initialize question form when a template is selected
   useEffect(() => {
     if (selectedTemplate) {
-      questionForm.setValue("templateId", selectedTemplate.id);
       // Set order to the next available order number
       if (templateQuestions && templateQuestions.length > 0) {
         const maxOrder = Math.max(...templateQuestions.map(q => q.order));
@@ -274,11 +273,16 @@ export default function SurveyAdminTab() {
       // Convert options string to array if provided
       const processedQuestion = {
         ...question,
+        companyId: companyId, // Ensure company ID is included
         // Convert options string to array for question types that need options
         options: ['radio', 'select', 'checkbox', 'scale'].includes(question.questionType) && question.options
           ? getOptionsArray(question.options)
-          : undefined
+          : undefined,
+        // Remove any extra fields that aren't in the database schema
+        templateId: undefined
       };
+      
+      console.log('Creating question with data:', JSON.stringify(processedQuestion));
       
       const res = await apiRequest(
         "POST", 
@@ -287,25 +291,42 @@ export default function SurveyAdminTab() {
       );
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (createdQuestion) => {
+      console.log('Question created successfully:', createdQuestion);
       queryClient.invalidateQueries({ queryKey: ["/api/survey-questions"] });
       setIsAddingQuestion(false);
+      
+      // Reset form with default values
       questionForm.reset({
         questionText: "",
         questionType: "text",
         options: "",
         required: true,
-        order: templateQuestions && templateQuestions.length > 0 
-          ? Math.max(...templateQuestions.map(q => q.order)) + 1 
-          : 1,
-        templateId: selectedTemplate?.id || 0,
+        order: 1,
+        companyId: companyId || undefined
       });
+      
       toast({
         title: "Question added",
         description: "Survey question has been added successfully.",
       });
+      
+      // If a template is selected, automatically add the question to the template
+      if (selectedTemplate && createdQuestion?.id) {
+        // Calculate next order number
+        const nextOrder = templateQuestions && templateQuestions.length > 0
+          ? Math.max(...templateQuestions.map(q => q.order)) + 1
+          : 1;
+        
+        addQuestionToTemplateMutation.mutate({
+          templateId: selectedTemplate.id,
+          questionId: createdQuestion.id,
+          order: nextOrder
+        });
+      }
     },
     onError: (error: Error) => {
+      console.error('Error creating question:', error);
       toast({
         title: "Failed to add question",
         description: error.message,
