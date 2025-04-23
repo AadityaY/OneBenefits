@@ -233,3 +233,27 @@ export const insertCompanySettingsSchema = createInsertSchema(companySettings).o
 });
 export type InsertCompanySettings = z.infer<typeof insertCompanySettingsSchema>;
 export type CompanySettings = typeof companySettings.$inferSelect;
+
+// Notification schema
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  userId: integer("user_id").references(() => users.id),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull(), // "event", "survey", "announcement", etc.
+  linkType: text("link_type"), // "event", "survey", etc.
+  linkId: integer("link_id"), // ID of the related item (event, survey, etc.)
+  isRead: boolean("is_read").default(false).notNull(),
+  isGlobal: boolean("is_global").default(false).notNull(), // If true, sent to all users in company
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  scheduledFor: timestamp("scheduled_for"), // For scheduled notifications
+  expiresAt: timestamp("expires_at"), // Optional expiry time
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;

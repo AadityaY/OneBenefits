@@ -77,6 +77,15 @@ export interface IStorage {
   // Company settings methods
   getCompanySettings(companyId: number): Promise<CompanySettings | undefined>;
   updateCompanySettings(settings: Partial<InsertCompanySettings>, companyId: number): Promise<CompanySettings>;
+  
+  // Notification methods
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  getUserNotifications(userId: number, companyId: number): Promise<Notification[]>;
+  getCompanyNotifications(companyId: number): Promise<Notification[]>;
+  markNotificationAsRead(id: number, userId: number): Promise<boolean>;
+  markAllUserNotificationsAsRead(userId: number, companyId: number): Promise<boolean>;
+  deleteNotification(id: number, companyId: number): Promise<boolean>;
+  getUnreadNotificationCount(userId: number, companyId: number): Promise<number>;
 
   // Session store
   sessionStore: session.SessionStore;
@@ -399,6 +408,90 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return newSettings;
     }
+  }
+  
+  // Notification methods
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    return newNotification;
+  }
+  
+  async getUserNotifications(userId: number, companyId: number): Promise<Notification[]> {
+    return await db.select().from(notifications)
+      .where(and(
+        eq(notifications.companyId, companyId),
+        or(
+          // User-specific notifications
+          eq(notifications.userId, userId),
+          // Global company notifications
+          and(
+            eq(notifications.isGlobal, true),
+            isNull(notifications.userId)
+          )
+        )
+      ))
+      .orderBy(desc(notifications.createdAt));
+  }
+  
+  async getCompanyNotifications(companyId: number): Promise<Notification[]> {
+    return await db.select().from(notifications)
+      .where(and(
+        eq(notifications.companyId, companyId),
+        eq(notifications.isGlobal, true)
+      ))
+      .orderBy(desc(notifications.createdAt));
+  }
+  
+  async markNotificationAsRead(id: number, userId: number): Promise<boolean> {
+    const result = await db.update(notifications)
+      .set({ isRead: true })
+      .where(and(
+        eq(notifications.id, id),
+        or(
+          eq(notifications.userId, userId),
+          eq(notifications.isGlobal, true)
+        )
+      ));
+    return result.rowCount > 0;
+  }
+  
+  async markAllUserNotificationsAsRead(userId: number, companyId: number): Promise<boolean> {
+    const result = await db.update(notifications)
+      .set({ isRead: true })
+      .where(and(
+        eq(notifications.companyId, companyId),
+        or(
+          eq(notifications.userId, userId),
+          eq(notifications.isGlobal, true)
+        ),
+        eq(notifications.isRead, false)
+      ));
+    return result.rowCount > 0;
+  }
+  
+  async deleteNotification(id: number, companyId: number): Promise<boolean> {
+    const result = await db.delete(notifications)
+      .where(and(
+        eq(notifications.id, id),
+        eq(notifications.companyId, companyId)
+      ));
+    return result.rowCount > 0;
+  }
+  
+  async getUnreadNotificationCount(userId: number, companyId: number): Promise<number> {
+    const result = await db.select({ count: count() }).from(notifications)
+      .where(and(
+        eq(notifications.companyId, companyId),
+        or(
+          eq(notifications.userId, userId),
+          and(
+            eq(notifications.isGlobal, true),
+            isNull(notifications.userId)
+          )
+        ),
+        eq(notifications.isRead, false)
+      ));
+    return result[0]?.count || 0;
   }
 }
 
