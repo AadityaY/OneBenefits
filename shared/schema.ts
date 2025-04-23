@@ -155,3 +155,24 @@ export const insertSurveyTemplateSchema = createInsertSchema(surveyTemplates).om
 
 export type InsertSurveyTemplate = z.infer<typeof insertSurveyTemplateSchema>;
 export type SurveyTemplate = typeof surveyTemplates.$inferSelect;
+
+// Company settings schema
+export const companySettings = pgTable("company_settings", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  logo: text("logo"),
+  primaryColor: text("primary_color").default("#0f766e"),
+  secondaryColor: text("secondary_color").default("#0369a1"),
+  accentColor: text("accent_color").default("#7c3aed"),
+  website: text("website"),
+  contactEmail: text("contact_email"),
+  address: text("address"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertCompanySettingsSchema = createInsertSchema(companySettings).omit({
+  id: true,
+  updatedAt: true,
+});
+export type InsertCompanySettings = z.infer<typeof insertCompanySettingsSchema>;
+export type CompanySettings = typeof companySettings.$inferSelect;

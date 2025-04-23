@@ -5,7 +5,8 @@ import {
   CalendarEvent, InsertCalendarEvent,
   User, InsertUser,
   SurveyTemplate, InsertSurveyTemplate,
-  SurveyQuestion, InsertSurveyQuestion
+  SurveyQuestion, InsertSurveyQuestion,
+  CompanySettings, InsertCompanySettings
 } from "@shared/schema";
 
 // modify the interface with any CRUD methods
@@ -52,6 +53,10 @@ export interface IStorage {
   getCalendarEvents(): Promise<CalendarEvent[]>;
   updateCalendarEvent(id: number, event: Partial<InsertCalendarEvent>): Promise<CalendarEvent | undefined>;
   deleteCalendarEvent(id: number): Promise<boolean>;
+  
+  // Company settings methods
+  getCompanySettings(): Promise<CompanySettings | undefined>;
+  updateCompanySettings(settings: Partial<InsertCompanySettings>): Promise<CompanySettings>;
 }
 
 export class MemStorage implements IStorage {
@@ -62,6 +67,7 @@ export class MemStorage implements IStorage {
   private surveyQuestions: Map<number, SurveyQuestion>;
   private chatMessages: Map<number, ChatMessage>;
   private calendarEvents: Map<number, CalendarEvent>;
+  private companySettings: CompanySettings | undefined;
   
   private userId: number;
   private documentId: number;
@@ -457,6 +463,40 @@ export class MemStorage implements IStorage {
   
   async deleteSurveyQuestion(id: number): Promise<boolean> {
     return this.surveyQuestions.delete(id);
+  }
+  
+  // Company settings methods
+  async getCompanySettings(): Promise<CompanySettings | undefined> {
+    return this.companySettings;
+  }
+  
+  async updateCompanySettings(settings: Partial<InsertCompanySettings>): Promise<CompanySettings> {
+    const updatedAt = new Date();
+    
+    if (!this.companySettings) {
+      // Initialize new settings if none exist
+      this.companySettings = {
+        id: 1,
+        name: settings.name || "Benefits Portal",
+        logo: settings.logo || null,
+        primaryColor: settings.primaryColor || "#0f766e",
+        secondaryColor: settings.secondaryColor || "#0369a1",
+        accentColor: settings.accentColor || "#7c3aed",
+        website: settings.website || null,
+        contactEmail: settings.contactEmail || null,
+        address: settings.address || null,
+        updatedAt
+      };
+    } else {
+      // Update existing settings
+      this.companySettings = {
+        ...this.companySettings,
+        ...settings,
+        updatedAt
+      };
+    }
+    
+    return this.companySettings;
   }
 }
 
