@@ -824,8 +824,8 @@ export default function SurveyAdminTab() {
                   <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
                   <p className="text-sm text-muted-foreground mt-1">{selectedTemplate.description}</p>
                 </div>
-                <Badge variant={selectedTemplate.isPublished ? "success" : "secondary"}>
-                  {selectedTemplate.isPublished ? "Published" : "Draft"}
+                <Badge variant={selectedTemplate.status === "published" ? "success" : "secondary"}>
+                  {selectedTemplate.status === "published" ? "Published" : "Draft"}
                 </Badge>
               </div>
               
@@ -909,8 +909,8 @@ export default function SurveyAdminTab() {
                   <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
                   <p className="text-sm text-muted-foreground mt-1">{selectedTemplate.description}</p>
                 </div>
-                <Badge variant={selectedTemplate.isPublished ? "success" : "secondary"}>
-                  {selectedTemplate.isPublished ? "Published" : "Draft"}
+                <Badge variant={selectedTemplate.status === "published" ? "success" : "secondary"}>
+                  {selectedTemplate.status === "published" ? "Published" : "Draft"}
                 </Badge>
               </div>
               

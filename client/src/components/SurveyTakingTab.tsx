@@ -156,7 +156,7 @@ export default function SurveyTakingTab() {
   // Handle moving to the next question
   const handleNextQuestion = () => {
     // Ensure current question is answered if required
-    if (currentQuestion.isRequired && !responses[currentQuestion.id]) {
+    if (currentQuestion.required && !responses[currentQuestion.id]) {
       toast({
         title: "Required question",
         description: "Please answer this question before continuing.",
@@ -186,7 +186,7 @@ export default function SurveyTakingTab() {
     
     // Check if all required questions are answered
     const unansweredRequired = sortedQuestions
-      .filter(q => q.isRequired && !responses[q.id])
+      .filter(q => q.required && !responses[q.id])
       .map(q => q.questionText);
     
     if (unansweredRequired.length > 0) {
@@ -284,10 +284,10 @@ export default function SurveyTakingTab() {
                 <div className="space-y-1">
                   <CardTitle className="text-base">
                     {currentQuestion.questionText}
-                    {currentQuestion.isRequired && <span className="text-destructive ml-1">*</span>}
+                    {currentQuestion.required && <span className="text-destructive ml-1">*</span>}
                   </CardTitle>
                   <CardDescription>
-                    {currentQuestion.isRequired 
+                    {currentQuestion.required 
                       ? "This question requires an answer" 
                       : "This question is optional"}
                   </CardDescription>
