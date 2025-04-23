@@ -3,31 +3,36 @@ import {
   useQuery,
   useMutation,
   UseMutationResult,
-  QueryClient,
 } from "@tanstack/react-query";
-import { User, InsertUser } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { User, insertUserSchema } from "@shared/schema";
+import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export type LoginData = z.infer<typeof loginSchema>;
+
+export const registerSchema = insertUserSchema.extend({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+});
+
+export type RegisterData = z.infer<typeof registerSchema>;
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
-  isAdmin: boolean;
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<User, Error, RegisterData>;
-};
-
-type LoginData = {
-  username: string;
-  password: string;
-};
-
-type RegisterData = {
-  username: string;
-  password: string;
-  role?: string;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -41,42 +46,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
   } = useQuery<User | null, Error>({
     queryKey: ["/api/user"],
-    queryFn: async () => {
-      try {
-        const res = await apiRequest("GET", "/api/user");
-        if (res.ok) {
-          return await res.json();
-        }
-        return null;
-      } catch (error) {
-        return null;
-      }
-    },
-    retry: false,
+    queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest("POST", "/api/login", credentials);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Login failed");
-      }
       return await res.json();
     },
-    onSuccess: (userData: User) => {
-      queryClient.setQueryData(["/api/user"], userData);
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
       toast({
-        title: "Login successful",
-        description: `Welcome, ${userData.username}!`,
+        title: "Welcome back!",
+        description: `Logged in as ${user.firstName || user.username}`,
       });
-      
-      // Navigate to the appropriate dashboard based on user role
-      if (userData.role === "admin") {
-        window.location.href = "/admin";
-      } else {
-        window.location.href = "/dashboard";
-      }
     },
     onError: (error: Error) => {
       toast({
@@ -88,27 +71,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (userData: RegisterData) => {
+    mutationFn: async (credentials: RegisterData) => {
+      // Remove confirmPassword as it's not in the schema
+      const { confirmPassword, ...userData } = credentials;
       const res = await apiRequest("POST", "/api/register", userData);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Registration failed");
-      }
       return await res.json();
     },
-    onSuccess: (userData: User) => {
-      queryClient.setQueryData(["/api/user"], userData);
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "Registration successful",
-        description: `Welcome, ${userData.username}!`,
+        description: `Welcome to the platform, ${user.firstName || user.username}!`,
       });
-      
-      // Navigate to the appropriate dashboard based on user role
-      if (userData.role === "admin") {
-        window.location.href = "/admin";
-      } else {
-        window.location.href = "/dashboard";
-      }
     },
     onError: (error: Error) => {
       toast({
@@ -121,21 +95,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/logout");
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Logout failed");
-      }
+      await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
+      queryClient.invalidateQueries();
       toast({
         title: "Logged out",
-        description: "You have been successfully logged out",
+        description: "You have been successfully logged out.",
       });
-      
-      // Redirect to the login page
-      window.location.href = "/auth";
     },
     onError: (error: Error) => {
       toast({
@@ -146,16 +114,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  // Check if the user is an admin
-  const isAdmin = user ? user.role === "admin" : false;
-
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user || null,
         isLoading,
         error,
-        isAdmin,
         loginMutation,
         logoutMutation,
         registerMutation,
