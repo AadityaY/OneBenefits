@@ -108,7 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Survey endpoints
+  // Survey Response endpoints
   app.post("/api/survey", async (req: Request, res: Response) => {
     try {
       const surveyData = req.body;
@@ -133,6 +133,202 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching survey responses:", error);
       res.status(500).json({ message: "Failed to fetch survey responses" });
+    }
+  });
+  
+  // Survey Template endpoints
+  app.post("/api/survey-templates", async (req: Request, res: Response) => {
+    try {
+      const templateData = req.body;
+      const validatedData = insertSurveyTemplateSchema.parse(templateData);
+      const template = await storage.createSurveyTemplate(validatedData);
+      res.status(201).json(template);
+    } catch (error) {
+      console.error("Error creating survey template:", error);
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid template data", errors: fromZodError(error).message });
+      }
+      
+      res.status(500).json({ message: "Failed to create survey template" });
+    }
+  });
+  
+  app.get("/api/survey-templates", async (req: Request, res: Response) => {
+    try {
+      const templates = await storage.getSurveyTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching survey templates:", error);
+      res.status(500).json({ message: "Failed to fetch survey templates" });
+    }
+  });
+  
+  app.get("/api/survey-templates/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const template = await storage.getSurveyTemplate(id);
+      if (!template) {
+        return res.status(404).json({ message: "Survey template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching survey template:", error);
+      res.status(500).json({ message: "Failed to fetch survey template" });
+    }
+  });
+  
+  app.patch("/api/survey-templates/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const templateData = req.body;
+      const template = await storage.updateSurveyTemplate(id, templateData);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Survey template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating survey template:", error);
+      res.status(500).json({ message: "Failed to update survey template" });
+    }
+  });
+  
+  app.delete("/api/survey-templates/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteSurveyTemplate(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Survey template not found" });
+      }
+      
+      res.status(200).json({ message: "Survey template deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting survey template:", error);
+      res.status(500).json({ message: "Failed to delete survey template" });
+    }
+  });
+  
+  app.post("/api/survey-templates/:id/publish", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const template = await storage.publishSurveyTemplate(id);
+      
+      if (!template) {
+        return res.status(404).json({ message: "Survey template not found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error publishing survey template:", error);
+      res.status(500).json({ message: "Failed to publish survey template" });
+    }
+  });
+  
+  // Survey Question endpoints
+  app.post("/api/survey-questions", async (req: Request, res: Response) => {
+    try {
+      const questionData = req.body;
+      const validatedData = insertSurveyQuestionSchema.parse(questionData);
+      const question = await storage.createSurveyQuestion(validatedData);
+      res.status(201).json(question);
+    } catch (error) {
+      console.error("Error creating survey question:", error);
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid question data", errors: fromZodError(error).message });
+      }
+      
+      res.status(500).json({ message: "Failed to create survey question" });
+    }
+  });
+  
+  app.get("/api/survey-questions", async (req: Request, res: Response) => {
+    try {
+      const questions = await storage.getSurveyQuestions();
+      res.json(questions);
+    } catch (error) {
+      console.error("Error fetching survey questions:", error);
+      res.status(500).json({ message: "Failed to fetch survey questions" });
+    }
+  });
+  
+  app.get("/api/survey-questions/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const question = await storage.getSurveyQuestion(id);
+      if (!question) {
+        return res.status(404).json({ message: "Survey question not found" });
+      }
+      
+      res.json(question);
+    } catch (error) {
+      console.error("Error fetching survey question:", error);
+      res.status(500).json({ message: "Failed to fetch survey question" });
+    }
+  });
+  
+  app.patch("/api/survey-questions/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const questionData = req.body;
+      const question = await storage.updateSurveyQuestion(id, questionData);
+      
+      if (!question) {
+        return res.status(404).json({ message: "Survey question not found" });
+      }
+      
+      res.json(question);
+    } catch (error) {
+      console.error("Error updating survey question:", error);
+      res.status(500).json({ message: "Failed to update survey question" });
+    }
+  });
+  
+  app.delete("/api/survey-questions/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteSurveyQuestion(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Survey question not found" });
+      }
+      
+      res.status(200).json({ message: "Survey question deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting survey question:", error);
+      res.status(500).json({ message: "Failed to delete survey question" });
     }
   });
   

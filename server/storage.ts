@@ -3,7 +3,9 @@ import {
   SurveyResponse, InsertSurveyResponse,
   ChatMessage, InsertChatMessage,
   CalendarEvent, InsertCalendarEvent,
-  User, InsertUser 
+  User, InsertUser,
+  SurveyTemplate, InsertSurveyTemplate,
+  SurveyQuestion, InsertSurveyQuestion
 } from "@shared/schema";
 
 // modify the interface with any CRUD methods
@@ -25,6 +27,21 @@ export interface IStorage {
   createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse>;
   getSurveyResponses(): Promise<SurveyResponse[]>;
   
+  // Survey Template methods
+  createSurveyTemplate(template: InsertSurveyTemplate): Promise<SurveyTemplate>;
+  getSurveyTemplates(): Promise<SurveyTemplate[]>;
+  getSurveyTemplate(id: number): Promise<SurveyTemplate | undefined>;
+  updateSurveyTemplate(id: number, template: Partial<InsertSurveyTemplate>): Promise<SurveyTemplate | undefined>;
+  deleteSurveyTemplate(id: number): Promise<boolean>;
+  publishSurveyTemplate(id: number): Promise<SurveyTemplate | undefined>;
+  
+  // Survey Question methods
+  createSurveyQuestion(question: InsertSurveyQuestion): Promise<SurveyQuestion>;
+  getSurveyQuestions(): Promise<SurveyQuestion[]>;
+  getSurveyQuestion(id: number): Promise<SurveyQuestion | undefined>;
+  updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion | undefined>;
+  deleteSurveyQuestion(id: number): Promise<boolean>;
+  
   // Chat methods
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(): Promise<ChatMessage[]>;
@@ -40,12 +57,16 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private documents: Map<number, Document>;
   private surveyResponses: Map<number, SurveyResponse>;
+  private surveyTemplates: Map<number, SurveyTemplate>;
+  private surveyQuestions: Map<number, SurveyQuestion>;
   private chatMessages: Map<number, ChatMessage>;
   private calendarEvents: Map<number, CalendarEvent>;
   
   private userId: number;
   private documentId: number;
   private surveyResponseId: number;
+  private surveyTemplateId: number;
+  private surveyQuestionId: number;
   private chatMessageId: number;
   private calendarEventId: number;
 
@@ -53,17 +74,23 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.documents = new Map();
     this.surveyResponses = new Map();
+    this.surveyTemplates = new Map();
+    this.surveyQuestions = new Map();
     this.chatMessages = new Map();
     this.calendarEvents = new Map();
     
     this.userId = 1;
     this.documentId = 1;
     this.surveyResponseId = 1;
+    this.surveyTemplateId = 1;
+    this.surveyQuestionId = 1;
     this.chatMessageId = 1;
     this.calendarEventId = 1;
     
     // Add some sample calendar events
     this.initializeCalendarEvents();
+    // Initialize a sample survey template and questions
+    this.initializeSurveyTemplate();
   }
   
   private initializeCalendarEvents() {
@@ -250,6 +277,141 @@ export class MemStorage implements IStorage {
   
   async deleteCalendarEvent(id: number): Promise<boolean> {
     return this.calendarEvents.delete(id);
+  }
+  
+  // Initialize a sample survey template with questions
+  private initializeSurveyTemplate() {
+    const benefitsSurveyTemplate: InsertSurveyTemplate = {
+      title: "Employee Benefits Survey",
+      description: "Help us understand your preferences and needs regarding the employee benefits program.",
+      status: "draft"
+    };
+    
+    this.createSurveyTemplate(benefitsSurveyTemplate)
+      .then(template => {
+        // Create questions for the template
+        const questions: InsertSurveyQuestion[] = [
+          {
+            questionText: "How satisfied are you with the current health insurance options?",
+            questionType: "radio",
+            required: true,
+            order: 1,
+            options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"],
+            active: true
+          },
+          {
+            questionText: "Which of the following benefits are most important to you? (Select up to 3)",
+            questionType: "checkbox",
+            required: true,
+            order: 2,
+            options: ["Health insurance", "Dental insurance", "Vision insurance", "Retirement plan (401k/403b)", "Paid time off", "Parental leave", "Wellness programs"],
+            active: true
+          },
+          {
+            questionText: "How well do you understand your current benefits package?",
+            questionType: "select",
+            required: true,
+            order: 3,
+            options: ["Very well - I understand all aspects", "Somewhat - I understand the basics", "Neutral", "Not much - I'm confused about many aspects", "Not at all - I don't understand my benefits"],
+            active: true
+          },
+          {
+            questionText: "Do you have any suggestions for improving our benefits program?",
+            questionType: "textarea",
+            required: false,
+            order: 4,
+            options: [],
+            active: true
+          },
+          {
+            questionText: "Would you be interested in attending a benefits information session?",
+            questionType: "radio",
+            required: true,
+            order: 5,
+            options: ["Yes", "No", "Maybe"],
+            active: true
+          }
+        ];
+        
+        // Add each question to the database
+        questions.forEach(question => this.createSurveyQuestion(question));
+      });
+  }
+  
+  // Survey Template methods
+  async createSurveyTemplate(template: InsertSurveyTemplate): Promise<SurveyTemplate> {
+    const id = this.surveyTemplateId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const newTemplate: SurveyTemplate = { ...template, id, createdAt, updatedAt, publishedAt: null };
+    this.surveyTemplates.set(id, newTemplate);
+    return newTemplate;
+  }
+  
+  async getSurveyTemplates(): Promise<SurveyTemplate[]> {
+    return Array.from(this.surveyTemplates.values());
+  }
+  
+  async getSurveyTemplate(id: number): Promise<SurveyTemplate | undefined> {
+    return this.surveyTemplates.get(id);
+  }
+  
+  async updateSurveyTemplate(id: number, template: Partial<InsertSurveyTemplate>): Promise<SurveyTemplate | undefined> {
+    const existingTemplate = this.surveyTemplates.get(id);
+    if (!existingTemplate) return undefined;
+    
+    const updatedAt = new Date();
+    const updatedTemplate = { ...existingTemplate, ...template, updatedAt };
+    this.surveyTemplates.set(id, updatedTemplate);
+    return updatedTemplate;
+  }
+  
+  async deleteSurveyTemplate(id: number): Promise<boolean> {
+    return this.surveyTemplates.delete(id);
+  }
+  
+  async publishSurveyTemplate(id: number): Promise<SurveyTemplate | undefined> {
+    const existingTemplate = this.surveyTemplates.get(id);
+    if (!existingTemplate) return undefined;
+    
+    const publishedAt = new Date();
+    const updatedAt = new Date();
+    const publishedTemplate = { ...existingTemplate, status: "published", publishedAt, updatedAt };
+    this.surveyTemplates.set(id, publishedTemplate);
+    return publishedTemplate;
+  }
+  
+  // Survey Question methods
+  async createSurveyQuestion(question: InsertSurveyQuestion): Promise<SurveyQuestion> {
+    const id = this.surveyQuestionId++;
+    const createdAt = new Date();
+    const updatedAt = new Date();
+    const newQuestion: SurveyQuestion = { ...question, id, createdAt, updatedAt };
+    this.surveyQuestions.set(id, newQuestion);
+    return newQuestion;
+  }
+  
+  async getSurveyQuestions(): Promise<SurveyQuestion[]> {
+    return Array.from(this.surveyQuestions.values())
+      .sort((a, b) => a.order - b.order); // Sort by order
+  }
+  
+  async getSurveyQuestion(id: number): Promise<SurveyQuestion | undefined> {
+    return this.surveyQuestions.get(id);
+  }
+  
+  async updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion | undefined> {
+    const existingQuestion = this.surveyQuestions.get(id);
+    if (!existingQuestion) return undefined;
+    
+    const updatedAt = new Date();
+    const updatedQuestion = { ...existingQuestion, ...question, updatedAt };
+    this.surveyQuestions.set(id, updatedQuestion);
+    return updatedQuestion;
+  }
+  
+  async deleteSurveyQuestion(id: number): Promise<boolean> {
+    return this.surveyQuestions.delete(id);
   }
 }
 
