@@ -1319,6 +1319,141 @@ export default function SurveyAdminTab() {
           )}
         </TabsContent>
         
+        <TabsContent value="preview" className="space-y-4">
+          {selectedTemplate && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center border-b pb-4">
+                <div>
+                  <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">{selectedTemplate.description}</p>
+                </div>
+                <Badge variant={selectedTemplate.status === "published" ? "secondary" : "secondary"}>
+                  {selectedTemplate.status === "published" ? "Published" : "Draft"}
+                </Badge>
+              </div>
+              
+              {loadingTemplateQuestions ? (
+                <div className="py-12 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2">Loading preview...</span>
+                </div>
+              ) : templateQuestions && templateQuestions.length > 0 ? (
+                <div className="border rounded-lg p-6 bg-card">
+                  <h3 className="text-lg font-semibold mb-4">Survey Preview</h3>
+                  
+                  <div className="space-y-6">
+                    {templateQuestions
+                      .sort((a, b) => a.order - b.order)
+                      .map((question, index) => (
+                      <div key={question.id} className="space-y-2">
+                        <div className="flex items-start space-x-2">
+                          <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
+                            {index + 1}
+                          </span>
+                          <div className="flex-1">
+                            <Label className="font-medium">
+                              {question.questionText}
+                              {question.required && <span className="text-destructive ml-1">*</span>}
+                            </Label>
+                            
+                            {/* Render different input types based on question type */}
+                            {question.questionType === "text" && (
+                              <Input placeholder="Short answer..." className="mt-2" />
+                            )}
+                            
+                            {question.questionType === "textarea" && (
+                              <Textarea placeholder="Long answer..." className="mt-2" />
+                            )}
+                            
+                            {question.questionType === "number" && (
+                              <Input type="number" placeholder="0" className="mt-2" />
+                            )}
+                            
+                            {question.questionType === "select" && question.options && (
+                              <Select>
+                                <SelectTrigger className="mt-2">
+                                  <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {getOptionsArray(question.options).map((option, i) => (
+                                    <SelectItem key={i} value={`option-${i}`}>{option}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            
+                            {question.questionType === "date" && (
+                              <Input type="date" className="mt-2" />
+                            )}
+                            
+                            {question.questionType === "radio" && question.options && (
+                              <div className="space-y-2 mt-2">
+                                {getOptionsArray(question.options).map((option, i) => (
+                                  <div key={i} className="flex items-center space-x-2">
+                                    <input type="radio" id={`option-${question.id}-${i}`} name={`question-${question.id}`} />
+                                    <Label htmlFor={`option-${question.id}-${i}`} className="font-normal">
+                                      {option}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.questionType === "checkbox" && question.options && (
+                              <div className="space-y-2 mt-2">
+                                {getOptionsArray(question.options).map((option, i) => (
+                                  <div key={i} className="flex items-center space-x-2">
+                                    <input type="checkbox" id={`check-${question.id}-${i}`} />
+                                    <Label htmlFor={`check-${question.id}-${i}`} className="font-normal">
+                                      {option}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.questionType === "scale" && (
+                              <div className="flex space-x-4 mt-3">
+                                {[1, 2, 3, 4, 5].map((num) => (
+                                  <div key={num} className="text-center">
+                                    <div className="w-10 h-10 rounded-full border flex items-center justify-center cursor-pointer hover:bg-primary/10">
+                                      {num}
+                                    </div>
+                                    {num === 1 && <div className="text-xs mt-1">Poor</div>}
+                                    {num === 5 && <div className="text-xs mt-1">Excellent</div>}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="pt-4 border-t mt-8">
+                      <Button>Submit Survey</Button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="border rounded-lg p-8 text-center">
+                  <CalendarCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium mb-2">No Questions to Preview</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Add questions to see a preview of how the survey will look to users.
+                  </p>
+                  <Button onClick={() => {
+                    setActiveTab("questions");
+                    setIsAddingQuestion(true);
+                  }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Questions
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );
