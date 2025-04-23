@@ -136,16 +136,18 @@ export default function SurveyAdminTab() {
   });
 
   // Create a form for new questions
+  const defaultQuestionValues = {
+    questionText: "",
+    questionType: "text" as const,
+    options: "",
+    required: true,
+    order: 1,
+    companyId: companyId || undefined
+  };
+  
   const questionForm = useForm<z.infer<typeof questionSchema>>({
     resolver: zodResolver(questionSchema),
-    defaultValues: {
-      questionText: "",
-      questionType: "text",
-      options: "",
-      required: true,
-      companyId: companyId || undefined,
-      order: 1,
-    },
+    defaultValues: defaultQuestionValues,
   });
 
   // Initialize question form when a template is selected
@@ -297,14 +299,7 @@ export default function SurveyAdminTab() {
       setIsAddingQuestion(false);
       
       // Reset form with default values
-      questionForm.reset({
-        questionText: "",
-        questionType: "text",
-        options: "",
-        required: true,
-        order: 1,
-        companyId: companyId || undefined
-      });
+      questionForm.reset(defaultQuestionValues);
       
       toast({
         title: "Question added",
