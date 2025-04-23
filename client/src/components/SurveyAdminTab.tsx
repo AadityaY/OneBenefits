@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Helper function to safely handle options that could be string or string[]
@@ -108,13 +108,13 @@ export default function SurveyAdminTab() {
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
-  
+
   // Create a form schema for new survey templates
   const templateSchema = insertSurveyTemplateSchema.extend({
     title: z.string().min(3, { message: "Title must be at least 3 characters" }),
     description: z.string().min(10, { message: "Description must be at least 10 characters" }),
   });
-  
+
   // Create a form for new templates
   const templateForm = useForm<z.infer<typeof templateSchema>>({
     resolver: zodResolver(templateSchema),
@@ -125,7 +125,7 @@ export default function SurveyAdminTab() {
       companyId: companyId || 0,
     },
   });
-  
+
   // Create a form schema for survey questions
   const questionSchema = insertSurveyQuestionSchema.extend({
     questionText: z.string().min(5, { message: "Question text must be at least 5 characters" }),
@@ -135,7 +135,7 @@ export default function SurveyAdminTab() {
     order: z.number(),
     required: z.boolean(),
   });
-  
+
   // Create a form for new questions
   const questionForm = useForm<z.infer<typeof questionSchema>>({
     resolver: zodResolver(questionSchema),
@@ -148,21 +148,21 @@ export default function SurveyAdminTab() {
       templateId: 0,
     },
   });
-  
+
   // Initialize question form with template ID when a template is selected
-  useState(() => {
+  useEffect(() => {
     if (selectedTemplate) {
       questionForm.setValue("templateId", selectedTemplate.id);
       // Set order to the next available order number
-      if (questions && questions.length > 0) {
-        const maxOrder = Math.max(...questions.map(q => q.order));
+      if (templateQuestions && templateQuestions.length > 0) {
+        const maxOrder = Math.max(...templateQuestions.map(q => q.order));
         questionForm.setValue("order", maxOrder + 1);
       } else {
         questionForm.setValue("order", 1);
       }
     }
-  });
-  
+  }, [selectedTemplate, templateQuestions]);
+
   // Create a new survey template
   const createTemplateMutation = useMutation({
     mutationFn: async (template: z.infer<typeof templateSchema>) => {
@@ -190,7 +190,7 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Update a survey template
   const updateTemplateMutation = useMutation({
     mutationFn: async ({ id, template }: { id: number, template: Partial<z.infer<typeof templateSchema>> }) => {
@@ -217,7 +217,7 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Delete a survey template
   const deleteTemplateMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -243,7 +243,7 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Publish a survey template
   const publishTemplateMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -268,7 +268,7 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Create a new survey question
   const createQuestionMutation = useMutation({
     mutationFn: async (question: z.infer<typeof questionSchema>) => {
@@ -296,7 +296,9 @@ export default function SurveyAdminTab() {
         questionType: "text",
         options: "",
         required: true,
-        order: questions ? Math.max(...questions.map(q => q.order)) + 1 : 1,
+        order: templateQuestions && templateQuestions.length > 0 
+          ? Math.max(...templateQuestions.map(q => q.order)) + 1 
+          : 1,
         templateId: selectedTemplate?.id || 0,
       });
       toast({
@@ -312,7 +314,7 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Delete a survey question
   const deleteQuestionMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -337,12 +339,63 @@ export default function SurveyAdminTab() {
       });
     },
   });
-  
+
   // Handle form submission for new template
   const handleCreateTemplate = (data: z.infer<typeof templateSchema>) => {
     createTemplateMutation.mutate(data);
   };
-  
+
+  // Add an existing question to a template
+  const addQuestionToTemplateMutation = useMutation({
+    mutationFn: async ({ templateId, questionId, order }: { templateId: number, questionId: number, order: number }) => {
+      const res = await apiRequest(
+        "POST",
+        `/api/survey-templates/${templateId}/questions`,
+        { questionId, order }
+      );
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/survey-templates", selectedTemplate?.id, "questions"] });
+      toast({
+        title: "Question added to template",
+        description: "Question has been added to the survey template.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to add question to template",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove a question from a template
+  const removeQuestionFromTemplateMutation = useMutation({
+    mutationFn: async ({ templateId, questionId }: { templateId: number, questionId: number }) => {
+      const res = await apiRequest(
+        "DELETE",
+        `/api/survey-templates/${templateId}/questions/${questionId}`
+      );
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/survey-templates", selectedTemplate?.id, "questions"] });
+      toast({
+        title: "Question removed from template",
+        description: "Question has been removed from the survey template.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to remove question",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Handle form submission for new question
   const handleAddQuestion = (data: z.infer<typeof questionSchema>) => {
     // If the question type is radio or select, ensure options are provided
@@ -357,6 +410,32 @@ export default function SurveyAdminTab() {
     createQuestionMutation.mutate(data);
   };
   
+  // Handle adding a question to a template
+  const handleAddQuestionToTemplate = (questionId: number) => {
+    if (!selectedTemplate) return;
+    
+    // Calculate next order number
+    const nextOrder = templateQuestions && templateQuestions.length > 0
+      ? Math.max(...templateQuestions.map(q => q.order)) + 1
+      : 1;
+    
+    addQuestionToTemplateMutation.mutate({
+      templateId: selectedTemplate.id,
+      questionId,
+      order: nextOrder
+    });
+  };
+  
+  // Handle removing a question from a template
+  const handleRemoveQuestionFromTemplate = (questionId: number) => {
+    if (!selectedTemplate) return;
+    
+    removeQuestionFromTemplateMutation.mutate({
+      templateId: selectedTemplate.id,
+      questionId
+    });
+  };
+
   // Handle editing a template
   const handleEditTemplate = () => {
     if (!selectedTemplate) return;
@@ -370,7 +449,7 @@ export default function SurveyAdminTab() {
     
     setIsEditing(true);
   };
-  
+
   // Handle updating a template
   const handleUpdateTemplate = (data: z.infer<typeof templateSchema>) => {
     if (!selectedTemplate) return;
@@ -380,7 +459,7 @@ export default function SurveyAdminTab() {
       template: data,
     });
   };
-  
+
   // Handle deleting a template
   const handleDeleteTemplate = () => {
     if (!selectedTemplate) return;
@@ -389,14 +468,14 @@ export default function SurveyAdminTab() {
       deleteTemplateMutation.mutate(selectedTemplate.id);
     }
   };
-  
+
   // Handle publishing a template
   const handlePublishTemplate = () => {
     if (!selectedTemplate) return;
     
     publishTemplateMutation.mutate(selectedTemplate.id);
   };
-  
+
   // Watch the question type to conditionally show options input
   const questionType = questionForm.watch("questionType");
   
@@ -408,7 +487,7 @@ export default function SurveyAdminTab() {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -576,14 +655,14 @@ export default function SurveyAdminTab() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="text">Text (Short Answer)</SelectItem>
+                                <SelectItem value="text">Short Text</SelectItem>
                                 <SelectItem value="textarea">Long Text</SelectItem>
-                                <SelectItem value="number">Number</SelectItem>
-                                <SelectItem value="select">Dropdown Selection</SelectItem>
+                                <SelectItem value="select">Dropdown</SelectItem>
                                 <SelectItem value="radio">Multiple Choice</SelectItem>
                                 <SelectItem value="checkbox">Checkboxes</SelectItem>
-                                <SelectItem value="scale">Rating Scale (1-5)</SelectItem>
+                                <SelectItem value="number">Number</SelectItem>
                                 <SelectItem value="date">Date</SelectItem>
+                                <SelectItem value="scale">Rating Scale</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormDescription>
@@ -594,17 +673,17 @@ export default function SurveyAdminTab() {
                         )}
                       />
                       
-                      {(questionType === "select" || questionType === "radio" || questionType === "checkbox") && (
+                      {(questionType === "radio" || questionType === "select" || questionType === "checkbox") && (
                         <FormField
                           control={questionForm.control}
                           name="options"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Answer Options</FormLabel>
+                              <FormLabel>Options</FormLabel>
                               <FormControl>
                                 <Textarea 
                                   placeholder="Option 1&#10;Option 2&#10;Option 3"
-                                  className="min-h-[80px]"
+                                  className="min-h-[100px]"
                                   {...field} 
                                 />
                               </FormControl>
@@ -623,9 +702,9 @@ export default function SurveyAdminTab() {
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                             <div className="space-y-0.5">
-                              <FormLabel>Required Question</FormLabel>
+                              <FormLabel>Required</FormLabel>
                               <FormDescription>
-                                Make this question mandatory to answer
+                                Make this question mandatory
                               </FormDescription>
                             </div>
                             <FormControl>
@@ -659,192 +738,200 @@ export default function SurveyAdminTab() {
         </div>
         
         <TabsContent value="templates" className="space-y-4">
-          {templates && templates.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {templates.map((template) => (
-                <Card 
-                  key={template.id} 
-                  className={`overflow-hidden ${selectedTemplate?.id === template.id ? 'ring-2 ring-primary' : ''}`}
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{template.title}</CardTitle>
-                        <CardDescription className="line-clamp-2 mt-1">
-                          {template.description}
-                        </CardDescription>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem 
-                            onClick={() => setSelectedTemplate(template)}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Questions
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleEditTemplate}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Template
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={handleDeleteTemplate}>
-                            <Trash className="h-4 w-4 mr-2" />
-                            Delete Template
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={handlePublishTemplate}
-                            disabled={template.status === "published"}
-                          >
-                            <FilePlus className="h-4 w-4 mr-2" />
-                            {template.status === "published" ? "Already Published" : "Publish Template"}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-3">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div>Created: {new Date(template.createdAt).toLocaleDateString()}</div>
-                      {template.updatedAt && (
-                        <div>Updated: {new Date(template.updatedAt).toLocaleDateString()}</div>
-                      )}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="border-t bg-muted/50 p-3 flex justify-between">
-                    <Badge variant="secondary">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {templates && templates.map((template) => (
+              <Card 
+                key={template.id} 
+                className={`${
+                  selectedTemplate?.id === template.id ? 'ring-2 ring-primary/50' : ''
+                } cursor-pointer transition-all hover:shadow-md`}
+                onClick={() => {
+                  setSelectedTemplate(template);
+                  setActiveTab("questions");
+                }}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{template.title}</CardTitle>
+                    <Badge variant={template.status === "published" ? "default" : "secondary"}>
                       {template.status === "published" ? "Published" : "Draft"}
                     </Badge>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setSelectedTemplate(template)}
-                    >
-                      Select
+                  </div>
+                  <CardDescription className="line-clamp-2">{template.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="flex items-center text-sm text-muted-foreground gap-4">
+                    <div className="flex items-center gap-1">
+                      <ClipboardCheck className="h-4 w-4" />
+                      <span>{
+                        templateQuestions && selectedTemplate && selectedTemplate.id === template.id 
+                          ? templateQuestions.length 
+                          : 0
+                      } questions</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <BarChart className="h-4 w-4" />
+                      <span>0 responses</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="pt-0">
+                  <div className="flex justify-between items-center w-full">
+                    <Button variant="outline" size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTemplate(template);
+                      setActiveTab("preview");
+                    }}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      Preview
                     </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="border rounded-lg p-8 text-center">
-              <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium mb-2">No Survey Templates</h3>
-              <p className="text-muted-foreground mb-4">
-                Create your first survey template to start collecting feedback.
-              </p>
-              <Button onClick={() => setIsCreatingTemplate(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Template
-              </Button>
-            </div>
-          )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTemplate(template);
+                          handleEditTemplate();
+                        }}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTemplate(template);
+                          handleDeleteTemplate();
+                        }}>
+                          <Trash className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                        {template.status !== "published" && (
+                          <DropdownMenuItem onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTemplate(template);
+                            handlePublishTemplate();
+                          }}>
+                            <FilePlus className="h-4 w-4 mr-2" />
+                            Publish
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+            
+            {(!templates || templates.length === 0) && (
+              <div className="md:col-span-2 lg:col-span-3 border rounded-lg p-8 text-center">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium mb-2">No Templates Yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create your first survey template to get started.
+                </p>
+                <Button onClick={() => setIsCreatingTemplate(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create First Template
+                </Button>
+              </div>
+            )}
+          </div>
           
-          {/* Edit Template Dialog */}
-          <Dialog open={isEditing} onOpenChange={setIsEditing}>
-            <DialogContent className="sm:max-w-[550px]">
-              <DialogHeader>
-                <DialogTitle>Edit Survey Template</DialogTitle>
-                <DialogDescription>
-                  Make changes to the survey template.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <Form {...templateForm}>
-                <form onSubmit={templateForm.handleSubmit(handleUpdateTemplate)} className="space-y-4 py-4">
-                  <FormField
-                    control={templateForm.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Quarterly Satisfaction Survey" {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          The title of your survey template
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={templateForm.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="This survey collects feedback on employee satisfaction and engagement."
-                            className="min-h-[100px]"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          A detailed description of the survey's purpose
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={templateForm.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>Published Status</FormLabel>
-                          <FormDescription>
-                            Controls whether this survey is available to users
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="w-[120px]">
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="draft">Draft</SelectItem>
-                              <SelectItem value="published">Published</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <DialogFooter>
-                    <Button type="submit" disabled={updateTemplateMutation.isPending}>
-                      {updateTemplateMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        "Save Changes"
+          {isEditing && selectedTemplate && (
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
+              <DialogContent className="sm:max-w-[550px]">
+                <DialogHeader>
+                  <DialogTitle>Edit Survey Template</DialogTitle>
+                  <DialogDescription>
+                    Update the details for "{selectedTemplate.title}".
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <Form {...templateForm}>
+                  <form onSubmit={templateForm.handleSubmit(handleUpdateTemplate)} className="space-y-4 py-4">
+                    <FormField
+                      control={templateForm.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+                    />
+                    
+                    <FormField
+                      control={templateForm.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              className="min-h-[100px]"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={templateForm.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="published">Published</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <DialogFooter>
+                      <Button type="submit" disabled={updateTemplateMutation.isPending}>
+                        {updateTemplateMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Updating...
+                          </>
+                        ) : (
+                          "Update Template"
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          )}
         </TabsContent>
         
         <TabsContent value="questions" className="space-y-4">
           {selectedTemplate && (
-            <div className="space-y-4">
+            <div>
               <div className="flex justify-between items-center border-b pb-4">
                 <div>
                   <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
@@ -855,72 +942,148 @@ export default function SurveyAdminTab() {
                 </Badge>
               </div>
               
-              {loadingQuestions ? (
+              {activeTab === "questions" && (
+                <div className="flex items-center justify-between mb-4 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Template Questions</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Manage questions for this template
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={() => setIsAddingQuestion(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Question
+                  </Button>
+                </div>
+              )}
+              
+              {(loadingTemplateQuestions || loadingAllQuestions) ? (
                 <div className="py-12 flex justify-center">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="ml-2">Loading questions...</span>
                 </div>
-              ) : questions && questions.length > 0 ? (
-                <div className="space-y-3">
-                  {questions
-                    .sort((a, b) => a.order - b.order)
-                    .map((question, index) => (
-                    <Card key={question.id} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-start space-x-2">
-                            <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
-                              {index + 1}
-                            </span>
-                            <div>
-                              <CardTitle className="text-base">{question.questionText}</CardTitle>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Badge variant="outline" className="capitalize">
-                              {question.questionType}
-                            </Badge>
-                            {question.required && (
-                              <Badge variant="secondary">Required</Badge>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => deleteQuestionMutation.mutate(question.id)}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      {(question.questionType === "select" || 
-                        question.questionType === "radio" || 
-                        question.questionType === "checkbox") && question.options && (
-                        <CardContent className="pb-2">
-                          <div className="text-sm text-muted-foreground">
-                            <span className="font-medium">Options:</span>
-                            <ul className="list-disc list-inside mt-1 pl-2">
-                              {getOptionsArray(question.options).map((option, i) => (
-                                <li key={i}>{option}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </CardContent>
-                      )}
-                    </Card>
-                  ))}
-                </div>
               ) : (
-                <div className="border rounded-lg p-8 text-center">
-                  <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">No Questions Yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Add your first question to start building this survey.
-                  </p>
-                  <Button onClick={() => setIsAddingQuestion(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add First Question
-                  </Button>
+                <div className="space-y-6">
+                  {/* Template Questions */}
+                  {templateQuestions && templateQuestions.length > 0 ? (
+                    <div className="space-y-3">
+                      {templateQuestions
+                        .sort((a, b) => a.order - b.order)
+                        .map((question, index) => (
+                        <Card key={question.id} className="overflow-hidden">
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-start space-x-2">
+                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
+                                  {index + 1}
+                                </span>
+                                <div>
+                                  <CardTitle className="text-base">{question.questionText}</CardTitle>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="outline" className="capitalize">
+                                  {question.questionType}
+                                </Badge>
+                                {question.required && (
+                                  <Badge variant="secondary">Required</Badge>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveQuestionFromTemplate(question.id)}
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          {(question.questionType === "select" || 
+                            question.questionType === "radio" || 
+                            question.questionType === "checkbox") && question.options && (
+                            <CardContent className="pb-2">
+                              <div className="text-sm text-muted-foreground">
+                                <span className="font-medium">Options:</span>
+                                <ul className="list-disc list-inside mt-1 pl-2">
+                                  {getOptionsArray(question.options).map((option, i) => (
+                                    <li key={i}>{option}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border rounded-lg p-8 text-center">
+                      <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-lg font-medium mb-2">No Questions Yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Add your first question to start building this survey.
+                      </p>
+                      <Button onClick={() => setIsAddingQuestion(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Question
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* Available Questions Bank */}
+                  {allQuestions && allQuestions.length > 0 && (
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold mb-4">Question Bank</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Add existing questions from your company's question bank to this template
+                      </p>
+                      
+                      <div className="space-y-2">
+                        {allQuestions
+                          .filter(q => !templateQuestions?.some(tq => tq.id === q.id))
+                          .map(question => (
+                          <Card key={question.id} className="overflow-hidden">
+                            <CardHeader className="pb-2">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <CardTitle className="text-base">{question.questionText}</CardTitle>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Badge variant="outline" className="capitalize">
+                                    {question.questionType}
+                                  </Badge>
+                                  {question.required && (
+                                    <Badge variant="secondary">Required</Badge>
+                                  )}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleAddQuestionToTemplate(question.id)}
+                                  >
+                                    <Plus className="h-4 w-4 mr-1" />
+                                    Add to Template
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            {(question.questionType === "select" || 
+                              question.questionType === "radio" || 
+                              question.questionType === "checkbox") && question.options && (
+                              <CardContent className="pb-2">
+                                <div className="text-sm text-muted-foreground">
+                                  <span className="font-medium">Options:</span>
+                                  <ul className="list-disc list-inside mt-1 pl-2">
+                                    {getOptionsArray(question.options).map((option, i) => (
+                                      <li key={i}>{option}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </CardContent>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -940,17 +1103,17 @@ export default function SurveyAdminTab() {
                 </Badge>
               </div>
               
-              {loadingQuestions ? (
+              {loadingTemplateQuestions ? (
                 <div className="py-12 flex justify-center">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                   <span className="ml-2">Loading preview...</span>
                 </div>
-              ) : questions && questions.length > 0 ? (
+              ) : templateQuestions && templateQuestions.length > 0 ? (
                 <div className="border rounded-lg p-6 bg-card">
                   <h3 className="text-lg font-semibold mb-4">Survey Preview</h3>
                   
                   <div className="space-y-6">
-                    {questions
+                    {templateQuestions
                       .sort((a, b) => a.order - b.order)
                       .map((question, index) => (
                       <div key={question.id} className="space-y-2">
