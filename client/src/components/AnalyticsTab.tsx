@@ -1,4 +1,11 @@
 import { useState, useMemo } from "react";
+
+// Helper function to safely handle options that could be string or string[]
+const getOptionsArray = (options: string | string[] | null): string[] => {
+  if (!options) return [];
+  if (typeof options === 'string') return options.split('\n');
+  return options;
+};
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
@@ -111,7 +118,7 @@ export default function AnalyticsTab() {
           question.questionType === 'select' || 
           question.questionType === 'checkbox') {
         
-        const options = question.options ? question.options.split('\n') : [];
+        const options = question.options ? getOptionsArray(question.options)('\n') : [];
         const optionCounts: Record<string, number> = {};
         
         // Initialize counts
