@@ -101,10 +101,7 @@ export default function SurveyAdminTab() {
   
   // Actions for templates
   const createTemplateMutation = useMutation({
-    mutationFn: async (template: typeof newTemplate) => {
-      const response = await apiRequest('POST', '/api/survey-templates', template);
-      return response.json();
-    },
+    mutationFn: createSurveyTemplate,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -128,10 +125,9 @@ export default function SurveyAdminTab() {
   });
   
   const updateTemplateMutation = useMutation({
-    mutationFn: async (template: SurveyTemplate) => {
+    mutationFn: (template: SurveyTemplate) => {
       const { id, ...templateData } = template;
-      const response = await apiRequest('PATCH', `/api/survey-templates/${id}`, templateData);
-      return response.json();
+      return updateSurveyTemplate(id, templateData);
     },
     onSuccess: () => {
       toast({
@@ -152,10 +148,7 @@ export default function SurveyAdminTab() {
   });
   
   const deleteTemplateMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await apiRequest('DELETE', `/api/survey-templates/${id}`);
-      return response.json();
-    },
+    mutationFn: deleteSurveyTemplate,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -173,10 +166,7 @@ export default function SurveyAdminTab() {
   });
   
   const publishTemplateMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await apiRequest('POST', `/api/survey-templates/${id}/publish`);
-      return response.json();
-    },
+    mutationFn: publishSurveyTemplate,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -195,10 +185,7 @@ export default function SurveyAdminTab() {
   
   // Actions for questions
   const createQuestionMutation = useMutation({
-    mutationFn: async (question: any) => {
-      const response = await apiRequest('POST', '/api/survey-questions', question);
-      return response.json();
-    },
+    mutationFn: createSurveyQuestion,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -226,10 +213,9 @@ export default function SurveyAdminTab() {
   });
   
   const updateQuestionMutation = useMutation({
-    mutationFn: async (question: SurveyQuestion) => {
+    mutationFn: (question: SurveyQuestion) => {
       const { id, ...questionData } = question;
-      const response = await apiRequest('PATCH', `/api/survey-questions/${id}`, questionData);
-      return response.json();
+      return updateSurveyQuestion(id, questionData);
     },
     onSuccess: () => {
       toast({
@@ -251,10 +237,7 @@ export default function SurveyAdminTab() {
   });
   
   const deleteQuestionMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await apiRequest('DELETE', `/api/survey-questions/${id}`);
-      return response.json();
-    },
+    mutationFn: deleteSurveyQuestion,
     onSuccess: () => {
       toast({
         title: "Success",
