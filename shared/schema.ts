@@ -13,16 +13,26 @@ export const questionTypeEnum = z.enum([
 
 export type QuestionType = z.infer<typeof questionTypeEnum>;
 
+// Define roles enum
+export const userRoleEnum = z.enum(["user", "admin"]);
+export type UserRole = z.infer<typeof userRoleEnum>;
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").notNull().default("user"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export const insertUserSchema = createInsertSchema(users)
+  .pick({
+    username: true,
+    password: true,
+    role: true,
+  })
+  .extend({
+    role: userRoleEnum.default("user"),
+  });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;

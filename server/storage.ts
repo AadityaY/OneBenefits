@@ -88,10 +88,28 @@ export class MemStorage implements IStorage {
     this.chatMessageId = 1;
     this.calendarEventId = 1;
     
+    // Initialize default users
+    this.initializeUsers();
     // Add some sample calendar events
     this.initializeCalendarEvents();
     // Initialize a sample survey template and questions
     this.initializeSurveyTemplate();
+  }
+  
+  private initializeUsers() {
+    // Admin user
+    this.createUser({
+      username: "admin",
+      password: "password.salt", // This will be replaced with proper hashed password in auth.ts
+      role: "admin"
+    });
+    
+    // Regular user
+    this.createUser({
+      username: "user",
+      password: "password.salt", // This will be replaced with proper hashed password in auth.ts
+      role: "user"
+    });
   }
   
   private initializeCalendarEvents() {

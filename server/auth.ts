@@ -1,53 +1,67 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
-import createMemoryStore from "memorystore";
-
-const MemoryStore = createMemoryStore(session);
+import { User, UserRole } from "@shared/schema";
+import MemoryStore from "memorystore";
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User extends User {
+      role: UserRole;
+    }
   }
 }
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password: string) {
+async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+async function comparePasswords(supplied: string, stored: string): Promise<boolean> {
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-export function setupAuth(app: Express) {
-  // Create session store
-  const sessionStore = new MemoryStore({
-    checkPeriod: 86400000 // prune expired entries every 24h
-  });
+// Middleware to check if user is an admin
+export function isAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden: Admin access required" });
+  }
+  
+  next();
+}
 
+export function setupAuth(app: Express) {
+  const MemStore = MemoryStore(session);
+  
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "benefits-portal-secret-key",
+    secret: "employee-benefits-secret-key", // In production, use environment variables
     resave: false,
     saveUninitialized: false,
-    store: sessionStore,
+    store: new MemStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
     }
   };
 
-  app.set("trust proxy", 1);
   app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
@@ -56,28 +70,32 @@ export function setupAuth(app: Express) {
     new LocalStrategy(async (username, password, done) => {
       try {
         const user = await storage.getUserByUsername(username);
+        
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
         } else {
           return done(null, user);
         }
-      } catch (err) {
-        return done(err);
+      } catch (error) {
+        return done(error);
       }
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+  
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
       done(null, user);
-    } catch (err) {
-      done(err);
+    } catch (error) {
+      done(error);
     }
   });
 
-  // Register endpoint
+  // Register a new user
   app.post("/api/register", async (req, res, next) => {
     try {
       const { username, password, role } = req.body;
@@ -88,57 +106,66 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      // Create new user with hashed password
+      // Hash the password
       const hashedPassword = await hashPassword(password);
+      
+      // Create the user in storage
       const user = await storage.createUser({
         username,
         password: hashedPassword,
-        role: role || "user" // default to user role if not specified
+        role
       });
 
-      // Log the user in after successful registration
+      // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
-        // Return user without password
+        
+        // Return the user without the password
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
-    } catch (err) {
-      console.error("Registration error:", err);
+    } catch (error) {
+      console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
     }
   });
 
-  // Login endpoint
+  // Login a user
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
-      if (!user) return res.status(401).json({ message: "Invalid credentials" });
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
       
       req.login(user, (err) => {
         if (err) return next(err);
-        // Return user without password
+        
+        // Return the user without the password
         const { password, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
+        res.json(userWithoutPassword);
       });
     })(req, res, next);
   });
 
-  // Logout endpoint
-  app.post("/api/logout", (req, res, next) => {
+  // Logout a user
+  app.post("/api/logout", (req, res) => {
     req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.status(200).json({ message: "Logged out successfully" });
     });
   });
 
-  // Get current user endpoint
+  // Get the current authenticated user
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
     
-    // Return user without password
+    // Return the user without the password
     const { password, ...userWithoutPassword } = req.user;
     res.json(userWithoutPassword);
   });
