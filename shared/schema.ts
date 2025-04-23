@@ -2,6 +2,17 @@ import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Question types for survey template
+export const questionTypeEnum = z.enum([
+  "text",
+  "radio",
+  "checkbox",
+  "select",
+  "textarea"
+]);
+
+export type QuestionType = z.infer<typeof questionTypeEnum>;
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -82,3 +93,46 @@ export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit
 
 export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
 export type CalendarEvent = typeof calendarEvents.$inferSelect;
+
+// Survey question template schema
+export const surveyQuestions = pgTable("survey_questions", {
+  id: serial("id").primaryKey(),
+  questionText: text("question_text").notNull(),
+  questionType: text("question_type").notNull(),
+  required: boolean("required").default(false).notNull(),
+  order: integer("order").notNull(),
+  options: text("options").array(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  active: boolean("active").default(true).notNull(),
+});
+
+export const insertSurveyQuestionSchema = createInsertSchema(surveyQuestions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSurveyQuestion = z.infer<typeof insertSurveyQuestionSchema>;
+export type SurveyQuestion = typeof surveyQuestions.$inferSelect;
+
+// Survey template schema
+export const surveyTemplates = pgTable("survey_templates", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  publishedAt: timestamp("published_at"),
+});
+
+export const insertSurveyTemplateSchema = createInsertSchema(surveyTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+});
+
+export type InsertSurveyTemplate = z.infer<typeof insertSurveyTemplateSchema>;
+export type SurveyTemplate = typeof surveyTemplates.$inferSelect;
