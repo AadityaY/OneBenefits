@@ -39,38 +39,74 @@ function Router() {
   const { user } = useAuth();
   const [location] = useLocation();
   
-  // Handle root route redirects based on user role
-  if (location === '/') {
-    // If user is logged in, redirect to appropriate dashboard
-    if (user) {
-      const isAdmin = user.role === "admin" || user.role === "superadmin";
-      if (isAdmin) {
-        return <Redirect to="/admin/surveys" />;
-      } else {
-        return <Redirect to="/take-survey" />;
-      }
+  // Handle root route redirects
+  if (location === '/' && user) {
+    // Redirect based on user role
+    const isAdmin = user.role === "admin" || user.role === "superadmin";
+    if (isAdmin) {
+      return <Redirect to="/admin/surveys" />;
     } else {
-      // If not logged in, redirect to auth page
-      return <Redirect to="/auth" />;
+      return <Redirect to="/take-survey" />;
     }
+  }
+  
+  // Redirect to auth if not logged in (except for auth page itself)
+  if (!user && location !== '/auth' && location !== '/') {
+    return <Redirect to="/auth" />;
   }
   
   return (
     <AppLayout>
       <Switch>
+        {/* Root route handling */}
+        <Route path="/">
+          {user ? (
+            // This should never render as we redirect in the code above
+            <Redirect to={user.role === "admin" || user.role === "superadmin" ? "/admin/surveys" : "/take-survey"} />
+          ) : (
+            <Redirect to="/auth" />
+          )}
+        </Route>
+        
         {/* User Dashboard Routes */}
-        <ProtectedRoute path="/take-survey" component={Dashboard} />
-        <ProtectedRoute path="/chat" component={Dashboard} />
-        <ProtectedRoute path="/calendar" component={Dashboard} />
-        <ProtectedRoute path="/content" component={Dashboard} />
+        <Route path="/take-survey">
+          {user ? <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/chat">
+          {user ? <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/calendar">
+          {user ? <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/content">
+          {user ? <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
         
         {/* Admin Dashboard Routes */}
-        <ProtectedRoute path="/admin/surveys" component={Dashboard} roles={["admin", "superadmin"]} />
-        <ProtectedRoute path="/admin/analytics" component={Dashboard} roles={["admin", "superadmin"]} />
-        <ProtectedRoute path="/admin/email" component={Dashboard} roles={["admin", "superadmin"]} />
-        <ProtectedRoute path="/admin/events" component={Dashboard} roles={["admin", "superadmin"]} />
-        <ProtectedRoute path="/admin/documents" component={Dashboard} roles={["admin", "superadmin"]} />
-        <ProtectedRoute path="/admin/company-settings" component={CompanySettings} roles={["admin", "superadmin"]} />
+        <Route path="/admin/surveys">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/analytics">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/email">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/events">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/documents">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <Dashboard /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/company-settings">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <CompanySettings /> : <Redirect to="/auth" />}
+        </Route>
         
         {/* Login/Registration page */}
         <Route path="/auth" component={AuthPage} />
