@@ -65,7 +65,7 @@ export function Header() {
           )}
 
           {isAdmin && (
-            <Link to="/settings">
+            <Link to="/company-settings">
               <Button variant="ghost">Company Settings</Button>
             </Link>
           )}
@@ -91,7 +91,7 @@ export function Header() {
               </DropdownMenuItem>
               {isAdmin && (
                 <DropdownMenuItem asChild>
-                  <Link to="/settings">Company Settings</Link>
+                  <Link to="/company-settings">Company Settings</Link>
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
@@ -118,22 +118,22 @@ export function Header() {
                   <span className="font-medium">{user?.firstName || user?.username}</span>
                 </div>
                 <div className="space-y-3">
-                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">Dashboard</Button>
                   </Link>
                   {isAdmin && (
-                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">Admin</Button>
                     </Link>
                   )}
-                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
                       <UserIcon className="h-4 w-4 mr-2" />
                       Profile Settings
                     </Button>
                   </Link>
                   {isAdmin && (
-                    <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to="/company-settings" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">
                         <Settings className="h-4 w-4 mr-2" />
                         Company Settings
