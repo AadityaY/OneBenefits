@@ -186,8 +186,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Survey template routes
   app.post("/api/survey-templates", isAdmin, companyAccess, async (req: Request, res: Response) => {
     try {
-      const companyId = req.user.companyId;
-      if (!companyId) {
+      let companyId = req.user.companyId;
+      
+      // For superadmin users, allow creating templates for any company
+      if (!companyId && req.user.role === "superadmin") {
+        // Use companyId from request if provided, otherwise use company ID 1 (default)
+        companyId = req.body.companyId || 1;
+      } else if (!companyId) {
         return res.status(400).json({ message: "Admin has no associated company" });
       }
       
@@ -280,8 +285,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Survey question operations - all company-specific
   app.post("/api/survey-questions", isAdmin, companyAccess, async (req: Request, res: Response) => {
     try {
-      const companyId = req.user.companyId;
-      if (!companyId) {
+      let companyId = req.user.companyId;
+      
+      // For superadmin users, allow creating questions for any company
+      if (!companyId && req.user.role === "superadmin") {
+        // Use companyId from request if provided, otherwise use company ID 1 (default)
+        companyId = req.body.companyId || 1;
+      } else if (!companyId) {
         return res.status(400).json({ message: "User has no associated company" });
       }
       
@@ -299,8 +309,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/survey-questions", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
-      const companyId = req.user.companyId;
-      if (!companyId) {
+      let companyId = req.user.companyId;
+      
+      // For superadmin users, allow retrieving questions for any company
+      if (!companyId && req.user.role === "superadmin") {
+        // Use companyId from query if provided, otherwise use company ID 1 (default)
+        companyId = req.query.companyId ? parseInt(req.query.companyId as string) : 1;
+      } else if (!companyId) {
         return res.status(400).json({ message: "User has no associated company" });
       }
       
