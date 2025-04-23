@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,11 +10,19 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 
+// Router redirects to /auth by default
 function Router() {
+  const [location] = useLocation();
+  
   return (
     <Switch>
-      {/* Protected main route - redirects to auth if not logged in */}
-      <ProtectedRoute path="/" component={Dashboard} />
+      {/* Default route redirects to auth */}
+      <Route path="/">
+        <Redirect to="/auth" />
+      </Route>
+      
+      {/* Dashboard is protected and requires login */}
+      <ProtectedRoute path="/dashboard" component={Dashboard} />
       
       {/* Admin dashboard - same component but with adminOnly flag */}
       <ProtectedRoute path="/admin" component={Dashboard} adminOnly={true} />

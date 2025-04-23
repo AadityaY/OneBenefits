@@ -97,17 +97,19 @@ export class MemStorage implements IStorage {
   }
   
   private initializeUsers() {
-    // Admin user
+    // Admin user with a simple password 
     this.createUser({
       username: "admin",
-      password: "password.salt", // This will be replaced with proper hashed password in auth.ts
+      // Use a simple format for the pre-defined users
+      password: "password.hash",
       role: "admin"
     });
     
-    // Regular user
+    // Regular user with a simple password
     this.createUser({
       username: "user",
-      password: "password.salt", // This will be replaced with proper hashed password in auth.ts
+      // Use a simple format for the pre-defined users
+      password: "password.hash",
       role: "user"
     });
   }
