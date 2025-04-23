@@ -854,7 +854,7 @@ export default function SurveyAdminTab() {
                             <Badge variant="outline" className="capitalize">
                               {question.questionType}
                             </Badge>
-                            {question.required && (
+                            {question.isRequired && (
                               <Badge variant="secondary">Required</Badge>
                             )}
                             <Button
@@ -935,7 +935,7 @@ export default function SurveyAdminTab() {
                           <div className="flex-1">
                             <Label className="font-medium">
                               {question.questionText}
-                              {question.required && <span className="text-destructive ml-1">*</span>}
+                              {question.isRequired && <span className="text-destructive ml-1">*</span>}
                             </Label>
                             
                             {/* Render different input types based on question type */}
