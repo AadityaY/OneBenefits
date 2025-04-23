@@ -78,7 +78,7 @@ export default function SurveyAdminTab() {
     isLoading: loadingTemplates,
   } = useQuery<SurveyTemplateType[]>({
     queryKey: ["/api/survey-templates", companyId],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
   
@@ -88,7 +88,7 @@ export default function SurveyAdminTab() {
     isLoading: loadingQuestions,
   } = useQuery<SurveyQuestionType[]>({
     queryKey: ["/api/survey-questions", selectedTemplate?.id],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
   

@@ -105,7 +105,7 @@ export default function CalendarTab() {
     isLoading: loadingEvents 
   } = useQuery<CalendarEvent[]>({ 
     queryKey: ["/api/events", companyId],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
   

@@ -52,7 +52,7 @@ export default function AnalyticsTab() {
     isLoading: loadingTemplates 
   } = useQuery<SurveyTemplate[]>({ 
     queryKey: ["/api/survey-templates", companyId],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
   
@@ -62,11 +62,7 @@ export default function AnalyticsTab() {
     isLoading: loadingResponses 
   } = useQuery<SurveyResponse[]>({ 
     queryKey: ["/api/survey", selectedTemplate],
-    queryFn: getQueryFn({ 
-      params: { 
-        templateId: selectedTemplate,
-      } 
-    }),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate && !!companyId,
   });
   
@@ -76,7 +72,7 @@ export default function AnalyticsTab() {
     isLoading: loadingQuestions 
   } = useQuery<SurveyQuestion[]>({ 
     queryKey: ["/api/survey-questions", selectedTemplate],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
   

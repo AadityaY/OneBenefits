@@ -46,7 +46,7 @@ export default function ChatTab() {
     isError: messagesError
   } = useQuery<ChatMessage[]>({ 
     queryKey: ["/api/chat", companyId],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
   

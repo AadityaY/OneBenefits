@@ -70,7 +70,7 @@ export default function SurveyTakingTab() {
     isLoading: loadingTemplates 
   } = useQuery<SurveyTemplate[]>({ 
     queryKey: ["/api/survey-templates", companyId],
-    queryFn: getQueryFn({ params: { isPublished: true } }),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
   
@@ -80,7 +80,7 @@ export default function SurveyTakingTab() {
     isLoading: loadingQuestions 
   } = useQuery<SurveyQuestion[]>({ 
     queryKey: ["/api/survey-questions", selectedTemplate?.id],
-    queryFn: getQueryFn(),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
   
@@ -90,7 +90,7 @@ export default function SurveyTakingTab() {
     isLoading: loadingPreviousResponses
   } = useQuery<SurveyResponse[]>({ 
     queryKey: ["/api/survey", selectedTemplate?.id],
-    queryFn: getQueryFn({ params: { templateId: selectedTemplate?.id } }),
+    queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate && !!user,
   });
   
