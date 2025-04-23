@@ -66,6 +66,19 @@ export async function getSurveyQuestions(): Promise<SurveyQuestion[]> {
   return response.json();
 }
 
+export async function getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]> {
+  const response = await fetch(`/api/survey-questions?templateId=${templateId}`, {
+    credentials: 'include',
+  });
+  
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${response.status}: ${text || response.statusText}`);
+  }
+  
+  return response.json();
+}
+
 export async function getSurveyQuestion(id: number): Promise<SurveyQuestion> {
   const response = await fetch(`/api/survey-questions/${id}`, {
     credentials: 'include',

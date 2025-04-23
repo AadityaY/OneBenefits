@@ -47,7 +47,8 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { 
   getSurveyTemplates, 
-  getSurveyQuestions, 
+  getSurveyQuestions,
+  getSurveyQuestionsByTemplateId,
   createSurveyTemplate, 
   updateSurveyTemplate, 
   deleteSurveyTemplate, 

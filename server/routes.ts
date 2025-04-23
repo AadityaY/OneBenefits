@@ -271,8 +271,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/survey-questions", async (req: Request, res: Response) => {
     try {
-      const questions = await storage.getSurveyQuestions();
-      res.json(questions);
+      // Check if templateId query parameter exists
+      const templateId = req.query.templateId ? parseInt(req.query.templateId as string) : undefined;
+      
+      if (templateId && !isNaN(templateId)) {
+        // If templateId is provided, filter questions by template
+        const questions = await storage.getSurveyQuestionsByTemplateId(templateId);
+        return res.json(questions);
+      } else {
+        // Otherwise, get all questions
+        const questions = await storage.getSurveyQuestions();
+        return res.json(questions);
+      }
     } catch (error) {
       console.error("Error fetching survey questions:", error);
       res.status(500).json({ message: "Failed to fetch survey questions" });
