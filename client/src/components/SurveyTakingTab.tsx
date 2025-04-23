@@ -162,6 +162,16 @@ export default function SurveyTakingTab() {
   
   // Handle moving to the next question
   const handleNextQuestion = () => {
+    // Make sure there is a current question before proceeding
+    if (!currentQuestion) {
+      toast({
+        title: "Error",
+        description: "No question found. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Ensure current question is answered if required
     if (currentQuestion.required && !responses[currentQuestion.id]) {
       toast({
@@ -182,6 +192,16 @@ export default function SurveyTakingTab() {
   
   // Handle moving to the previous question
   const handlePreviousQuestion = () => {
+    // Make sure there are questions to navigate through
+    if (!sortedQuestions.length) {
+      toast({
+        title: "Error",
+        description: "No questions found. Please refresh and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
     }
@@ -189,21 +209,29 @@ export default function SurveyTakingTab() {
   
   // Handle survey submission
   const handleSubmitSurvey = async () => {
-    if (sortedQuestions.length === 0 || !selectedTemplate) return;
-    
-    // Check if all required questions are answered
-    const unansweredRequired = sortedQuestions
-      .filter(q => q.required && !responses[q.id])
-      .map(q => q.questionText);
-    
-    if (unansweredRequired.length > 0) {
+    if (sortedQuestions.length === 0 || !selectedTemplate) {
       toast({
-        title: "Required questions",
-        description: `Please answer all required questions before submitting.`,
+        title: "Cannot submit survey",
+        description: "No questions or template found. Please refresh and try again.",
         variant: "destructive",
       });
       return;
     }
+    
+    try {
+      // Check if all required questions are answered
+      const unansweredRequired = sortedQuestions
+        .filter(q => q.required && !responses[q.id])
+        .map(q => q.questionText);
+      
+      if (unansweredRequired.length > 0) {
+        toast({
+          title: "Required questions",
+          description: `Please answer all required questions before submitting.`,
+          variant: "destructive",
+        });
+        return;
+      }
     
     setSubmitting(true);
     
@@ -221,6 +249,15 @@ export default function SurveyTakingTab() {
     };
     
     submitResponseMutation.mutate(surveyResponse);
+    } catch (error) {
+      console.error('Error during survey submission:', error);
+      setSubmitting(false);
+      toast({
+        title: "Error",
+        description: "An error occurred while submitting your survey. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   // Handle returning to the templates list
