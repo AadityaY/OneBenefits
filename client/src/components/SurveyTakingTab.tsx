@@ -375,7 +375,10 @@ export default function SurveyTakingTab() {
                     <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
                   <SelectContent>
-                    {currentQuestion.options.split('\n').map((option, i) => (
+                    {(Array.isArray(currentQuestion.options) 
+                      ? currentQuestion.options 
+                      : currentQuestion.options.split('\n')
+                    ).map((option, i) => (
                       <SelectItem key={i} value={option}>{option}</SelectItem>
                     ))}
                   </SelectContent>
@@ -396,7 +399,10 @@ export default function SurveyTakingTab() {
                   onValueChange={(value) => handleResponseChange(currentQuestion.id, value)}
                   className="space-y-3"
                 >
-                  {currentQuestion.options.split('\n').map((option, i) => (
+                  {(Array.isArray(currentQuestion.options) 
+                    ? currentQuestion.options 
+                    : currentQuestion.options.split('\n')
+                  ).map((option, i) => (
                     <div key={i} className="flex items-center space-x-2">
                       <RadioGroupItem value={option} id={`option-${currentQuestion.id}-${i}`} />
                       <Label htmlFor={`option-${currentQuestion.id}-${i}`}>{option}</Label>
@@ -407,7 +413,10 @@ export default function SurveyTakingTab() {
               
               {currentQuestion.questionType === "checkbox" && currentQuestion.options && (
                 <div className="space-y-3">
-                  {currentQuestion.options.split('\n').map((option, i) => (
+                  {(Array.isArray(currentQuestion.options) 
+                    ? currentQuestion.options 
+                    : currentQuestion.options.split('\n')
+                  ).map((option, i) => (
                     <div key={i} className="flex items-center space-x-2">
                       <Checkbox
                         id={`check-${currentQuestion.id}-${i}`}
