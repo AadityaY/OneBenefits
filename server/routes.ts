@@ -277,28 +277,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Survey question routes
-  app.post("/api/survey-questions", isAdmin, async (req: Request, res: Response) => {
+  // Survey question operations - all company-specific
+  app.post("/api/survey-questions", isAdmin, companyAccess, async (req: Request, res: Response) => {
     try {
-      const question = await storage.createSurveyQuestion(req.body);
+      const companyId = req.user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      const questionData = {
+        ...req.body,
+        companyId
+      };
+      
+      const question = await storage.createSurveyQuestion(questionData);
       res.status(201).json(question);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/survey-questions", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/survey-questions", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
-      const questions = await storage.getSurveyQuestions();
+      const companyId = req.user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      const questions = await storage.getSurveyQuestions(companyId);
       res.json(questions);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get("/api/survey-questions/:id", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/survey-questions/:id", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const question = await storage.getSurveyQuestion(id);
+      const companyId = req.user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      const question = await storage.getSurveyQuestion(id, companyId);
       
       if (!question) {
         return res.status(404).json({ message: "Survey question not found" });
@@ -310,10 +331,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/survey-questions/:id", isAdmin, async (req: Request, res: Response) => {
+  app.patch("/api/survey-questions/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const question = await storage.updateSurveyQuestion(id, req.body);
+      const companyId = req.user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      const question = await storage.updateSurveyQuestion(id, req.body, companyId);
       
       if (!question) {
         return res.status(404).json({ message: "Survey question not found" });
@@ -325,13 +351,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/survey-questions/:id", isAdmin, async (req: Request, res: Response) => {
+  app.delete("/api/survey-questions/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteSurveyQuestion(id);
+      const companyId = req.user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      const success = await storage.deleteSurveyQuestion(id, companyId);
       
       if (!success) {
         return res.status(404).json({ message: "Survey question not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Template-Question relationship management
+  app.get("/api/survey-templates/:templateId/questions", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const templateId = parseInt(req.params.templateId);
+      const questions = await storage.getQuestionsForTemplate(templateId);
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.post("/api/survey-templates/:templateId/questions", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const templateId = parseInt(req.params.templateId);
+      const questionId = req.body.questionId;
+      const order = req.body.order || 0;
+      
+      if (!questionId) {
+        return res.status(400).json({ message: "Question ID is required" });
+      }
+      
+      const templateQuestion = await storage.addQuestionToTemplate(templateId, questionId, order);
+      res.status(201).json(templateQuestion);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.delete("/api/survey-templates/:templateId/questions/:questionId", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const templateId = parseInt(req.params.templateId);
+      const questionId = parseInt(req.params.questionId);
+      
+      const success = await storage.removeQuestionFromTemplate(templateId, questionId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Question not found in template" });
       }
       
       res.json({ success: true });

@@ -89,12 +89,22 @@ export default function SurveyAdminTab() {
     enabled: !!companyId,
   });
   
-  // Fetch all survey questions if a template is selected
+  // Fetch all survey questions for a company
   const {
-    data: questions,
-    isLoading: loadingQuestions,
+    data: allQuestions,
+    isLoading: loadingAllQuestions,
   } = useQuery<SurveyQuestionType[]>({
-    queryKey: ["/api/survey-questions", selectedTemplate?.id],
+    queryKey: ["/api/survey-questions", companyId],
+    queryFn: getQueryFn({ on401: "throw" }),
+    enabled: !!companyId,
+  });
+  
+  // Fetch questions assigned to the selected template
+  const {
+    data: templateQuestions,
+    isLoading: loadingTemplateQuestions,
+  } = useQuery<SurveyQuestionType[]>({
+    queryKey: ["/api/survey-templates", selectedTemplate?.id, "questions"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
