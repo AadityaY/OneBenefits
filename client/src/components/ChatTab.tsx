@@ -127,17 +127,23 @@ export default function ChatTab() {
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="chat">AI Assistant</TabsTrigger>
-            <TabsTrigger value="documents">Document Search</TabsTrigger>
+          <TabsList className="bg-background/50 backdrop-blur-sm border-gradient p-1">
+            <TabsTrigger value="chat" className="hover-lift">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              AI Assistant
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="hover-lift">
+              <FileText className="h-4 w-4 mr-2" />
+              Document Search
+            </TabsTrigger>
           </TabsList>
         </div>
         
         <TabsContent value="chat" className="space-y-4">
-          <Card className="w-full max-w-4xl mx-auto overflow-hidden glass-effect">
-            <CardHeader className="border-b bg-muted/50 px-4 py-3">
+          <Card className="w-full max-w-4xl mx-auto overflow-hidden frost-glass shadow-lg">
+            <CardHeader className="border-b bg-background/70 px-4 py-3">
               <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 animated-gradient-bg">
                   <AvatarFallback>AI</AvatarFallback>
                   <AvatarImage src={AI_AVATAR_URL} />
                 </Avatar>
@@ -281,10 +287,12 @@ export default function ChatTab() {
         </TabsContent>
         
         <TabsContent value="documents" className="space-y-4">
-          <Card className="w-full max-w-4xl mx-auto overflow-hidden glass-effect">
-            <CardHeader className="border-b bg-muted/50 px-4 py-3">
+          <Card className="w-full max-w-4xl mx-auto overflow-hidden frost-glass shadow-lg">
+            <CardHeader className="border-b bg-background/70 px-4 py-3">
               <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-muted-foreground" />
+                <div className="h-8 w-8 rounded-full flex items-center justify-center animated-gradient-bg">
+                  <Search className="h-4 w-4 text-background" />
+                </div>
                 <div>
                   <CardTitle className="text-base gradient-heading">Benefits Document Search</CardTitle>
                   <CardDescription className="text-xs">
@@ -300,12 +308,12 @@ export default function ChatTab() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search documents..."
-                    className="pl-9"
+                    className="pl-9 focus-within:border-gradient"
                   />
                 </div>
                 
                 <div className="pt-4 space-y-4">
-                  <h3 className="text-sm font-medium">Popular Documents</h3>
+                  <h3 className="text-sm font-semibold gradient-heading">Popular Documents</h3>
                   
                   <div className="grid gap-3">
                     {[
@@ -334,16 +342,16 @@ export default function ChatTab() {
                         date: "Updated Dec 2022"
                       },
                     ].map((doc, i) => (
-                      <div key={i} className="flex items-start border rounded-md p-3 hover:bg-muted/50 transition-colors gradient-border card-hover">
+                      <div key={i} className="flex items-start border rounded-md p-3 hover-lift frost-glass-light shadow-sm transition-all">
                         <div className="mr-3">
-                          <div className="h-10 w-10 rounded bg-primary/10 flex items-center justify-center">
-                            <FileText className="h-5 w-5 text-primary" />
+                          <div className="h-10 w-10 rounded animated-gradient-bg flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-background" />
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
                             <h4 className="text-sm font-medium">{doc.title}</h4>
-                            <Badge variant="outline" className="ml-2 shrink-0">
+                            <Badge variant="secondary" className="ml-2 shrink-0">
                               {doc.type}
                             </Badge>
                           </div>
@@ -352,7 +360,7 @@ export default function ChatTab() {
                           </p>
                           <div className="flex items-center mt-2 text-xs text-muted-foreground">
                             {doc.date}
-                            <Button variant="ghost" size="sm" className="ml-auto h-7 text-xs">
+                            <Button variant="outline" size="sm" className="ml-auto h-7 text-xs hover-lift">
                               View
                             </Button>
                           </div>
