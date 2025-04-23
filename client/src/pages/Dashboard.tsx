@@ -154,7 +154,7 @@ interface PageHeaderProps {
 function PageHeader({ title, description }: PageHeaderProps) {
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold mb-2 gradient-heading">
+      <h1 className="text-2xl md:text-3xl font-bold mb-2 text-foreground">
         {title}
       </h1>
       <p className="text-muted-foreground">
