@@ -1,0 +1,9 @@
+129:      isRequired: true,
+272:        isRequired: true,
+596:                        name="isRequired"
+827:                <Badge variant={selectedTemplate.isPublished ? "success" : "secondary"}>
+828:                  {selectedTemplate.isPublished ? "Published" : "Draft"}
+857:                            {question.isRequired && (
+912:                <Badge variant={selectedTemplate.isPublished ? "success" : "secondary"}>
+913:                  {selectedTemplate.isPublished ? "Published" : "Draft"}
+938:                              {question.isRequired && <span className="text-destructive ml-1">*</span>}
