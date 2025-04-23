@@ -135,7 +135,7 @@ export type CalendarEvent = typeof calendarEvents.$inferSelect;
 // Survey question template schema
 export const surveyQuestions = pgTable("survey_questions", {
   id: serial("id").primaryKey(),
-  templateId: integer("template_id"),
+  companyId: integer("company_id").notNull().references(() => companies.id),
   questionText: text("question_text").notNull(),
   questionType: text("question_type").notNull(),
   required: boolean("required").default(false).notNull(),
@@ -154,6 +154,23 @@ export const insertSurveyQuestionSchema = createInsertSchema(surveyQuestions).om
 
 export type InsertSurveyQuestion = z.infer<typeof insertSurveyQuestionSchema>;
 export type SurveyQuestion = typeof surveyQuestions.$inferSelect;
+
+// Junction table for many-to-many relationship between templates and questions
+export const templateQuestions = pgTable("template_questions", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").notNull().references(() => surveyTemplates.id),
+  questionId: integer("question_id").notNull().references(() => surveyQuestions.id),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertTemplateQuestionSchema = createInsertSchema(templateQuestions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTemplateQuestion = z.infer<typeof insertTemplateQuestionSchema>;
+export type TemplateQuestion = typeof templateQuestions.$inferSelect;
 
 // Survey template schema
 export const surveyTemplates = pgTable("survey_templates", {

@@ -6,12 +6,13 @@ import {
   calendarEvents, type CalendarEvent, type InsertCalendarEvent,
   surveyTemplates, type SurveyTemplate, type InsertSurveyTemplate,
   surveyQuestions, type SurveyQuestion, type InsertSurveyQuestion,
+  templateQuestions, type TemplateQuestion, type InsertTemplateQuestion,
   companies, type Company, type InsertCompany,
   companySettings, type CompanySettings, type InsertCompanySettings
 } from "@shared/schema";
 
 import { db } from "./db";
-import { eq, and, isNull } from "drizzle-orm";
+import { eq, and, isNull, inArray, sql } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
 import { pool } from "./db";
@@ -46,11 +47,15 @@ export interface IStorage {
   
   // Survey Question methods
   createSurveyQuestion(question: InsertSurveyQuestion): Promise<SurveyQuestion>;
-  getSurveyQuestions(): Promise<SurveyQuestion[]>;
-  getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]>;
-  getSurveyQuestion(id: number): Promise<SurveyQuestion | undefined>;
-  updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion | undefined>;
-  deleteSurveyQuestion(id: number): Promise<boolean>;
+  getSurveyQuestions(companyId: number): Promise<SurveyQuestion[]>;
+  getSurveyQuestion(id: number, companyId: number): Promise<SurveyQuestion | undefined>;
+  updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>, companyId: number): Promise<SurveyQuestion | undefined>;
+  deleteSurveyQuestion(id: number, companyId: number): Promise<boolean>;
+  
+  // Template Question relationship methods
+  addQuestionToTemplate(templateId: number, questionId: number, order: number): Promise<TemplateQuestion>;
+  removeQuestionFromTemplate(templateId: number, questionId: number): Promise<boolean>;
+  getQuestionsForTemplate(templateId: number): Promise<SurveyQuestion[]>;
   
   // Chat methods
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -255,33 +260,81 @@ export class DatabaseStorage implements IStorage {
     return newQuestion;
   }
 
-  async getSurveyQuestions(): Promise<SurveyQuestion[]> {
-    return await db.select().from(surveyQuestions);
-  }
-
-  async getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]> {
+  async getSurveyQuestions(companyId: number): Promise<SurveyQuestion[]> {
     return await db.select().from(surveyQuestions)
-      .where(eq(surveyQuestions.templateId, templateId));
+      .where(eq(surveyQuestions.companyId, companyId));
   }
 
-  async getSurveyQuestion(id: number): Promise<SurveyQuestion | undefined> {
+  async getSurveyQuestion(id: number, companyId: number): Promise<SurveyQuestion | undefined> {
     const [question] = await db.select().from(surveyQuestions)
-      .where(eq(surveyQuestions.id, id));
+      .where(and(
+        eq(surveyQuestions.id, id),
+        eq(surveyQuestions.companyId, companyId)
+      ));
     return question;
   }
 
-  async updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion | undefined> {
+  async updateSurveyQuestion(id: number, question: Partial<InsertSurveyQuestion>, companyId: number): Promise<SurveyQuestion | undefined> {
     const [updatedQuestion] = await db.update(surveyQuestions)
       .set({ ...question, updatedAt: new Date() })
-      .where(eq(surveyQuestions.id, id))
+      .where(and(
+        eq(surveyQuestions.id, id),
+        eq(surveyQuestions.companyId, companyId)
+      ))
       .returning();
     return updatedQuestion;
   }
 
-  async deleteSurveyQuestion(id: number): Promise<boolean> {
+  async deleteSurveyQuestion(id: number, companyId: number): Promise<boolean> {
     const result = await db.delete(surveyQuestions)
-      .where(eq(surveyQuestions.id, id));
+      .where(and(
+        eq(surveyQuestions.id, id),
+        eq(surveyQuestions.companyId, companyId)
+      ));
     return result.rowCount > 0;
+  }
+  
+  // Template-Question relationship methods
+  async addQuestionToTemplate(templateId: number, questionId: number, order: number): Promise<TemplateQuestion> {
+    const [templateQuestion] = await db.insert(templateQuestions)
+      .values({
+        templateId,
+        questionId,
+        order
+      })
+      .returning();
+    return templateQuestion;
+  }
+  
+  async removeQuestionFromTemplate(templateId: number, questionId: number): Promise<boolean> {
+    const result = await db.delete(templateQuestions)
+      .where(and(
+        eq(templateQuestions.templateId, templateId),
+        eq(templateQuestions.questionId, questionId)
+      ));
+    return result.rowCount > 0;
+  }
+  
+  async getQuestionsForTemplate(templateId: number): Promise<SurveyQuestion[]> {
+    const templateQuestionsResult = await db
+      .select()
+      .from(templateQuestions)
+      .where(eq(templateQuestions.templateId, templateId))
+      .orderBy(templateQuestions.order);
+    
+    if (templateQuestionsResult.length === 0) {
+      return [];
+    }
+    
+    // Extract question IDs
+    const questionIds = templateQuestionsResult.map(tq => tq.questionId);
+    
+    // Get the actual question details
+    return await db
+      .select()
+      .from(surveyQuestions)
+      .where(inArray(surveyQuestions.id, questionIds))
+      .orderBy(sql`array_position(ARRAY[${questionIds.join(',')}]::int[], ${surveyQuestions.id})`);
   }
 
   // Company methods
