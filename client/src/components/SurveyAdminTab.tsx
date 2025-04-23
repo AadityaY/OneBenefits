@@ -566,8 +566,8 @@ export default function SurveyAdminTab() {
                 <div className="flex items-center gap-2">
                   <Label htmlFor="templateFilter">Filter by Template:</Label>
                   <Select 
-                    value={selectedTemplateId?.toString() || ""}
-                    onValueChange={(value) => setSelectedTemplateId(value ? parseInt(value) : null)}
+                    value={selectedTemplateId?.toString() || "all"}
+                    onValueChange={(value) => setSelectedTemplateId(value !== "all" ? parseInt(value) : null)}
                   >
                     <SelectTrigger className="w-[200px]">
                       <SelectValue placeholder="All templates" />
@@ -628,17 +628,17 @@ export default function SurveyAdminTab() {
                         <div className="grid gap-2">
                           <Label htmlFor="templateId">Survey Template</Label>
                           <Select
-                            value={newQuestion.templateId?.toString() || ""}
+                            value={newQuestion.templateId?.toString() || "none"}
                             onValueChange={(value) => setNewQuestion({ 
                               ...newQuestion, 
-                              templateId: value ? parseInt(value) : null 
+                              templateId: value !== "none" ? parseInt(value) : null 
                             })}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select a template" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">None</SelectItem>
+                              <SelectItem value="none">None</SelectItem>
                               {templatesQuery.data?.map(template => (
                                 <SelectItem key={template.id} value={template.id.toString()}>
                                   {template.title}
