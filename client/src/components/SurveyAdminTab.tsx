@@ -262,10 +262,19 @@ export default function SurveyAdminTab() {
   // Create a new survey question
   const createQuestionMutation = useMutation({
     mutationFn: async (question: z.infer<typeof questionSchema>) => {
+      // Convert options string to array if provided
+      const processedQuestion = {
+        ...question,
+        // Convert options string to array for question types that need options
+        options: ['radio', 'select', 'checkbox', 'scale'].includes(question.questionType) && question.options
+          ? getOptionsArray(question.options)
+          : undefined
+      };
+      
       const res = await apiRequest(
         "POST", 
         `/api/survey-questions`, 
-        question
+        processedQuestion
       );
       return res.json();
     },
