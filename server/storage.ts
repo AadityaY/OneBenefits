@@ -316,6 +316,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getQuestionsForTemplate(templateId: number): Promise<SurveyQuestion[]> {
+    // First, get all template-question associations for this template
     const templateQuestionsResult = await db
       .select()
       .from(templateQuestions)
@@ -325,16 +326,22 @@ export class DatabaseStorage implements IStorage {
     if (templateQuestionsResult.length === 0) {
       return [];
     }
+
+    // Now get the questions one by one in order
+    const questions: SurveyQuestion[] = [];
     
-    // Extract question IDs
-    const questionIds = templateQuestionsResult.map(tq => tq.questionId);
+    for (const tq of templateQuestionsResult) {
+      const [question] = await db
+        .select()
+        .from(surveyQuestions)
+        .where(eq(surveyQuestions.id, tq.questionId));
+      
+      if (question) {
+        questions.push(question);
+      }
+    }
     
-    // Get the actual question details
-    return await db
-      .select()
-      .from(surveyQuestions)
-      .where(inArray(surveyQuestions.id, questionIds))
-      .orderBy(sql`array_position(ARRAY[${questionIds.join(',')}]::int[], ${surveyQuestions.id})`);
+    return questions;
   }
 
   // Company methods
