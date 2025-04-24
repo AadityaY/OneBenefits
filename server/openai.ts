@@ -96,7 +96,8 @@ export async function chatWithDocuments(
   userMessage: string,
   companyId: number = 1,
   userId: number = 1,
-  companyName: string = "your company"
+  companyName: string = "your company",
+  assistantName: string = "Benefits Assistant"
 ): Promise<ChatResponse> {
   try {
     // Get the conversation state for this company and user
@@ -118,7 +119,7 @@ export async function chatWithDocuments(
 
     // Prepare system message with the document context
     const systemMessage = `
-You are a helpful benefits assistant for ${companyName}. Your goal is to help employees understand their benefits.
+You are ${assistantName}, a helpful benefits assistant for ${companyName}. Your goal is to help employees understand their benefits.
 Be clear, conversational, and empathetic. If you don't know the answer to a question, don't make up information.
 Use only the following document context to answer questions:
 

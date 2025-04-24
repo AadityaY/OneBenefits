@@ -544,6 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get company settings to personalize the chat
       const companySettings = await storage.getCompanySettings(companyId);
       const companyName = companySettings?.name || "your company";
+      const assistantName = companySettings?.aiAssistantName || "Benefits Assistant";
       
       // Filter out any documents with null content and prepare for OpenAI
       const documentsWithContent = documents
@@ -556,7 +557,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.content,
         companyId,
         userId,
-        companyName
+        companyName,
+        assistantName
       );
       
       // Store AI response
