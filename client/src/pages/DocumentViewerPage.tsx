@@ -40,7 +40,10 @@ const DocumentViewerPage = () => {
       <div className="mb-6">
         <Button 
           variant="outline" 
-          onClick={() => setLocation("/content")}
+          onClick={() => {
+            const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+            setLocation(isAdmin ? "/admin/documents" : "/content");
+          }}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Documents
