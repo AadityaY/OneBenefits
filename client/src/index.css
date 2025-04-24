@@ -176,6 +176,105 @@
   opacity: 1;
 }
 
+/* Chat Markdown customization */
+.prose a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.prose a:hover {
+  color: hsl(var(--primary)/0.8);
+}
+
+.prose code {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--primary));
+  font-size: 0.875em;
+  font-weight: 500;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+}
+
+.prose pre {
+  background-color: hsl(var(--muted));
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: hsl(var(--foreground));
+}
+
+.prose blockquote {
+  border-left: 3px solid hsl(var(--primary)/0.5);
+  padding-left: 1rem;
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+  margin: 1em 0;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.prose li {
+  margin-bottom: 0.25em;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 {
+  font-size: 1.5em;
+}
+
+.prose h2 {
+  font-size: 1.3em;
+}
+
+.prose h3 {
+  font-size: 1.15em;
+}
+
+.prose h4 {
+  font-size: 1em;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.prose thead {
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.prose th, .prose td {
+  padding: 0.5em;
+  border: 1px solid hsl(var(--border));
+  text-align: left;
+}
+
 /* PDF Viewer customization */
 .customized-viewer .rpv-default-layout__toolbar {
   background: rgba(255, 255, 255, 0.95);
