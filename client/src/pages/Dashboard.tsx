@@ -5,6 +5,8 @@ import SurveyTakingTab from "@/components/SurveyTakingTab";
 import AnalyticsTab from "@/components/AnalyticsTab";
 import ChatTab from "@/components/ChatTab";
 import CalendarTab from "@/components/CalendarTab";
+import DocumentManagementTab from "@/components/DocumentManagementTab";
+import DocumentsListComponent from "@/components/DocumentsListComponent";
 import { FileText } from "lucide-react";
 
 export default function Dashboard() {
@@ -60,13 +62,7 @@ export default function Dashboard() {
             title="Benefits Content" 
             description="Access your benefits documentation and resources."
           />
-          <div className="frost-glass p-8 rounded-lg flex flex-col items-center justify-center min-h-[300px]">
-            <FileText className="h-16 w-16 text-primary/50 mb-4" />
-            <h3 className="text-xl font-medium mb-2">Content Coming Soon</h3>
-            <p className="text-muted-foreground text-center max-w-md">
-              Your benefits documentation will be available here soon. Check back later for updates.
-            </p>
-          </div>
+          <DocumentsListComponent />
         </div>
       );
     }
@@ -96,19 +92,28 @@ export default function Dashboard() {
       );
     }
     
+    if (location === "/admin/documents" && isAdmin) {
+      return (
+        <div className="space-y-8">
+          <PageHeader 
+            title="Document Management" 
+            description="Upload and manage benefits documentation."
+          />
+          <DocumentManagementTab />
+        </div>
+      );
+    }
+    
     if ((location === "/admin/email" || 
-         location === "/admin/events" || 
-         location === "/admin/documents") && isAdmin) {
+         location === "/admin/events") && isAdmin) {
       const titles = {
         "/admin/email": "Email Campaigns",
-        "/admin/events": "Events Management",
-        "/admin/documents": "Document Management"
+        "/admin/events": "Events Management"
       };
       
       const descriptions = {
         "/admin/email": "Create and manage email campaigns for your employees.",
-        "/admin/events": "Schedule and manage employee benefits events.",
-        "/admin/documents": "Upload and manage benefits documentation."
+        "/admin/events": "Schedule and manage employee benefits events."
       };
       
       return (
