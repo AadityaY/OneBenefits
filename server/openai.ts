@@ -10,30 +10,31 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Using gpt-4o-mini as requested by the user
+// Model for fallback completions (used for document processing)
 const OPENAI_MODEL = "gpt-4o-mini";
 
-// Company-specific conversation histories
-interface ConversationState {
-  companyId: number;
-  userId: number;
-  history: { role: string; content: string }[];
-}
+// Store threads by company and user
+const threadStore = new Map<string, string>();
 
-// Store conversation history by company and user
-const conversationStates = new Map<string, ConversationState>();
-
-// Get or create conversation state
-function getConversationState(companyId: number, userId: number): ConversationState {
+// Function to get or create a thread for a user in a company
+async function getOrCreateThread(companyId: number, userId: number): Promise<string> {
   const key = `${companyId}-${userId}`;
-  if (!conversationStates.has(key)) {
-    conversationStates.set(key, {
-      companyId,
-      userId,
-      history: []
-    });
+  
+  // Check if we already have a thread ID stored
+  if (threadStore.has(key)) {
+    return threadStore.get(key)!;
   }
-  return conversationStates.get(key)!;
+  
+  // Create a new thread
+  try {
+    const thread = await openai.beta.threads.create();
+    threadStore.set(key, thread.id);
+    console.log(`Created new thread ${thread.id} for company ${companyId}, user ${userId}`);
+    return thread.id;
+  } catch (error) {
+    console.error("Error creating thread:", error);
+    throw error;
+  }
 }
 
 /**
@@ -89,7 +90,7 @@ This document contains information about employee benefits.
 }
 
 /**
- * Chat with documents using OpenAI and document context
+ * Chat with documents using OpenAI Assistant API
  */
 export async function chatWithDocuments(
   documents: { content: string }[], 
@@ -100,59 +101,65 @@ export async function chatWithDocuments(
   assistantName: string = "Benefits Assistant"
 ): Promise<ChatResponse> {
   try {
-    // Get the conversation state for this company and user
-    const conversationState = getConversationState(companyId, userId);
-    
-    // Add user message to conversation history
-    conversationState.history.push({ role: 'user', content: userMessage });
-    
-    // Extract relevant content from documents to use as context
-    let documentContext = "";
-    if (documents.length > 0) {
-      // Combine document contents, limiting the total size
-      documentContext = documents
-        .map(doc => doc.content)
-        .filter(content => content) // Filter out null or undefined
-        .join("\n\n")
-        .substring(0, 15000); // Limit context size
+    // Check if we have an assistant ID in the environment
+    const assistantId = process.env.OPENAI_ASSISTANT_ID;
+    if (!assistantId) {
+      throw new Error("OPENAI_ASSISTANT_ID environment variable is not set");
     }
 
-    // Prepare system message with the document context
-    const systemMessage = `
-You are ${assistantName}, a helpful benefits assistant for ${companyName}. Your goal is to help employees understand their benefits.
-Be clear, conversational, and empathetic. If you don't know the answer to a question, don't make up information.
-Use only the following document context to answer questions:
+    // Get or create a thread for this user and company
+    const threadId = await getOrCreateThread(companyId, userId);
 
-${documentContext || "No benefits documents are currently available."}
-
-If the information needed to answer the question is not in the context, politely explain that you don't have that specific information.
-Keep your answers concise but thorough. Focus on facts from the documents rather than general advice.
-`;
-
-    // Prepare messages for OpenAI API
-    const messages = [
-      { role: 'system', content: systemMessage },
-      // Include last few messages for context (limit to avoid token issues)
-      ...conversationState.history.slice(-5)
-    ];
-
-    // Call OpenAI API
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: messages as any, // Type assertion to satisfy TypeScript
-      max_tokens: 1000,
-      temperature: 0.7,
+    // Add the user's message to the thread
+    await openai.beta.threads.messages.create(threadId, {
+      role: "user",
+      content: userMessage
     });
 
-    const assistantResponse = response.choices[0].message.content || 
-      "I'm sorry, I couldn't generate a response. Please try asking in a different way.";
+    // Create a run with the assistant
+    const run = await openai.beta.threads.runs.create(threadId, {
+      assistant_id: assistantId
+    });
+
+    // Poll for the run to complete
+    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     
-    // Add assistant response to conversation history
-    conversationState.history.push({ role: 'assistant', content: assistantResponse });
+    // Wait for the assistant to respond (with a timeout)
+    const startTime = Date.now();
+    const timeout = 30000; // 30 seconds timeout
     
-    // Keep conversation history to a reasonable size (last 10 messages)
-    if (conversationState.history.length > 10) {
-      conversationState.history = conversationState.history.slice(-10);
+    while (runStatus.status !== "completed" && runStatus.status !== "failed" && Date.now() - startTime < timeout) {
+      // Wait 1 second before checking again
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+    }
+
+    if (runStatus.status === "failed") {
+      throw new Error(`Assistant run failed: ${runStatus.last_error?.message || "Unknown error"}`);
+    }
+
+    if (runStatus.status !== "completed") {
+      throw new Error("Assistant response timed out");
+    }
+
+    // Get the latest messages from the thread
+    const messages = await openai.beta.threads.messages.list(threadId);
+    
+    // Find the most recent assistant message
+    const assistantMessages = messages.data.filter(msg => msg.role === "assistant");
+    if (assistantMessages.length === 0) {
+      throw new Error("No assistant response found");
+    }
+
+    // Get the most recent message
+    const latestMessage = assistantMessages[0];
+    
+    // Extract the text content from the message
+    let assistantResponse = "";
+    if (latestMessage.content[0].type === "text") {
+      assistantResponse = latestMessage.content[0].text.value;
+    } else {
+      assistantResponse = "I'm sorry, I couldn't generate a response in text format.";
     }
     
     return {
