@@ -60,11 +60,21 @@ export const documents = pgTable("documents", {
   size: integer("size").notNull(),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
   content: text("content"),
+  title: text("title"),
+  description: text("description"),
+  isPublic: boolean("is_public").default(false).notNull(),
+  category: text("category").default("general"),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
 });
 
 export const insertDocumentSchema = createInsertSchema(documents).omit({
   id: true,
   uploadedAt: true,
+}).extend({
+  isPublic: z.boolean().default(false),
+  category: z.string().default("general"),
+  title: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
