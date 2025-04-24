@@ -234,6 +234,7 @@ export const companySettings = pgTable("company_settings", {
   website: text("website"),
   contactEmail: text("contact_email"),
   address: text("address"),
+  aiAssistantName: text("ai_assistant_name").default("Benefits Assistant"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 

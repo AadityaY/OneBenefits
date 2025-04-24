@@ -30,6 +30,7 @@ export default function CompanySettings() {
     secondaryColor: companySettings?.secondaryColor || "#10b981",
     accentColor: companySettings?.accentColor || "#f59e0b",
     logo: companySettings?.logo || "",
+    aiAssistantName: companySettings?.aiAssistantName || "Benefits Assistant",
   });
   
   // Update form data when settings load
@@ -44,6 +45,7 @@ export default function CompanySettings() {
         secondaryColor: companySettings.secondaryColor || "#10b981",
         accentColor: companySettings.accentColor || "#f59e0b",
         logo: companySettings.logo || "",
+        aiAssistantName: companySettings.aiAssistantName || "Benefits Assistant",
       });
     }
   }, [companySettings]);
@@ -129,6 +131,11 @@ export default function CompanySettings() {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="branding">Branding & Theme</TabsTrigger>
             <TabsTrigger value="contact">Contact Info</TabsTrigger>
+            <TabsTrigger value="ai">
+              <div className="flex items-center gap-1">
+                <span className="gradient-text">AI Assistant</span>
+              </div>
+            </TabsTrigger>
             <TabsTrigger value="notifications">
               <div className="flex items-center gap-1">
                 <BellRing className="h-4 w-4" />
@@ -325,6 +332,59 @@ export default function CompanySettings() {
                       onChange={handleChange}
                       placeholder="https://www.example.com"
                     />
+                  </div>
+                </CardContent>
+              </TabsContent>
+              
+              <TabsContent value="ai" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>AI Assistant Settings</CardTitle>
+                  <CardDescription>
+                    Configure your OpenAI-powered Benefits Assistant
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="rounded-lg p-4 border-gradient animated-gradient-bg">
+                    <div className="bg-background rounded-md p-6">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-primary/20">
+                          <img 
+                            src="https://api.dicebear.com/7.x/thumbs/svg?seed=benefits&backgroundColor=b16fef,8d72e6,5e81ea,4588f0&eyes=variant4W14,variant4W15&mouth=variant23,variant24,variant26,variant28" 
+                            alt="AI Assistant" 
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold gradient-text">OpenAI GPT-4o Integration</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Powered by OpenAI's latest large language model
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <Label htmlFor="aiAssistantName">Assistant Name</Label>
+                        <Input
+                          id="aiAssistantName"
+                          name="aiAssistantName"
+                          value={formData.aiAssistantName || "Benefits Assistant"}
+                          onChange={handleChange}
+                          placeholder="Enter a name for your AI assistant"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This name will be displayed to users in the chat interface
+                        </p>
+                      </div>
+                      
+                      <div className="mt-6 text-sm">
+                        <h4 className="font-medium text-primary mb-2">How it works</h4>
+                        <ul className="space-y-2 list-disc list-inside text-muted-foreground">
+                          <li>Your AI assistant uses OpenAI's GPT-4o model to answer employee questions</li>
+                          <li>It automatically uses your uploaded benefits documents as context</li>
+                          <li>All responses are generated in real-time based on your company's specific information</li>
+                          <li>Employees can ask questions about benefits, policies, and procedures</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </TabsContent>
