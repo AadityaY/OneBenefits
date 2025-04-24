@@ -110,10 +110,7 @@ function Router() {
         </Route>
         
         {/* Document Viewer Page */}
-        <Route path="/documents/:id">
-          {user ? <DocumentViewerPage /> : <Redirect to="/auth" />}
-        </Route>
-        <Route path="/documents">
+        <Route path="/document/:id">
           {user ? <DocumentViewerPage /> : <Redirect to="/auth" />}
         </Route>
         
