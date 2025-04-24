@@ -6,7 +6,7 @@ import { processDocumentContent, chatWithDocuments } from "./openai";
 import * as fs from "fs/promises";
 import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess } from "./auth";
 import { z } from "zod";
-import { insertCompanySchema } from "@shared/schema";
+import { insertCompanySchema, InsertDocument } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes (/api/register, /api/login, /api/logout, /api/user)
@@ -69,9 +69,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!companyId) {
         return res.status(400).json({ message: "User has no associated company" });
       }
+      
+      // Get document metadata from the request body
+      const { title, description, isPublic = false, category = "general" } = req.body;
 
       const results = await Promise.all(
-        req.files.map(async (file) => {
+        req.files.map(async (file, index) => {
           try {
             // Read file content
             const filePath = getFilePath(file.filename);
@@ -82,6 +85,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               content = await processDocumentContent("");
             }
 
+            // For multiple files, append index to title if provided
+            const fileTitle = title ? (req.files.length > 1 ? `${title} (${index + 1})` : title) : file.originalname;
+            
             // Store in database
             const document = await storage.createDocument({
               companyId,
@@ -89,7 +95,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               originalName: file.originalname,
               mimeType: file.mimetype,
               size: file.size,
-              content
+              content,
+              title: fileTitle,
+              description,
+              isPublic: Boolean(isPublic),
+              category,
+              uploadedBy: req.user.id
             });
 
             return document;
@@ -109,21 +120,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
-
+  
+  // Get all documents for a company (admins can see all, users only see public ones)
   app.get("/api/documents", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
-      const companyId = parseInt(req.query.companyId as string);
-      const documents = await storage.getDocuments(companyId);
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      const onlyPublic = req.user.role === "user"; // Regular users only see public documents
+      const documents = await storage.getDocuments(companyId, onlyPublic);
       res.json(documents);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
-
-  app.delete("/api/documents/:id", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
+  
+  // Get a single document
+  app.get("/api/documents/:id", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const companyId = parseInt(req.query.companyId as string);
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      
+      const document = await storage.getDocument(id, companyId);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Check if user has access to this document (admins or public docs)
+      if (req.user.role === "user" && !document.isPublic) {
+        return res.status(403).json({ message: "Access denied to this document" });
+      }
+      
+      res.json(document);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Delete a document (admin only)
+  app.delete("/api/documents/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
       
       // Get the document to check if it exists and get the filename
       const document = await storage.getDocument(id, companyId);
@@ -146,6 +182,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Update document metadata (admin only) - used to toggle availability and update document details
+  app.patch("/api/documents/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      
+      // Get the document to check if it exists
+      const document = await storage.getDocument(id, companyId);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Update document metadata
+      const { title, description, isPublic, category } = req.body;
+      const updates: Partial<InsertDocument> = {};
+      
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
+      if (isPublic !== undefined) updates.isPublic = Boolean(isPublic);
+      if (category !== undefined) updates.category = category;
+      
+      const updatedDocument = await storage.updateDocument(id, updates, companyId);
+      
+      res.json(updatedDocument);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

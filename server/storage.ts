@@ -29,9 +29,10 @@ export interface IStorage {
   
   // Document methods
   createDocument(document: InsertDocument): Promise<Document>;
-  getDocuments(companyId: number): Promise<Document[]>;
+  getDocuments(companyId: number, onlyPublic?: boolean): Promise<Document[]>;
   getDocument(id: number, companyId: number): Promise<Document | undefined>;
   deleteDocument(id: number, companyId: number): Promise<boolean>;
+  updateDocument(id: number, updates: Partial<InsertDocument>, companyId: number): Promise<Document | undefined>;
   
   // Survey methods
   createSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse>;
@@ -129,8 +130,18 @@ export class DatabaseStorage implements IStorage {
     return newDocument;
   }
 
-  async getDocuments(companyId: number): Promise<Document[]> {
-    return await db.select().from(documents).where(eq(documents.companyId, companyId));
+  async getDocuments(companyId: number, onlyPublic: boolean = false): Promise<Document[]> {
+    if (onlyPublic) {
+      return await db.select().from(documents)
+        .where(and(
+          eq(documents.companyId, companyId),
+          eq(documents.isPublic, true)
+        ));
+    } else {
+      return await db.select().from(documents)
+        .where(eq(documents.companyId, companyId))
+        .orderBy(desc(documents.uploadedAt));
+    }
   }
 
   async getDocument(id: number, companyId: number): Promise<Document | undefined> {
@@ -143,6 +154,17 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(documents)
       .where(and(eq(documents.id, id), eq(documents.companyId, companyId)));
     return result.rowCount > 0;
+  }
+  
+  async updateDocument(id: number, updates: Partial<InsertDocument>, companyId: number): Promise<Document | undefined> {
+    const [updatedDocument] = await db.update(documents)
+      .set(updates)
+      .where(and(
+        eq(documents.id, id),
+        eq(documents.companyId, companyId)
+      ))
+      .returning();
+    return updatedDocument;
   }
 
   // Survey methods
