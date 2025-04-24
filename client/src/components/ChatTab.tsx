@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,11 +38,15 @@ const USER_AVATARS = [
 export default function ChatTab() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { companySettings } = useCompanyTheme();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("chat");
   const [messageText, setMessageText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
+  // Get AI assistant name from company settings
+  const assistantName = companySettings?.aiAssistantName || "Benefits Assistant";
   
   // Get company ID from user
   const companyId = user?.companyId;
@@ -136,7 +141,7 @@ export default function ChatTab() {
           <TabsList className="bg-background/50 backdrop-blur-sm border-gradient p-1">
             <TabsTrigger value="chat" className="hover-lift">
               <MessageCircle className="h-4 w-4 mr-2" />
-              AI Assistant
+              {assistantName}
             </TabsTrigger>
             <TabsTrigger value="documents" className="hover-lift">
               <FileText className="h-4 w-4 mr-2" />
@@ -155,7 +160,7 @@ export default function ChatTab() {
                 </Avatar>
                 <div>
                   <CardTitle className="text-base gradient-heading flex items-center">
-                    AI Benefits Assistant
+                    {assistantName}
                     <Badge variant="outline" className="ml-2 text-[10px] h-5 border-primary/20 bg-primary/5">
                       OpenAI GPT-4o
                     </Badge>
@@ -201,7 +206,7 @@ export default function ChatTab() {
                           </div>
                           
                           <h3 className="font-bold text-xl mb-3 gradient-text">
-                            Your OpenAI-Powered Benefits Assistant
+                            Your OpenAI-Powered {assistantName}
                           </h3>
                           <p className="text-muted-foreground text-sm mb-6">
                             Ask me questions about your employee benefits, company policies, and more. 
