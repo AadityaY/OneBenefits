@@ -52,8 +52,7 @@ export function Sidebar() {
         { title: "Take Survey", href: "/take-survey" },
         { title: "Benefits Chat", href: "/chat" },
         { title: "Calendar", href: "/calendar" },
-        { title: "Benefits Documents", href: "/documents" },
-        { title: "Content", href: "/content" },
+        { title: "Benefits Documents", href: "/content" },
       ]
     },
     {
@@ -168,7 +167,7 @@ export function Sidebar() {
                             className={cn(
                               "block p-2 rounded-md hover-lift cursor-pointer",
                               (location === subItem.href || 
-                               (subItem.href === "/documents" && location.startsWith("/documents/"))) 
+                               (subItem.href === "/content" && location.startsWith("/document/"))) 
                                 ? "bg-primary/10 text-primary gradient-border" 
                                 : "hover:bg-muted/50"
                             )}
