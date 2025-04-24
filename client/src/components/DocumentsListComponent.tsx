@@ -34,7 +34,9 @@ const DocumentsListComponent = () => {
     queryKey: ["/api/documents"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/documents");
-      return response.json() as Promise<Document[]>;
+      const data = await response.json() as Document[];
+      console.log("Documents fetched:", data); // Debug log
+      return data;
     }
   });
   
@@ -123,8 +125,8 @@ const DocumentsListComponent = () => {
           <div className="flex gap-2">
             <div className="w-40">
               <Select
-                value={categoryFilter || ""}
-                onValueChange={(value) => setCategoryFilter(value || null)}
+                value={categoryFilter || "all_categories"}
+                onValueChange={(value) => setCategoryFilter(value === "all_categories" ? null : value)}
               >
                 <SelectTrigger className="w-full">
                   <div className="flex items-center gap-2">
@@ -133,7 +135,7 @@ const DocumentsListComponent = () => {
                   </div>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all_categories">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
