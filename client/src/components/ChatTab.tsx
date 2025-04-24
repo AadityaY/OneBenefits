@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from "react-markdown";
 import { 
   Send, 
   Loader2, 
@@ -274,8 +275,10 @@ export default function ChatTab() {
                           : "bg-primary/10 shadow-sm"
                       }`}
                     >
-                      <div className="whitespace-pre-line text-sm">
-                        {message.content}
+                      <div className="prose prose-sm max-w-none text-sm overflow-hidden">
+                        <ReactMarkdown>
+                          {message.content}
+                        </ReactMarkdown>
                       </div>
                       <div className="mt-2 text-xs text-muted-foreground flex items-center justify-end">
                         <div className="w-2 h-2 rounded-full mr-1.5 bg-primary/40"></div>
