@@ -154,9 +154,14 @@ export default function ChatTab() {
                   <AvatarImage src={AI_AVATAR_URL} />
                 </Avatar>
                 <div>
-                  <CardTitle className="text-base gradient-heading">Benefits Assistant</CardTitle>
+                  <CardTitle className="text-base gradient-heading flex items-center">
+                    AI Benefits Assistant
+                    <Badge variant="outline" className="ml-2 text-[10px] h-5 border-primary/20 bg-primary/5">
+                      OpenAI GPT-4o
+                    </Badge>
+                  </CardTitle>
                   <CardDescription className="text-xs">
-                    Ask me questions about company benefits and policies
+                    Answers questions about your company benefits using document context
                   </CardDescription>
                 </div>
               </div>
@@ -196,11 +201,11 @@ export default function ChatTab() {
                           </div>
                           
                           <h3 className="font-bold text-xl mb-3 gradient-text">
-                            Your Benefits Assistant
+                            Your OpenAI-Powered Benefits Assistant
                           </h3>
                           <p className="text-muted-foreground text-sm mb-6">
-                            I can answer questions about your employee benefits, company policies, and more. 
-                            Our team is here to help you understand your benefits package!
+                            Ask me questions about your employee benefits, company policies, and more. 
+                            I use OpenAI technology to provide accurate, personalized answers based on your company's documents!
                           </p>
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
