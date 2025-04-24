@@ -1,131 +1,162 @@
-// Document chat system with context awareness (simulated without OpenAI)
+import OpenAI from 'openai';
 
 interface ChatResponse {
   role: string;
   content: string;
 }
 
-interface DocumentIndex {
-  docId: number;
-  content: string;
-  keywords: Map<string, number[]>; // keyword -> positions in document
-  sentences: string[];
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+const OPENAI_MODEL = "gpt-4o";
+
+// Company-specific conversation histories
+interface ConversationState {
+  companyId: number;
+  userId: number;
+  history: { role: string; content: string }[];
 }
 
-// In-memory storage for document indices and conversation history
-const documentIndices: DocumentIndex[] = [];
-const conversationHistory: { role: string; content: string }[] = [];
+// Store conversation history by company and user
+const conversationStates = new Map<string, ConversationState>();
+
+// Get or create conversation state
+function getConversationState(companyId: number, userId: number): ConversationState {
+  const key = `${companyId}-${userId}`;
+  if (!conversationStates.has(key)) {
+    conversationStates.set(key, {
+      companyId,
+      userId,
+      history: []
+    });
+  }
+  return conversationStates.get(key)!;
+}
 
 /**
- * Process and index document content for more efficient retrieval
+ * Process and index document content using OpenAI
  */
 export async function processDocumentContent(content: string, docId?: number): Promise<string> {
   try {
-    // Extract sentences (basic splitting by periods, question marks, and exclamation points)
-    const sentences = content
-      .split(/[.!?]+/)
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
-    
-    // Create a keyword index
-    const keywords = new Map<string, number[]>();
-    const words = content.toLowerCase().split(/\W+/).filter(w => w.length > 2);
-    
-    words.forEach((word, index) => {
-      if (!keywords.has(word)) {
-        keywords.set(word, []);
-      }
-      keywords.get(word)?.push(index);
-    });
-    
-    // Add to our document indices
-    const docIndex: DocumentIndex = {
-      docId: docId || documentIndices.length + 1,
-      content,
-      keywords,
-      sentences
-    };
-    
-    // Check if we're updating an existing index or adding a new one
-    const existingIndex = documentIndices.findIndex(d => d.docId === docIndex.docId);
-    if (existingIndex >= 0) {
-      documentIndices[existingIndex] = docIndex;
-    } else {
-      documentIndices.push(docIndex);
-    }
-    
-    // Generate a summary for the document (simulated)
-    const summary = `
+    // Only process if content is not empty
+    if (!content || content.trim().length === 0) {
+      return `
 # Document Summary
-${sentences.length > 0 ? `## Introduction\n${sentences[0]}` : ''}
 
 ## Key Points
-${sentences.slice(1, Math.min(5, sentences.length)).map(s => `• ${s}`).join('\n')}
 
 ## Content Overview
-This document contains information about employee benefits${keywordSummary(keywords)}.
-It has ${sentences.length} sections and covers approximately ${Math.round(content.length / 100)} topics.
+This document contains information about employee benefits.
+It has 0 sections and covers approximately 0 topics.
     `;
-    
-    return summary;
+    }
+
+    const prompt = `
+You are an expert benefits document analyzer. Analyze the following document and provide a concise summary of its contents.
+Focus on extracting key benefits information that would be relevant to employees.
+
+Document content:
+${content.substring(0, 15000)} ${content.length > 15000 ? '... (document truncated due to length)' : ''}
+
+Your summary should include:
+1. A document title (if present)
+2. Key points (3-5 bullet points)
+3. Content overview - what types of benefits are covered in this document
+`;
+
+    const response = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1000,
+    });
+
+    // Return the summary or a default message if the response was empty
+    return response.choices[0].message.content || `
+# Document Summary
+
+## Key Points
+
+## Content Overview
+This document contains information about employee benefits.
+    `;
   } catch (error) {
-    console.error("Error processing document content:", error);
+    console.error("Error processing document with OpenAI:", error);
     return `Error processing document: ${error instanceof Error ? error.message : "Unknown error"}`;
   }
 }
 
 /**
- * Generate a small summary of important keywords in the document
+ * Chat with documents using OpenAI and document context
  */
-function keywordSummary(keywords: Map<string, number[]>): string {
-  const commonBenefitsTerms = [
-    'health', 'dental', 'vision', 'insurance', 'medical', 'retirement', '401k',
-    'pto', 'vacation', 'leave', 'sick', 'disability', 'fsa', 'hsa',
-    'wellness', 'life', 'reimbursement', 'tuition', 'bonus', 'pension'
-  ];
-  
-  const foundTerms = commonBenefitsTerms.filter(term => 
-    keywords.has(term) && keywords.get(term)!.length > 0
-  ).slice(0, 5);
-  
-  if (foundTerms.length > 0) {
-    return `, including ${foundTerms.join(', ')}`;
-  }
-  return '';
-}
-
-/**
- * Chat with documents with context awareness
- */
-export async function chatWithDocuments(documents: { content: string }[], userMessage: string): Promise<ChatResponse> {
+export async function chatWithDocuments(
+  documents: { content: string }[], 
+  userMessage: string,
+  companyId: number = 1,
+  userId: number = 1,
+  companyName: string = "your company"
+): Promise<ChatResponse> {
   try {
+    // Get the conversation state for this company and user
+    const conversationState = getConversationState(companyId, userId);
+    
     // Add user message to conversation history
-    conversationHistory.push({ role: 'user', content: userMessage });
+    conversationState.history.push({ role: 'user', content: userMessage });
     
-    // Process documents if not already indexed
-    if (documentIndices.length === 0 && documents.length > 0) {
-      for (let i = 0; i < documents.length; i++) {
-        await processDocumentContent(documents[i].content || '', i + 1);
-      }
+    // Extract relevant content from documents to use as context
+    let documentContext = "";
+    if (documents.length > 0) {
+      // Combine document contents, limiting the total size
+      documentContext = documents
+        .map(doc => doc.content)
+        .filter(content => content) // Filter out null or undefined
+        .join("\n\n")
+        .substring(0, 15000); // Limit context size
     }
-    
-    // Find relevant context from documents based on query
-    const relevantContext = findRelevantContext(userMessage, conversationHistory);
-    
-    // Generate response
-    const response = generateResponse(userMessage, relevantContext, conversationHistory);
+
+    // Prepare system message with the document context
+    const systemMessage = `
+You are a helpful benefits assistant for ${companyName}. Your goal is to help employees understand their benefits.
+Be clear, conversational, and empathetic. If you don't know the answer to a question, don't make up information.
+Use only the following document context to answer questions:
+
+${documentContext || "No benefits documents are currently available."}
+
+If the information needed to answer the question is not in the context, politely explain that you don't have that specific information.
+Keep your answers concise but thorough. Focus on facts from the documents rather than general advice.
+`;
+
+    // Prepare messages for OpenAI API
+    const messages = [
+      { role: 'system', content: systemMessage },
+      // Include last few messages for context (limit to avoid token issues)
+      ...conversationState.history.slice(-5)
+    ];
+
+    // Call OpenAI API
+    const response = await openai.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: messages as any, // Type assertion to satisfy TypeScript
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
+
+    const assistantResponse = response.choices[0].message.content || 
+      "I'm sorry, I couldn't generate a response. Please try asking in a different way.";
     
     // Add assistant response to conversation history
-    conversationHistory.push({ role: 'assistant', content: response });
+    conversationState.history.push({ role: 'assistant', content: assistantResponse });
     
     // Keep conversation history to a reasonable size (last 10 messages)
-    if (conversationHistory.length > 10) {
-      conversationHistory.splice(0, conversationHistory.length - 10);
+    if (conversationState.history.length > 10) {
+      conversationState.history = conversationState.history.slice(-10);
     }
     
     return {
       role: "assistant",
-      content: response
+      content: assistantResponse
     };
   } catch (error) {
     console.error("Error in chat with documents:", error);
@@ -134,105 +165,4 @@ export async function chatWithDocuments(documents: { content: string }[], userMe
       content: `I'm sorry, I encountered an error while processing your question: ${error instanceof Error ? error.message : "Unknown error"}. Please try again or contact support if the issue persists.`
     };
   }
-}
-
-/**
- * Find the most relevant context from documents based on user query and conversation history
- */
-function findRelevantContext(query: string, history: { role: string; content: string }[]): string[] {
-  // No documents indexed
-  if (documentIndices.length === 0) {
-    return ["No documents have been uploaded or indexed yet."];
-  }
-  
-  // Extract keywords from query
-  const queryWords = query.toLowerCase()
-    .split(/\W+/)
-    .filter(w => w.length > 2)
-    .filter(w => !['what', 'when', 'where', 'which', 'who', 'how', 'does', 'is', 'are', 'the', 'and', 'for', 'that'].includes(w));
-    
-  // For context awareness, also consider keywords from the last assistant and user message
-  const recentMessages = history.slice(-4);
-  const historyKeywords = recentMessages
-    .flatMap(msg => msg.content.toLowerCase().split(/\W+/))
-    .filter(w => w.length > 2)
-    .filter(w => !['what', 'when', 'where', 'which', 'who', 'how', 'does', 'is', 'are', 'the', 'and', 'for', 'that'].includes(w));
-  
-  const allKeywords = Array.from(new Set([...queryWords, ...historyKeywords]));
-  
-  // Collect relevant sentences from all documents
-  const relevantSentences: string[] = [];
-  
-  documentIndices.forEach(docIndex => {
-    // Find sentences containing query keywords
-    docIndex.sentences.forEach(sentence => {
-      const sentenceLower = sentence.toLowerCase();
-      // Check if this sentence contains any of our keywords
-      if (allKeywords.some(keyword => sentenceLower.includes(keyword))) {
-        relevantSentences.push(sentence);
-      }
-    });
-  });
-  
-  // If no relevant sentences found, return first few sentences from documents as context
-  if (relevantSentences.length === 0) {
-    return documentIndices.flatMap(doc => doc.sentences.slice(0, 3));
-  }
-  
-  // Return most relevant sentences (limit to reasonable number)
-  return relevantSentences.slice(0, 10);
-}
-
-/**
- * Generate a response based on user query, relevant context, and conversation history
- */
-function generateResponse(query: string, relevantContext: string[], history: { role: string; content: string }[]): string {
-  // If no relevant context was found
-  if (relevantContext.length === 0 || relevantContext[0].includes("No documents")) {
-    return `I don't have enough information to answer your question about "${query}". Please upload benefits documents so I can provide more helpful responses.`;
-  }
-  
-  // Check for common benefits-related terms
-  const queryLower = query.toLowerCase();
-  
-  // Extract the last user and assistant message for context
-  const lastUserMsg = history.filter(m => m.role === 'user').slice(-2)[0]?.content || '';
-  const lastAssistantMsg = history.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
-  
-  // Handle follow-up questions
-  if (queryLower.includes('what about') || queryLower.includes('how about') || 
-      queryLower.includes('and what') || queryLower.includes('what else') || 
-      queryLower.startsWith('and') || queryLower.startsWith('how') || queryLower.startsWith('why')) {
-    
-    // This is likely a follow-up question, let's acknowledge that
-    return `Regarding your follow-up about ${query.replace(/^(and|what about|how about)/i, '')}, here's what I found:\n\n${relevantContext.join(' ')}`;
-  }
-  
-  // Health insurance related
-  if (queryLower.includes('health') || queryLower.includes('medical') || queryLower.includes('insurance')) {
-    return `Based on the benefits information I have, here's what I found about health insurance:\n\n${relevantContext.join('\n\n')}\n\nIs there anything specific about health benefits you'd like to know more about?`;
-  }
-  
-  // Dental coverage
-  if (queryLower.includes('dental')) {
-    return `Here's what the benefits documents say about dental coverage:\n\n${relevantContext.join('\n\n')}\n\nLet me know if you have questions about specific dental procedures or coverage limits.`;
-  }
-  
-  // Vision coverage
-  if (queryLower.includes('vision') || queryLower.includes('eye') || queryLower.includes('glasses')) {
-    return `Regarding vision benefits, here's what I found:\n\n${relevantContext.join('\n\n')}\n\nThis should help you understand what's covered for eye exams, glasses, and contacts.`;
-  }
-  
-  // Retirement/401k
-  if (queryLower.includes('401k') || queryLower.includes('401') || queryLower.includes('retirement') || queryLower.includes('pension')) {
-    return `Here's what I found about retirement plans and 401(k):\n\n${relevantContext.join('\n\n')}\n\nWould you like me to explain more about contribution limits or matching?`;
-  }
-  
-  // PTO/vacation
-  if (queryLower.includes('pto') || queryLower.includes('vacation') || queryLower.includes('time off') || queryLower.includes('leave')) {
-    return `Regarding paid time off (PTO) and vacation benefits:\n\n${relevantContext.join('\n\n')}\n\nLet me know if you have questions about accrual rates or requesting time off.`;
-  }
-  
-  // Default response with relevant information
-  return `Based on our benefits documentation, here's what I found related to your question about "${query}":\n\n${relevantContext.join('\n\n')}\n\nIs there anything specific you'd like me to clarify?`;
 }

@@ -541,10 +541,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: req.body.content
       });
       
-      // Generate AI response (pass documents for context)
+      // Get company settings to personalize the chat
+      const companySettings = await storage.getCompanySettings(companyId);
+      const companyName = companySettings?.name || "your company";
+      
+      // Filter out any documents with null content and prepare for OpenAI
+      const documentsWithContent = documents
+        .filter(doc => doc.content !== null)
+        .map(doc => ({ content: doc.content || '' }));
+      
+      // Generate AI response with proper context
       const aiResponse = await chatWithDocuments(
-        documents,
-        req.body.content
+        documentsWithContent, 
+        req.body.content,
+        companyId,
+        userId,
+        companyName
       );
       
       // Store AI response
