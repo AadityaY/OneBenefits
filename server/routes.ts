@@ -126,9 +126,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
       const onlyPublic = req.user.role === "user"; // Regular users only see public documents
+      
+      console.log(`Fetching documents for companyId: ${companyId}, onlyPublic: ${onlyPublic}, userRole: ${req.user.role}`);
+      
       const documents = await storage.getDocuments(companyId, onlyPublic);
+      
+      console.log(`Found ${documents.length} documents`);
+      if (documents.length > 0) {
+        console.log(`First document isPublic: ${documents[0].isPublic}`);
+      }
+      
       res.json(documents);
     } catch (error) {
+      console.error('Error fetching documents:', error);
       res.status(500).json({ message: error.message });
     }
   });

@@ -136,7 +136,8 @@ export class DatabaseStorage implements IStorage {
         .where(and(
           eq(documents.companyId, companyId),
           eq(documents.isPublic, true)
-        ));
+        ))
+        .orderBy(desc(documents.uploadedAt));
     } else {
       return await db.select().from(documents)
         .where(eq(documents.companyId, companyId))
