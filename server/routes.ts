@@ -401,7 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               },
               {
                 role: "user",
-                content: `Document content: ${document.content}\n\nGenerate 10 survey questions for a benefits satisfaction survey. For each question, provide the question text, question type (text, radio, checkbox, select, scale), and options (if applicable). Format the output as a valid JSON array with objects containing questionText, questionType, and options properties.`
+                content: `Document content: ${document.content}\n\nGenerate 10 survey questions for a benefits satisfaction survey based on the specific details in the document. For each question, provide the question text, question type (choose one of: text, radio, checkbox, select, scale), and options (required for radio, checkbox, select, and scale types). Format the output as a valid JSON with a 'questions' array containing objects with questionText, questionType, and options properties. Include specific details from the document in the questions.`
               }
             ],
             temperature: 0.7,
@@ -411,11 +411,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (!response.ok) {
           const errorData = await response.json();
+          console.error("OpenAI API error response:", errorData);
           throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
         }
         
         const generatedData = await response.json();
-        const generatedQuestions = JSON.parse(generatedData.choices[0].message.content).questions || [];
+        console.log("OpenAI API response:", JSON.stringify(generatedData.choices[0].message.content, null, 2));
+        
+        let generatedQuestions = [];
+        try {
+          const parsedContent = JSON.parse(generatedData.choices[0].message.content);
+          generatedQuestions = parsedContent.questions || [];
+          
+          if (!generatedQuestions || !Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
+            console.error("Invalid or empty questions array in OpenAI response:", parsedContent);
+            throw new Error("Failed to generate valid survey questions. Please try again.");
+          }
+        } catch (parseError) {
+          console.error("Error parsing OpenAI response:", parseError);
+          throw new Error("Failed to parse AI-generated questions. Please try again.");
+        }
         
         let templatesCreated = 0;
         let questionsCreated = 0;
