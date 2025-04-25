@@ -109,11 +109,20 @@ export default function SurveyAdminTab() {
   const {
     data: templateQuestions,
     isLoading: loadingTemplateQuestions,
+    refetch: refetchTemplateQuestions
   } = useQuery<SurveyQuestionType[]>({
     queryKey: ["/api/survey-templates", selectedTemplate?.id, "questions"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!selectedTemplate,
   });
+  
+  // When selectedTemplate changes, refetch the questions
+  useEffect(() => {
+    if (selectedTemplate && showTemplateQuestions) {
+      refetchTemplateQuestions();
+      console.log("Refetching questions for template:", selectedTemplate.id);
+    }
+  }, [selectedTemplate, showTemplateQuestions, refetchTemplateQuestions]);
 
   // Create a form schema for new survey templates
   const templateSchema = insertSurveyTemplateSchema.extend({
@@ -896,8 +905,13 @@ export default function SurveyAdminTab() {
                             )}
                           </div>
                           <CardTitle className="text-base font-medium">
-                            {index + 1}. {question.questionText}
+                            {index + 1}. {question.questionText || `Question ${question.id}`}
                           </CardTitle>
+                          {!question.questionText && (
+                            <div className="mt-1 text-sm text-red-500">
+                              Warning: Question text is missing
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardHeader>

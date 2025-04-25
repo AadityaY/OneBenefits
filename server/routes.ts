@@ -673,9 +673,16 @@ Include specific details from the document in the questions, and make sure quest
   app.get("/api/survey-templates/:templateId/questions", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
       const templateId = parseInt(req.params.templateId);
+      console.log(`Fetching questions for template ID: ${templateId}`);
+      
       const questions = await storage.getQuestionsForTemplate(templateId);
+      console.log(`Found ${questions.length} questions for template ${templateId}:`, 
+        questions.map(q => ({id: q.id, text: q.questionText, type: q.questionType})));
+      
+      // Ensure we're returning the full question objects
       res.json(questions);
     } catch (error) {
+      console.error(`Error fetching questions for template ${req.params.templateId}:`, error);
       res.status(500).json({ message: error.message });
     }
   });
