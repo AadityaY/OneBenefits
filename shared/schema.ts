@@ -154,6 +154,8 @@ export const surveyQuestions = pgTable("survey_questions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   active: boolean("active").default(true).notNull(),
+  createdByAI: boolean("created_by_ai").default(false).notNull(),
+  createdBy: integer("created_by").references(() => users.id),
 });
 
 export const insertSurveyQuestionSchema = createInsertSchema(surveyQuestions).omit({
@@ -192,6 +194,9 @@ export const surveyTemplates = pgTable("survey_templates", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   publishedAt: timestamp("published_at"),
+  createdByAI: boolean("created_by_ai").default(false).notNull(),
+  createdBy: integer("created_by").references(() => users.id),
+  templateType: text("template_type").default("custom"), // "quarterly", "annual", "custom"
 });
 
 export const insertSurveyTemplateSchema = createInsertSchema(surveyTemplates).omit({
@@ -235,6 +240,9 @@ export const companySettings = pgTable("company_settings", {
   contactEmail: text("contact_email"),
   address: text("address"),
   aiAssistantName: text("ai_assistant_name").default("Benefits Assistant"),
+  surveyGenerationPrompt: text("survey_generation_prompt").default(
+    "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement."
+  ),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
