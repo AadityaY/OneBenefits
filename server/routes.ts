@@ -356,6 +356,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI-based survey template generation endpoint
+  app.post("/api/survey-templates/generate", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const { documentId, createQuarterly, createAnnual, prompt } = req.body;
+      const companyId = req.user.companyId;
+      const userId = req.user.id;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      if (!documentId) {
+        return res.status(400).json({ message: "Document ID is required" });
+      }
+      
+      // Get the document to extract its content
+      const document = await storage.getDocument(documentId, companyId, false);
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      if (!document.content) {
+        return res.status(400).json({ message: "Document has no processed content" });
+      }
+      
+      // Generate questions using OpenAI based on the document content and prompt
+      const openaiSystem = prompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create questions based on the document.";
+      
+      try {
+        // Use the OpenAI API to generate questions
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content: openaiSystem
+              },
+              {
+                role: "user",
+                content: `Document content: ${document.content}\n\nGenerate 10 survey questions for a benefits satisfaction survey. For each question, provide the question text, question type (text, radio, checkbox, select, scale), and options (if applicable). Format the output as a valid JSON array with objects containing questionText, questionType, and options properties.`
+              }
+            ],
+            temperature: 0.7,
+            response_format: { type: "json_object" }
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+        }
+        
+        const generatedData = await response.json();
+        const generatedQuestions = JSON.parse(generatedData.choices[0].message.content).questions || [];
+        
+        let templatesCreated = 0;
+        let questionsCreated = 0;
+        
+        // Create questions first
+        const createdQuestionIds = [];
+        for (const q of generatedQuestions) {
+          const newQuestion = await storage.createSurveyQuestion({
+            companyId,
+            questionText: q.questionText,
+            questionType: q.questionType,
+            options: q.options || [],
+            required: true,
+            order: q.order || 1,
+            createdByAI: true,
+            createdBy: userId
+          });
+          
+          if (newQuestion) {
+            createdQuestionIds.push(newQuestion.id);
+            questionsCreated++;
+          }
+        }
+        
+        // Function to create a template and assign questions
+        const createTemplate = async (title, description, templateType) => {
+          const newTemplate = await storage.createSurveyTemplate({
+            companyId,
+            title,
+            description,
+            status: "draft",
+            createdByAI: true,
+            createdBy: userId,
+            templateType
+          });
+          
+          if (newTemplate) {
+            templatesCreated++;
+            
+            // Assign all questions to the template
+            for (let i = 0; i < createdQuestionIds.length; i++) {
+              await storage.addQuestionToTemplate({
+                templateId: newTemplate.id,
+                questionId: createdQuestionIds[i],
+                order: i + 1
+              });
+            }
+            
+            return newTemplate;
+          }
+          
+          return null;
+        };
+        
+        // Create templates based on user selection
+        if (createQuarterly) {
+          await createTemplate(
+            "Quarterly Benefits Survey", 
+            "A quarterly check-in on employee satisfaction with benefits programs.",
+            "quarterly"
+          );
+        }
+        
+        if (createAnnual) {
+          await createTemplate(
+            "Annual Benefits Survey", 
+            "A comprehensive annual survey about all aspects of the employee benefits program.",
+            "annual"
+          );
+        }
+        
+        res.json({
+          success: true,
+          templatesCreated,
+          questionsCreated,
+          message: `Successfully created ${templatesCreated} templates with ${questionsCreated} questions.`
+        });
+      } catch (openaiError) {
+        console.error("OpenAI generation error:", openaiError);
+        return res.status(500).json({ 
+          message: `Error generating content with AI: ${openaiError.message}`,
+          error: openaiError
+        });
+      }
+    } catch (error) {
+      console.error("Survey generation error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Survey question routes
   // Survey question operations - all company-specific
   app.post("/api/survey-questions", isAdmin, companyAccess, async (req: Request, res: Response) => {
