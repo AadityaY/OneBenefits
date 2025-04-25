@@ -31,6 +31,7 @@ export default function CompanySettings() {
     accentColor: companySettings?.accentColor || "#f59e0b",
     logo: companySettings?.logo || "",
     aiAssistantName: companySettings?.aiAssistantName || "Benefits Assistant",
+    surveyGenerationPrompt: companySettings?.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
   });
   
   // Update form data when settings load
@@ -46,6 +47,7 @@ export default function CompanySettings() {
         accentColor: companySettings.accentColor || "#f59e0b",
         logo: companySettings.logo || "",
         aiAssistantName: companySettings.aiAssistantName || "Benefits Assistant",
+        surveyGenerationPrompt: companySettings.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
       });
     }
   }, [companySettings]);
@@ -343,7 +345,7 @@ export default function CompanySettings() {
                     Configure your OpenAI-powered Benefits Assistant
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div className="rounded-lg p-4 border-gradient animated-gradient-bg">
                     <div className="bg-background rounded-md p-6">
                       <div className="flex items-center space-x-3 mb-4">
@@ -383,6 +385,26 @@ export default function CompanySettings() {
                           <li>All responses are generated in real-time based on your company's specific information</li>
                           <li>Employees can ask questions about benefits, policies, and procedures</li>
                         </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Survey Generation Settings</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="surveyGenerationPrompt">Survey Generation Prompt</Label>
+                        <Textarea
+                          id="surveyGenerationPrompt"
+                          name="surveyGenerationPrompt"
+                          value={formData.surveyGenerationPrompt || ""}
+                          onChange={(e) => setFormData(prev => ({ ...prev, surveyGenerationPrompt: e.target.value }))}
+                          placeholder="Enter instructions for generating survey templates and questions"
+                          className="min-h-[120px] mt-1"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This prompt is used when generating survey templates and questions from benefits documents
+                        </p>
                       </div>
                     </div>
                   </div>
