@@ -457,11 +457,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Assign all questions to the template
             for (let i = 0; i < createdQuestionIds.length; i++) {
-              await storage.addQuestionToTemplate({
-                templateId: newTemplate.id,
-                questionId: createdQuestionIds[i],
-                order: i + 1
-              });
+              await storage.addQuestionToTemplate(
+                newTemplate.id,
+                createdQuestionIds[i],
+                i + 1
+              );
             }
             
             return newTemplate;

@@ -264,12 +264,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSurveyTemplate(id: number, companyId: number): Promise<boolean> {
-    const result = await db.delete(surveyTemplates)
-      .where(and(
-        eq(surveyTemplates.id, id),
-        eq(surveyTemplates.companyId, companyId)
-      ));
-    return result.rowCount > 0;
+    try {
+      // First, delete all template-question relationships
+      await db.delete(templateQuestions)
+        .where(eq(templateQuestions.templateId, id));
+      
+      // Then, delete the template itself
+      const result = await db.delete(surveyTemplates)
+        .where(and(
+          eq(surveyTemplates.id, id),
+          eq(surveyTemplates.companyId, companyId)
+        ));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting template:", error);
+      return false;
+    }
   }
 
   async publishSurveyTemplate(id: number, companyId: number): Promise<SurveyTemplate | undefined> {
@@ -319,12 +330,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSurveyQuestion(id: number, companyId: number): Promise<boolean> {
-    const result = await db.delete(surveyQuestions)
-      .where(and(
-        eq(surveyQuestions.id, id),
-        eq(surveyQuestions.companyId, companyId)
-      ));
-    return result.rowCount > 0;
+    try {
+      // First, delete all template-question relationships for this question
+      await db.delete(templateQuestions)
+        .where(eq(templateQuestions.questionId, id));
+      
+      // Then, delete the question itself
+      const result = await db.delete(surveyQuestions)
+        .where(and(
+          eq(surveyQuestions.id, id),
+          eq(surveyQuestions.companyId, companyId)
+        ));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      return false;
+    }
   }
   
   // Template-Question relationship methods
