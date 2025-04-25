@@ -401,7 +401,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
               },
               {
                 role: "user",
-                content: `Document content: ${document.content}\n\nGenerate 10 survey questions for a benefits satisfaction survey based on the specific details in the document. For each question, provide the question text, question type (choose one of: text, radio, checkbox, select, scale), and options (required for radio, checkbox, select, and scale types). Format the output as a valid JSON with a 'questions' array containing objects with questionText, questionType, and options properties. Include specific details from the document in the questions.`
+                content: `Document content: ${document.content}\n\nGenerate survey questions for a benefits satisfaction survey based on the specific details in the document. For each question, provide the question text, question type (choose one of: text, radio, checkbox, select, scale), and options (required for radio, checkbox, select, and scale types). 
+
+Format the output as a valid JSON with a simple structure like this:
+{
+  "questions": [
+    {
+      "questionText": "How satisfied are you with...",
+      "questionType": "scale",
+      "options": ["1 - Very Dissatisfied", "2", "3", "4", "5 - Very Satisfied"]
+    },
+    {
+      "questionText": "Which benefits do you use most frequently?",
+      "questionType": "checkbox",
+      "options": ["Health Insurance", "Dental", "Vision", "401k", "Other"]
+    }
+  ]
+}
+
+Include specific details from the document in the questions, and make sure questionType is one of: text, radio, checkbox, select, or scale. For scales, provide 5 options with descriptive labels. For radio and checkbox, provide relevant options based on the document content.`
               }
             ],
             temperature: 0.7,
@@ -421,12 +439,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let generatedQuestions = [];
         try {
           const parsedContent = JSON.parse(generatedData.choices[0].message.content);
-          generatedQuestions = parsedContent.questions || [];
+          console.log("Parsed content structure:", JSON.stringify(parsedContent, null, 2));
+          
+          // Handle different possible response structures from OpenAI
+          if (parsedContent.questions && Array.isArray(parsedContent.questions)) {
+            // Simple flat array of questions
+            generatedQuestions = parsedContent.questions;
+          } else if (parsedContent.quarterlySurvey?.questions && Array.isArray(parsedContent.quarterlySurvey.questions)) {
+            // Structure with quarterly and annual sections
+            generatedQuestions = parsedContent.quarterlySurvey.questions;
+            
+            // If creating annual template is requested and annual questions exist, append them
+            if (createAnnual && parsedContent.annualSurvey?.questions && Array.isArray(parsedContent.annualSurvey.questions)) {
+              generatedQuestions = [...generatedQuestions, ...parsedContent.annualSurvey.questions];
+            }
+          } else {
+            // Try to extract questions from any array property in the response
+            const possibleQuestionArrays = Object.values(parsedContent).filter(
+              val => Array.isArray(val) && val.length > 0 && val[0].questionText
+            );
+            
+            if (possibleQuestionArrays.length > 0) {
+              generatedQuestions = possibleQuestionArrays[0];
+            }
+          }
           
           if (!generatedQuestions || !Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
             console.error("Invalid or empty questions array in OpenAI response:", parsedContent);
             throw new Error("Failed to generate valid survey questions. Please try again.");
           }
+          
+          console.log("Successfully extracted questions:", generatedQuestions.length);
         } catch (parseError) {
           console.error("Error parsing OpenAI response:", parseError);
           throw new Error("Failed to parse AI-generated questions. Please try again.");
