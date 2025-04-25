@@ -37,10 +37,21 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 function Router() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [location] = useLocation();
   
-  // Handle root route redirects
+  // Show loading state while authentication is being determined
+  if (isLoading && location === '/') {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </AppLayout>
+    );
+  }
+  
+  // Handle root route redirects once user is loaded
   if (location === '/' && user) {
     // Redirect based on user role
     const isAdmin = user.role === "admin" || user.role === "superadmin";
@@ -59,10 +70,13 @@ function Router() {
   return (
     <AppLayout>
       <Switch>
-        {/* Root route handling */}
+        {/* Root route handling with loading state */}
         <Route path="/">
-          {user ? (
-            // This should never render as we redirect in the code above
+          {isLoading ? (
+            <div className="flex items-center justify-center h-screen">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : user ? (
             <Redirect to={user.role === "admin" || user.role === "superadmin" ? "/admin/surveys" : "/take-survey"} />
           ) : (
             <Redirect to="/auth" />
