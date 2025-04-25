@@ -79,6 +79,8 @@ export default function SurveyAdminTab() {
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [quickSetupOpen, setQuickSetupOpen] = useState(false);
+  const [showTemplateDetails, setShowTemplateDetails] = useState(false);
+  const [showTemplateQuestions, setShowTemplateQuestions] = useState(false);
   
   // Get company ID from user
   const companyId = user?.companyId;
@@ -591,7 +593,10 @@ export default function SurveyAdminTab() {
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit template
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setSelectedTemplate(template)}>
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedTemplate(template);
+                                setShowTemplateQuestions(true);
+                              }}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 View questions
                               </DropdownMenuItem>
@@ -627,7 +632,10 @@ export default function SurveyAdminTab() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          onClick={() => setSelectedTemplate(template)}
+                          onClick={() => {
+                            setSelectedTemplate(template);
+                            setShowTemplateDetails(true);
+                          }}
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
