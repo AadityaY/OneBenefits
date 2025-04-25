@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import QuickSetupModal from "./QuickSetupModal";
 
 // Helper function to safely handle options that could be string or string[]
 const getOptionsArray = (options: string | string[] | null): string[] => {
@@ -76,6 +77,7 @@ export default function SurveyAdminTab() {
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [quickSetupOpen, setQuickSetupOpen] = useState(false);
   
   // Get company ID from user
   const companyId = user?.companyId;

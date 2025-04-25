@@ -10,6 +10,7 @@ import { NotificationManagement } from "@/components/NotificationManagement";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Upload, BellRing } from "lucide-react";
@@ -398,7 +399,7 @@ export default function CompanySettings() {
                           id="surveyGenerationPrompt"
                           name="surveyGenerationPrompt"
                           value={formData.surveyGenerationPrompt || ""}
-                          onChange={(e) => setFormData(prev => ({ ...prev, surveyGenerationPrompt: e.target.value }))}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, surveyGenerationPrompt: e.target.value }))}
                           placeholder="Enter instructions for generating survey templates and questions"
                           className="min-h-[120px] mt-1"
                         />
