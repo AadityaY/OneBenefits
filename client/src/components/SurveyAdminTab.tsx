@@ -792,6 +792,142 @@ export default function SurveyAdminTab() {
         open={quickSetupOpen} 
         onOpenChange={setQuickSetupOpen} 
       />
+
+      {/* Template Details Dialog */}
+      <Dialog open={showTemplateDetails} onOpenChange={setShowTemplateDetails}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{selectedTemplate?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedTemplate?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium mb-1">Status</h4>
+                <Badge variant={selectedTemplate?.status === 'published' ? 'default' : 'outline'}>
+                  {selectedTemplate?.status === 'published' ? 'Published' : 'Draft'}
+                </Badge>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium mb-1">Created At</h4>
+                <p className="text-sm text-muted-foreground">
+                  {selectedTemplate?.createdAt ? new Date(selectedTemplate.createdAt).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+            </div>
+            
+            {selectedTemplate?.createdByAI && (
+              <div className="mt-4">
+                <Badge variant="secondary">AI-Generated</Badge>
+                <p className="text-sm text-muted-foreground mt-2">
+                  This template was automatically generated based on your company documents.
+                </p>
+              </div>
+            )}
+            
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">Actions</h4>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setShowTemplateDetails(false);
+                    setShowTemplateQuestions(true);
+                  }}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Questions
+                </Button>
+                
+                {selectedTemplate?.status === 'draft' && (
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      publishTemplateMutation.mutate(selectedTemplate.id);
+                      setShowTemplateDetails(false);
+                    }}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Publish
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTemplateDetails(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Template Questions Dialog */}
+      <Dialog open={showTemplateQuestions} onOpenChange={setShowTemplateQuestions}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>Questions for {selectedTemplate?.title}</DialogTitle>
+            <DialogDescription>
+              View and manage questions in this template
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+            {loadingTemplateQuestions ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : templateQuestions && templateQuestions.length > 0 ? (
+              <div className="space-y-4">
+                {templateQuestions.map((question, index) => (
+                  <Card key={question.id} className="relative">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between">
+                        <div className="flex-1 pr-8">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="mb-1">
+                              {question.questionType}
+                            </Badge>
+                            {question.required && (
+                              <Badge variant="secondary" className="mb-1">Required</Badge>
+                            )}
+                          </div>
+                          <CardTitle className="text-base font-medium">
+                            {index + 1}. {question.questionText}
+                          </CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pb-2">
+                      {question.options && Array.isArray(question.options) && question.options.length > 0 && (
+                        <div className="mt-2">
+                          <h4 className="text-sm font-medium mb-1">Options</h4>
+                          <ul className="list-disc list-inside text-sm space-y-1 pl-2">
+                            {question.options.map((option, i) => (
+                              <li key={i} className="text-muted-foreground">{option}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No questions in this template</p>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTemplateQuestions(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
