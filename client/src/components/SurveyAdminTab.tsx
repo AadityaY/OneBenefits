@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import QuickSetupModal from "./QuickSetupModal";
 import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -59,7 +60,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import QuickSetupModal from "./QuickSetupModal";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Helper function to safely handle options that could be string or string[]
 const getOptionsArray = (options: string | string[] | null): string[] => {
@@ -664,249 +665,106 @@ export default function SurveyAdminTab() {
                   </div>
                 </div>
               )}
+
+              {/* ... other parts of the component */}
               
-              {selectedTemplate && (
-                <Sheet open={!!selectedTemplate} onOpenChange={(open) => !open && setSelectedTemplate(null)}>
-                  <SheetContent className="sm:max-w-md overflow-y-auto">
-                    <SheetHeader>
-                      <SheetTitle>Template Details</SheetTitle>
-                      <SheetDescription>
-                        View and manage questions for this template
-                      </SheetDescription>
-                    </SheetHeader>
-                    
-                    <div className="space-y-4 mt-6">
-                      <div>
-                        <h3 className="text-xl font-semibold">{selectedTemplate.title}</h3>
-                        <p className="text-muted-foreground mt-1">
-                          {selectedTemplate.description}
-                        </p>
-                        
-                        <div className="flex items-center mt-2 space-x-2">
-                          <Badge variant={selectedTemplate.status === 'published' ? 'default' : 'outline'}>
-                            {selectedTemplate.status === 'published' ? 'Published' : 'Draft'}
-                          </Badge>
-                          {selectedTemplate.createdByAI && (
-                            <Badge variant="secondary">AI-Generated</Badge>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium">Template Questions</h4>
-                          {allQuestions && allQuestions.length > 0 && (
-                            <Button variant="outline" size="sm">
-                              <Plus className="h-3.5 w-3.5 mr-1" />
-                              Add Question
-                            </Button>
-                          )}
-                        </div>
-                        
-                        {loadingTemplateQuestions ? (
-                          <div className="flex justify-center py-4">
-                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                          </div>
-                        ) : templateQuestions && templateQuestions.length > 0 ? (
-                          <div className="space-y-3 mt-2">
-                            {templateQuestions
-                              .sort((a, b) => a.order - b.order)
-                              .map((question, index) => (
-                                <Card key={question.id} className="relative">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="absolute right-1 top-1 h-7 w-7"
-                                    onClick={() => handleRemoveQuestionFromTemplate(question.id)}
-                                  >
-                                    <Trash className="h-3.5 w-3.5 text-muted-foreground" />
-                                  </Button>
-                                  
-                                  <CardContent className="p-3">
-                                    <div className="flex items-start gap-2">
-                                      <div className="bg-muted rounded-full h-6 w-6 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <span className="text-xs">{index + 1}</span>
-                                      </div>
-                                      <div>
-                                        <p className="font-medium">{question.questionText}</p>
-                                        <div className="flex flex-wrap items-center gap-2 mt-1">
-                                          <Badge variant="outline" className="text-xs">
-                                            {question.questionType}
-                                          </Badge>
-                                          {question.required && (
-                                            <Badge variant="secondary" className="text-xs">
-                                              Required
-                                            </Badge>
-                                          )}
-                                        </div>
-                                        
-                                        {question.questionType !== 'text' && question.options && (
-                                          <div className="mt-2">
-                                            <p className="text-sm text-muted-foreground mb-1">Options:</p>
-                                            <div className="grid grid-cols-2 gap-2">
-                                              {getOptionsArray(question.options).map((option, i) => (
-                                                <div key={i} className="text-sm border rounded p-1.5 bg-muted/50">
-                                                  {option}
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 border rounded-md">
-                            <p className="text-muted-foreground">No questions added to this template</p>
-                            <Button variant="outline" size="sm" className="mt-2">
-                              <Plus className="h-3.5 w-3.5 mr-1" />
-                              Add Questions
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <SheetFooter className="mt-6">
-                      <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
-                      </SheetClose>
-                    </SheetFooter>
-                  </SheetContent>
-                </Sheet>
-              )}
-              
-              {/* Create Template Dialog */}
-              <Dialog open={isCreatingTemplate} onOpenChange={setIsCreatingTemplate}>
+              {/* Add Question Dialog */}
+              <Dialog open={isAddingQuestion} onOpenChange={setIsAddingQuestion}>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle>Create Survey Template</DialogTitle>
+                    <DialogTitle>Add Survey Question</DialogTitle>
                     <DialogDescription>
-                      Create a new survey template and add questions to it
+                      Create a new question for your survey templates
                     </DialogDescription>
                   </DialogHeader>
                   
-                  <Form {...templateForm}>
-                    <form onSubmit={templateForm.handleSubmit(handleCreateTemplate)} className="space-y-4">
+                  <Form {...questionForm}>
+                    <form onSubmit={questionForm.handleSubmit(handleAddQuestion)} className="space-y-4">
                       <FormField
-                        control={templateForm.control}
-                        name="title"
+                        control={questionForm.control}
+                        name="questionText"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Template Title</FormLabel>
+                            <FormLabel>Question Text</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Quarterly Benefits Survey" {...field} />
+                              <Input placeholder="e.g. How satisfied are you with your benefits package?" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                       
-                      <FormField
-                        control={templateForm.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Describe the purpose of this survey template" 
-                                className="min-h-[100px]"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={questionForm.control}
+                          name="questionType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Question Type</FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="text">Text response</SelectItem>
+                                  <SelectItem value="radio">Single choice (Radio)</SelectItem>
+                                  <SelectItem value="checkbox">Multiple choice (Checkbox)</SelectItem>
+                                  <SelectItem value="select">Dropdown select</SelectItem>
+                                  <SelectItem value="scale">Scale (1-10)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={questionForm.control}
+                          name="required"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-end space-x-2 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <FormLabel>Required question</FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       
-                      {allQuestions && allQuestions.length > 0 && (
-                        <div>
-                          <h4 className="font-medium mb-2">Select Questions</h4>
-                          <div className="border rounded-md p-4 overflow-y-auto max-h-[200px]">
-                            <div className="space-y-2">
-                              {allQuestions.map((question) => (
-                                <div key={question.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`question-${question.id}`}
-                                    checked={selectedQuestionIds.includes(question.id)}
-                                    onCheckedChange={() => toggleQuestionSelection(question.id)}
-                                  />
-                                  <Label
-                                    htmlFor={`question-${question.id}`}
-                                    className="text-sm cursor-pointer"
-                                  >
-                                    {question.questionText}
-                                  </Label>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Selected {selectedQuestionIds.length} of {allQuestions.length} questions
-                          </p>
-                        </div>
+                      {['radio', 'select', 'checkbox', 'scale'].includes(questionForm.watch('questionType')) && (
+                        <FormField
+                          control={questionForm.control}
+                          name="options"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Options</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Enter options, one per line" 
+                                  className="min-h-[100px]"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Enter each option on a new line
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       )}
                       
                       <DialogFooter>
-                        <Button type="submit">Create Template</Button>
-                      </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-              
-              {/* Edit Template Dialog */}
-              <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[600px]">
-                  <DialogHeader>
-                    <DialogTitle>Edit Survey Template</DialogTitle>
-                    <DialogDescription>
-                      Update the template information
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <Form {...templateForm}>
-                    <form onSubmit={templateForm.handleSubmit(handleUpdateTemplate)} className="space-y-4">
-                      <FormField
-                        control={templateForm.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Template Title</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Quarterly Benefits Survey" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={templateForm.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Describe the purpose of this survey template" 
-                                className="min-h-[100px]"
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <DialogFooter>
-                        <Button type="submit">Update Template</Button>
+                        <Button type="submit">Add Question</Button>
                       </DialogFooter>
                     </form>
                   </Form>
@@ -916,175 +774,10 @@ export default function SurveyAdminTab() {
           )}
         </TabsContent>
         
-        <TabsContent value="questions" className="space-y-4">
-          {loadingAllQuestions ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <div>
-              {allQuestions && allQuestions.length > 0 ? (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {allQuestions.map((question) => (
-                      <Card key={question.id}>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-base">
-                            {question.questionText}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex flex-wrap gap-2 mb-2">
-                            <Badge variant="outline">
-                              {question.questionType}
-                            </Badge>
-                            {question.required && (
-                              <Badge variant="secondary">
-                                Required
-                              </Badge>
-                            )}
-                            {question.createdByAI && (
-                              <Badge variant="secondary">AI-Generated</Badge>
-                            )}
-                          </div>
-                          
-                          {(question.questionType !== "text" && question.options) && (
-                            <div className="mt-2">
-                              <p className="text-sm text-muted-foreground mb-1">Options:</p>
-                              <div className="grid grid-cols-2 gap-2">
-                                {getOptionsArray(question.options).map((option, i) => (
-                                  <div key={i} className="text-sm border rounded p-1.5 bg-muted/50">
-                                    {option}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="border rounded-lg p-8 text-center mt-4">
-                  <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-medium mb-2">No Questions Created</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Create your first survey question to get started.
-                  </p>
-                  <Button onClick={() => setIsAddingQuestion(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create First Question
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+        <TabsContent value="questions">
+          {/* Questions content here */}
         </TabsContent>
       </Tabs>
-      
-      {/* Add Question Dialog */}
-      <Dialog open={isAddingQuestion} onOpenChange={setIsAddingQuestion}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Add Survey Question</DialogTitle>
-            <DialogDescription>
-              Create a new question for your survey templates
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Form {...questionForm}>
-            <form onSubmit={questionForm.handleSubmit(handleAddQuestion)} className="space-y-4">
-              <FormField
-                control={questionForm.control}
-                name="questionText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Question Text</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. How satisfied are you with your benefits package?" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={questionForm.control}
-                  name="questionType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question Type</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="text">Text response</SelectItem>
-                          <SelectItem value="radio">Single choice (Radio)</SelectItem>
-                          <SelectItem value="checkbox">Multiple choice (Checkbox)</SelectItem>
-                          <SelectItem value="select">Dropdown select</SelectItem>
-                          <SelectItem value="scale">Scale (1-10)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={questionForm.control}
-                  name="required"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-end space-x-2 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel>Required question</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              {['radio', 'select', 'checkbox', 'scale'].includes(questionForm.watch('questionType')) && (
-                <FormField
-                  control={questionForm.control}
-                  name="options"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Options</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Enter options, one per line" 
-                          className="min-h-[100px]"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter each option on a new line
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              
-              <DialogFooter>
-                <Button type="submit">Add Question</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
       
       {/* Quick Setup Modal */}
       <QuickSetupModal 
