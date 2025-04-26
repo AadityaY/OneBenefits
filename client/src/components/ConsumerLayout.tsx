@@ -13,8 +13,8 @@ export function ConsumerLayout({ children, showHero = false }: ConsumerLayoutPro
   const [location] = useLocation();
   const { companySettings } = useCompanyTheme();
   
-  // Only show hero on main page or explicitly when requested
-  const shouldShowHero = showHero || location === '/take-survey';
+  // Use the showHero prop passed from the AppLayout component
+  const shouldShowHero = showHero;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

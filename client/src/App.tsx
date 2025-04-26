@@ -31,7 +31,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   // Use consumer layout for regular users
   if (user && user.role === 'user') {
     return (
-      <ConsumerLayout showHero={location === '/take-survey'}>
+      <ConsumerLayout showHero={location === '/' || location === '/take-survey'}>
         {children}
       </ConsumerLayout>
     );
@@ -70,9 +70,8 @@ function Router() {
     const isAdmin = user.role === "admin" || user.role === "superadmin";
     if (isAdmin) {
       return <Redirect to="/admin/surveys" />;
-    } else {
-      return <Redirect to="/take-survey" />;
     }
+    // Regular users stay on the root path now that we have a dashboard component rendering there
   }
   
   // Redirect to auth if not logged in (except for auth page itself)
@@ -90,7 +89,9 @@ function Router() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : user ? (
-            <Redirect to={user.role === "admin" || user.role === "superadmin" ? "/admin/surveys" : "/take-survey"} />
+            user.role === "admin" || user.role === "superadmin" ? 
+            <Redirect to="/admin/surveys" /> : 
+            <Dashboard />
           ) : (
             <Redirect to="/auth" />
           )}
