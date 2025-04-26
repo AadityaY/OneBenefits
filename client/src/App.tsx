@@ -15,6 +15,9 @@ import { CompanyThemeProvider } from "@/hooks/use-company-theme";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 
+// Layouts for different user types
+import { ConsumerLayout } from "@/components/ConsumerLayout";
+
 // Router with role-based redirects
 function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -25,6 +28,16 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
   
+  // Use consumer layout for regular users
+  if (user && user.role === 'user') {
+    return (
+      <ConsumerLayout showHero={location === '/take-survey'}>
+        {children}
+      </ConsumerLayout>
+    );
+  }
+  
+  // Use admin layout for admins and superadmins
   return (
     <div className="min-h-screen bg-background">
       {user && <Sidebar />}
