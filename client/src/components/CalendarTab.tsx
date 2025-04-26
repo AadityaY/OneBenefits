@@ -74,25 +74,35 @@ interface UIEvent {
   endTime: Date;
   allDay: boolean;
   category: string;
+  color?: string;
 }
 
 // Function to adapt DB events to UI events format
 function adaptDBEventsToUIEvents(dbEvents: CalendarEvent[] | undefined): UIEvent[] {
   if (!dbEvents) return [];
   
-  return dbEvents.map(event => ({
-    id: event.id,
-    companyId: event.companyId,
-    title: event.title,
-    description: event.description || "",
-    location: "",
-    // Use the eventDate for both start and end times
-    startTime: new Date(event.eventDate),
-    endTime: new Date(event.eventDate),
-    allDay: true,
-    // Map eventType to category
-    category: event.eventType || "general",
-  }));
+  return dbEvents.map(event => {
+    // Create a date object for the event date
+    const eventDate = new Date(event.eventDate);
+    
+    // Map event type to proper category and set appropriate color
+    const category = event.eventType || "general";
+    
+    return {
+      id: event.id,
+      companyId: event.companyId,
+      title: event.title,
+      description: event.description || "",
+      location: "",
+      // Use the eventDate for both start and end times
+      startTime: eventDate,
+      endTime: eventDate,
+      allDay: true,
+      // Map eventType to category
+      category: category,
+      color: event.color || getCategoryDefaultColor(category),
+    };
+  });
 }
 
 // Define categories and their colors (match with eventType in database)
@@ -103,6 +113,12 @@ const EVENT_CATEGORIES = [
   { value: "meeting", label: "Meeting", color: "bg-purple-100 text-purple-800" },
   { value: "holiday", label: "Holiday", color: "bg-yellow-100 text-yellow-800" },
 ];
+
+// Helper function to get default color for a category
+function getCategoryDefaultColor(category: string): string {
+  const foundCategory = EVENT_CATEGORIES.find(c => c.value === category);
+  return foundCategory?.color.split(' ')[0] || "bg-blue-100";
+}
 
 export default function CalendarTab() {
   const { user } = useAuth();
