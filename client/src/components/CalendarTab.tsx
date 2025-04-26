@@ -406,16 +406,8 @@ export default function CalendarTab() {
                 <Button variant="ghost" size="sm" onClick={previousMonth} className="hover-lift">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="px-2 font-medium text-lg text-foreground">
-                  <span style={{ 
-                    backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                    WebkitTextFillColor: 'transparent'
-                  }}>
-                    {format(currentMonth, "MMMM yyyy")}
-                  </span>
+                <h3 className="px-2 font-medium text-lg text-primary">
+                  {format(currentMonth, "MMMM yyyy")}
                 </h3>
                 <Button variant="ghost" size="sm" onClick={nextMonth} className="hover-lift">
                   <ChevronRight className="h-4 w-4" />
@@ -540,18 +532,10 @@ export default function CalendarTab() {
         {viewMode === "day" && (
           <Card className="col-span-1 frost-glass shadow-md">
             <CardHeader className="border-b bg-background/70">
-              <CardTitle className="text-xl">
-                <span style={{ 
-                  backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                  WebkitTextFillColor: 'transparent'
-                }}>
-                  {selectedDate 
-                    ? format(selectedDate, "MMMM d, yyyy") 
-                    : "Select a date"}
-                </span>
+              <CardTitle className="text-xl text-primary">
+                {selectedDate 
+                  ? format(selectedDate, "MMMM d, yyyy") 
+                  : "Select a date"}
               </CardTitle>
               <CardDescription>
                 {eventsForSelectedDate.length} scheduled events
@@ -904,7 +888,7 @@ export default function CalendarTab() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between space-x-2 space-y-0 rounded-md border p-3 frost-glass">
                     <div className="space-y-0.5">
-                      <FormLabel className="gradient-heading text-base">All Day Event</FormLabel>
+                      <FormLabel className="text-base text-primary">All Day Event</FormLabel>
                       <FormDescription>
                         Event will be scheduled for the entire day
                       </FormDescription>

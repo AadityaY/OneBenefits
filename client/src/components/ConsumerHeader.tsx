@@ -92,7 +92,7 @@ export function ConsumerHeader() {
                 <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
                   <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="text-xl font-bold text-primary">
                   {companySettings?.name || "Benefits Portal"}
                 </span>
               </Link>
@@ -132,7 +132,7 @@ export function ConsumerHeader() {
                       <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
                         <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
                       </div>
-                      <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      <span className="text-xl font-bold text-primary">
                         {companySettings?.name || "Benefits Portal"}
                       </span>
                     </Link>
@@ -183,7 +183,7 @@ export function ConsumerHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="frost-glass">
-                <DropdownMenuItem className="font-medium text-gradient-primary">
+                <DropdownMenuItem className="font-medium text-primary">
                   Signed in as {user?.email}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
