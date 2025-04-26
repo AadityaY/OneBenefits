@@ -10,6 +10,10 @@ import retirementBenefitSvg from '../assets/retirement_benefit.svg';
 export function HeroSection() {
   const { companySettings } = useCompanyTheme();
   const companyName = companySettings?.name || "Your Company";
+  const heroTitle = companySettings?.heroTitle || "Simplified";
+  const heroSubtitle = companySettings?.heroSubtitle || "Benefits Experience";
+  const heroDescription = companySettings?.heroDescription || `Access information, take surveys, and get personalized support with your ${companyName} employee benefits - all in one place.`;
+  const heroImageUrl = companySettings?.heroImageUrl;
   
   return (
     <div className="relative overflow-hidden border-b">
@@ -27,20 +31,41 @@ export function HeroSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="space-y-6 md:pr-12">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              <span className="gradient-text">Simplified</span><br />
-              <span className="text-gray-800">Benefits Experience</span>
+              <span className="gradient-text">{heroTitle}</span><br />
+              <span className="text-gray-800">{heroSubtitle}</span>
             </h1>
             
             <p className="text-lg text-gray-600 max-w-xl">
-              Access information, take surveys, and get personalized support with your {companyName} employee benefits - all in one place.
+              {heroDescription}
             </p>
             
             {/* Buttons removed as requested */}
           </div>
           
           <div className="flex justify-center md:justify-end relative">
-            {/* People images gallery instead of illustration */}
-            <PeopleImageGallery />
+            {/* Use custom hero image if provided, otherwise show people gallery */}
+            {heroImageUrl ? (
+              <div className="relative h-60 w-full md:w-96 rounded-lg overflow-hidden shadow-xl">
+                <img 
+                  src={heroImageUrl} 
+                  alt="Hero image"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to the people gallery if image fails to load
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = 'none';
+                    const gallery = document.getElementById('people-gallery');
+                    if (gallery) {
+                      gallery.style.display = 'block';
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div id="people-gallery">
+                <PeopleImageGallery />
+              </div>
+            )}
             
             {/* Keep decorative floating images as accents */}
             <div className="absolute -top-8 -left-12 w-16 h-16 opacity-80 animate-float-slow z-20 hidden md:block">

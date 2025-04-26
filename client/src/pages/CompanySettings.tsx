@@ -33,6 +33,10 @@ export default function CompanySettings() {
     logo: companySettings?.logo || "",
     aiAssistantName: companySettings?.aiAssistantName || "Benefits Assistant",
     surveyGenerationPrompt: companySettings?.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
+    heroTitle: companySettings?.heroTitle || "Simplified",
+    heroSubtitle: companySettings?.heroSubtitle || "Benefits Experience",
+    heroDescription: companySettings?.heroDescription || "Access information, take surveys, and get personalized support with your employee benefits - all in one place.",
+    heroImageUrl: companySettings?.heroImageUrl || "",
   });
   
   // Update form data when settings load
@@ -133,6 +137,7 @@ export default function CompanySettings() {
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="branding">Branding & Theme</TabsTrigger>
+            <TabsTrigger value="hero">Hero Section</TabsTrigger>
             <TabsTrigger value="contact">Contact Info</TabsTrigger>
             <TabsTrigger value="ai">
               <div className="flex items-center gap-1">

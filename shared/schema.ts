@@ -243,6 +243,10 @@ export const companySettings = pgTable("company_settings", {
   surveyGenerationPrompt: text("survey_generation_prompt").default(
     "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement."
   ),
+  heroTitle: text("hero_title").default("Simplified"),
+  heroSubtitle: text("hero_subtitle").default("Benefits Experience"),
+  heroDescription: text("hero_description").default("Access information, take surveys, and get personalized support with your employee benefits - all in one place."),
+  heroImageUrl: text("hero_image_url"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
