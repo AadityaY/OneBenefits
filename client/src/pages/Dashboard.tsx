@@ -20,18 +20,7 @@ export default function Dashboard() {
   
   // Get the current tab based on location
   const renderContent = () => {
-    // User routes
-    if (location === "/take-survey") {
-      return (
-        <div className="space-y-8">
-          <PageHeader 
-            title="Take Survey" 
-            description="Complete your benefits surveys to help us improve your experience."
-          />
-          <SurveyTakingTab />
-        </div>
-      );
-    }
+    // This section has been moved to SurveysPage.tsx
     
     if (location === "/chat") {
       return (

@@ -9,6 +9,9 @@ import AuthPage from "@/pages/auth-page";
 import CompanySettings from "@/pages/CompanySettings";
 import DocumentViewerPage from "@/pages/DocumentViewerPage";
 import SurveysPage from "@/pages/SurveysPage";
+import ChatPage from "@/pages/ChatPage";
+import CalendarPage from "@/pages/CalendarPage";
+import ContentPage from "@/pages/ContentPage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -102,17 +105,14 @@ function Router() {
         <Route path="/surveys">
           {user ? <SurveysPage /> : <Redirect to="/auth" />}
         </Route>
-        <Route path="/take-survey">
-          {user ? <Dashboard /> : <Redirect to="/auth" />}
-        </Route>
         <Route path="/chat">
-          {user ? <Dashboard /> : <Redirect to="/auth" />}
+          {user ? <ChatPage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/calendar">
-          {user ? <Dashboard /> : <Redirect to="/auth" />}
+          {user ? <CalendarPage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/content">
-          {user ? <Dashboard /> : <Redirect to="/auth" />}
+          {user ? <ContentPage /> : <Redirect to="/auth" />}
         </Route>
         
         {/* Admin Dashboard Routes */}

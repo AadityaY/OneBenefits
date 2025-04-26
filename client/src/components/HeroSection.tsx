@@ -92,7 +92,7 @@ export function HeroSection() {
         
         {/* Features section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-          <Link href="/take-survey" className="block">
+          <Link href="/surveys" className="block">
             <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
