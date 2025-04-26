@@ -31,16 +31,10 @@ export function ConsumerHeader() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Navigation links with icons for consumer experience
+  // Navigation links with icons for consumer experience - ordered per requirement
   const navLinks = [
     { 
-      name: "Home", 
-      href: "/", 
-      active: location === "/" || location === "",
-      icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🏠</div>
-    },
-    { 
-      name: "Explore Benefits", 
+      name: "Explore", 
       href: "/explore", 
       active: location === "/explore",
       icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🔍</div>
@@ -70,7 +64,7 @@ export function ConsumerHeader() {
       icon: <Calendar className="h-4 w-4 mr-1" />
     },
     { 
-      name: "Resources", 
+      name: "Documents", 
       href: "/content", 
       active: location === "/content",
       icon: <FileText className="h-4 w-4 mr-1" />

@@ -76,8 +76,10 @@ function Router() {
     const isAdmin = user.role === "admin" || user.role === "superadmin";
     if (isAdmin) {
       return <Redirect to="/admin/surveys" />;
+    } else {
+      // Regular users go to explore page per tab order requirement
+      return <Redirect to="/explore" />;
     }
-    // Regular users stay on the root path now that we have a dashboard component rendering there
   }
   
   // Redirect to auth if not logged in (except for auth page itself)
@@ -97,7 +99,7 @@ function Router() {
           ) : user ? (
             user.role === "admin" || user.role === "superadmin" ? 
             <Redirect to="/admin/surveys" /> : 
-            <Dashboard />
+            <Redirect to="/explore" />
           ) : (
             <Redirect to="/auth" />
           )}
