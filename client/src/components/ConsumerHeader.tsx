@@ -69,10 +69,12 @@ export function ConsumerHeader() {
           {/* Logo and navigation */}
           <div className="flex items-center">
             <div className="flex items-center">
-              <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
-              <span className="text-xl font-bold text-gradient-primary">
-                {companySettings?.name || "Benefits Portal"}
-              </span>
+              <Link href="/take-survey" className="flex items-center">
+                <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
+                <span className="text-xl font-bold text-gradient-primary">
+                  {companySettings?.name || "Benefits Portal"}
+                </span>
+              </Link>
             </div>
             
             {/* Desktop Navigation */}
@@ -105,10 +107,12 @@ export function ConsumerHeader() {
               <SheetContent side="right" className="w-[80%] sm:w-[350px]">
                 <div className="flex flex-col py-6 h-full">
                   <div className="flex items-center mb-8">
-                    <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
-                    <span className="text-xl font-bold text-gradient-primary">
-                      {companySettings?.name || "Benefits Portal"}
-                    </span>
+                    <Link href="/take-survey" className="flex items-center">
+                      <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
+                      <span className="text-xl font-bold text-gradient-primary">
+                        {companySettings?.name || "Benefits Portal"}
+                      </span>
+                    </Link>
                   </div>
                   <nav className="flex flex-col space-y-2">
                     {navLinks.map((link) => (

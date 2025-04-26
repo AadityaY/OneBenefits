@@ -27,7 +27,7 @@ export function HeroSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="space-y-6 md:pr-12">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              <span className="gradient-text">Simplify Your</span><br />
+              <span className="gradient-text">Simplified</span><br />
               <span className="text-gray-800">Benefits Experience</span>
             </h1>
             
@@ -36,13 +36,17 @@ export function HeroSection() {
             </p>
             
             <div className="flex flex-wrap gap-4 pt-4">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md">
-                <Link href="/take-survey">Take Survey</Link>
-              </Button>
+              <Link href="/take-survey">
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md">
+                  Take Survey
+                </Button>
+              </Link>
               
-              <Button variant="outline" size="lg" className="shadow-sm">
-                <Link href="/chat">Chat with Benefits AI</Link>
-              </Button>
+              <Link href="/chat">
+                <Button variant="outline" size="lg" className="shadow-sm">
+                  Chat with Benefits AI
+                </Button>
+              </Link>
             </div>
           </div>
           
@@ -75,35 +79,41 @@ export function HeroSection() {
         
         {/* Features section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-          <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          <Link href="/take-survey" className="block">
+            <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Surveys & Feedback</h3>
+              <p className="text-gray-600">Complete surveys to help us improve your benefits experience and tailor offerings to your needs.</p>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Surveys & Feedback</h3>
-            <p className="text-gray-600">Complete surveys to help us improve your benefits experience and tailor offerings to your needs.</p>
-          </div>
+          </Link>
           
-          <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300">
-            <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
-              <svg className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
+          <Link href="/chat" className="block">
+            <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
+              <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">AI Chat Assistant</h3>
+              <p className="text-gray-600">Get immediate answers to your benefits questions with our AI-powered chat assistant.</p>
             </div>
-            <h3 className="text-xl font-semibold mb-2">AI Chat Assistant</h3>
-            <p className="text-gray-600">Get immediate answers to your benefits questions with our AI-powered chat assistant.</p>
-          </div>
+          </Link>
           
-          <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300">
-            <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
-              <svg className="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+          <Link href="/calendar" className="block">
+            <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
+              <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Benefits Calendar</h3>
+              <p className="text-gray-600">Stay informed about upcoming benefits events, enrollment periods, and important deadlines.</p>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Benefits Calendar</h3>
-            <p className="text-gray-600">Stay informed about upcoming benefits events, enrollment periods, and important deadlines.</p>
-          </div>
+          </Link>
         </div>
         
         {/* Testimonials section with real people */}
