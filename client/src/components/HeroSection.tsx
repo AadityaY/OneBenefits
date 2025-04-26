@@ -92,7 +92,7 @@ export function HeroSection() {
         
         {/* Features section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-          <Link href="/surveys" className="block">
+          <a href="/surveys" target="_blank" rel="noopener noreferrer" className="block">
             <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,9 +102,9 @@ export function HeroSection() {
               <h3 className="text-xl font-semibold mb-2">Surveys & Feedback</h3>
               <p className="text-gray-600">Complete surveys to help us improve your benefits experience and tailor offerings to your needs.</p>
             </div>
-          </Link>
+          </a>
           
-          <Link href="/chat" className="block">
+          <a href="/chat" target="_blank" rel="noopener noreferrer" className="block">
             <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
               <div className="h-12 w-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,9 +114,9 @@ export function HeroSection() {
               <h3 className="text-xl font-semibold mb-2">AI Chat Assistant</h3>
               <p className="text-gray-600">Get immediate answers to your benefits questions with our AI-powered chat assistant.</p>
             </div>
-          </Link>
+          </a>
           
-          <Link href="/calendar" className="block">
+          <a href="/calendar" target="_blank" rel="noopener noreferrer" className="block">
             <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
               <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +126,7 @@ export function HeroSection() {
               <h3 className="text-xl font-semibold mb-2">Benefits Calendar</h3>
               <p className="text-gray-600">Stay informed about upcoming benefits events, enrollment periods, and important deadlines.</p>
             </div>
-          </Link>
+          </a>
         </div>
         
         {/* Testimonials section with real people */}

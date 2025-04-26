@@ -162,19 +162,35 @@ export function Sidebar() {
                   <div className="pl-10 space-y-1 mt-1">
                     {item.submenu.map((subItem) => (
                       <div key={subItem.title}>
-                        <Link href={subItem.href}>
-                          <div 
-                            className={cn(
-                              "block p-2 rounded-md hover-lift cursor-pointer",
-                              (location === subItem.href || 
-                               (subItem.href === "/content" && location.startsWith("/document/"))) 
-                                ? "bg-primary/10 text-primary gradient-border" 
-                                : "hover:bg-muted/50"
-                            )}
-                          >
-                            {subItem.title}
-                          </div>
-                        </Link>
+                        {subItem.href === '/surveys' || subItem.href === '/chat' || subItem.href === '/calendar' || subItem.href === '/content' ? (
+                          <a href={subItem.href} target="_blank" rel="noopener noreferrer">
+                            <div 
+                              className={cn(
+                                "block p-2 rounded-md hover-lift cursor-pointer",
+                                (location === subItem.href || 
+                                 (subItem.href === "/content" && location.startsWith("/document/"))) 
+                                  ? "bg-primary/10 text-primary gradient-border" 
+                                  : "hover:bg-muted/50"
+                              )}
+                            >
+                              {subItem.title}
+                            </div>
+                          </a>
+                        ) : (
+                          <Link href={subItem.href}>
+                            <div 
+                              className={cn(
+                                "block p-2 rounded-md hover-lift cursor-pointer",
+                                (location === subItem.href || 
+                                 (subItem.href === "/content" && location.startsWith("/document/"))) 
+                                  ? "bg-primary/10 text-primary gradient-border" 
+                                  : "hover:bg-muted/50"
+                              )}
+                            >
+                              {subItem.title}
+                            </div>
+                          </Link>
+                        )}
                       </div>
                     ))}
                   </div>
