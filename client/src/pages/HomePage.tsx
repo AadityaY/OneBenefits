@@ -10,30 +10,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const { companySettings } = useCompanyTheme();
 
-  // Example testimonials data
-  const testimonials = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      role: "Marketing Director",
-      image: "https://randomuser.me/api/portraits/women/65.jpg",
-      quote: "The benefits portal made everything so simple to understand. I was able to make informed choices for my family."
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      role: "Software Engineer",
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      quote: "The AI chat assistant answered all my benefits questions immediately, saving me hours of research."
-    },
-    {
-      id: 3,
-      name: "Aisha Patel",
-      role: "HR Specialist",
-      image: "https://randomuser.me/api/portraits/women/45.jpg",
-      quote: "Having all our benefits documents in one place has simplified our onboarding process."
-    }
-  ];
+
 
   return (
     <div className="space-y-16 p-6 pt-1">
@@ -143,36 +120,7 @@ export default function HomePage() {
         </Card>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">What {companySettings?.name || "Our"} Users Say</h2>
-          <p className="text-muted-foreground">Real feedback from employees using {companySettings?.name ? `the ${companySettings.name}` : "our"} benefits platform</p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="hover-lift">
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="h-20 w-20 rounded-full overflow-hidden mb-4 border-4 border-primary/10">
-                    <img 
-                      src={testimonial.image} 
-                      alt={testimonial.name} 
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <p className="italic mb-4 text-muted-foreground">
-                    "{testimonial.quote}"
-                  </p>
-                  <h3 className="font-medium text-gradient-primary">{testimonial.name}</h3>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
 
       {/* Quick Links Section */}
       <section className="space-y-4">
