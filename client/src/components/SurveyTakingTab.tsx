@@ -1,4 +1,9 @@
 import { useState } from "react";
+import benefitsHeroSvg from '@assets/benefits_hero.svg';
+import benefitsSurveySvg from '@assets/benefits_survey.svg';
+import healthBenefitSvg from '@assets/health_benefit.svg';
+import retirementBenefitSvg from '@assets/retirement_benefit.svg';
+import wellbeingBenefitSvg from '@assets/wellbeing_benefit.svg';
 
 // Helper function to safely handle options that could be string or string[]
 const getOptionsArray = (options: string | string[] | null): string[] => {

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="#EDE9FE" />
+  
+  <!-- Piggy bank -->
+  <ellipse cx="100" cy="110" rx="50" ry="40" fill="#A78BFA" />
+  <ellipse cx="135" cy="110" rx="20" ry="25" fill="#A78BFA" />
+  <circle cx="135" cy="110" r="10" fill="#7C3AED" />
+  <circle cx="135" cy="110" r="4" fill="#EDE9FE" />
+  
+  <!-- Ears -->
+  <path d="M80 80C80 80 70 60 80 50C90 40 100 50 100 70" fill="#A78BFA" />
+  <path d="M120 80C120 80 130 60 120 50C110 40 100 50 100 70" fill="#A78BFA" />
+  
+  <!-- Tail -->
+  <path d="M60 110C60 110 40 110 40 120C40 130 50 140 60 140" stroke="#A78BFA" stroke-width="8" stroke-linecap="round" />
+  
+  <!-- Legs -->
+  <rect x="75" y="140" width="10" height="15" rx="5" fill="#7C3AED" />
+  <rect x="115" y="140" width="10" height="15" rx="5" fill="#7C3AED" />
+  
+  <!-- Coin slot -->
+  <rect x="90" y="90" width="20" height="5" rx="2" fill="#7C3AED" />
+  
+  <!-- Eyes -->
+  <circle cx="85" cy="100" r="5" fill="#7C3AED" />
+  <circle cx="85" cy="100" r="2" fill="white" />
+  <circle cx="115" cy="100" r="5" fill="#7C3AED" />
+  <circle cx="115" cy="100" r="2" fill="white" />
+  
+  <!-- Coins -->
+  <circle cx="50" cy="60" r="12" fill="#FBBF24" />
+  <circle cx="50" cy="60" r="8" fill="#F59E0B" />
+  <circle cx="50" cy="60" r="3" fill="#FBBF24" />
+  
+  <circle cx="160" cy="50" r="14" fill="#FBBF24" />
+  <circle cx="160" cy="50" r="10" fill="#F59E0B" />
+  <circle cx="160" cy="50" r="4" fill="#FBBF24" />
+  
+  <circle cx="150" cy="150" r="16" fill="#FBBF24" />
+  <circle cx="150" cy="150" r="12" fill="#F59E0B" />
+  <circle cx="150" cy="150" r="5" fill="#FBBF24" />
+  
+  <!-- Dollar symbols -->
+  <path d="M50 57V63M50 57C50 57 48 57 48 55C48 53 50 53 50 53C50 53 52 53 52 55" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M160 47V53M160 47C160 47 158 47 158 45C158 43 160 43 160 43C160 43 162 43 162 45" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M150 147V153M150 147C150 147 148 147 148 145C148 143 150 143 150 143C150 143 152 143 152 145" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+</svg>

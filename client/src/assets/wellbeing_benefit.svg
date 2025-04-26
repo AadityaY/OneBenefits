@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="#E0F7FA" />
+  
+  <!-- Sun rays -->
+  <circle cx="100" cy="100" r="40" fill="#22D3EE" />
+  <circle cx="100" cy="100" r="30" fill="#06B6D4" />
+  <circle cx="100" cy="100" r="20" fill="#0891B2" />
+  
+  <!-- Rays -->
+  <rect x="96" y="30" width="8" height="30" rx="4" fill="#22D3EE" />
+  <rect x="96" y="140" width="8" height="30" rx="4" fill="#22D3EE" />
+  <rect x="30" y="96" width="30" height="8" rx="4" fill="#22D3EE" />
+  <rect x="140" y="96" width="30" height="8" rx="4" fill="#22D3EE" />
+  
+  <!-- Diagonal rays -->
+  <rect x="52" y="52" width="8" height="25" rx="4" transform="rotate(-45 52 52)" fill="#22D3EE" />
+  <rect x="143" y="143" width="8" height="25" rx="4" transform="rotate(-45 143 143)" fill="#22D3EE" />
+  <rect x="143" y="52" width="8" height="25" rx="4" transform="rotate(45 143 52)" fill="#22D3EE" />
+  <rect x="52" y="143" width="8" height="25" rx="4" transform="rotate(45 52 143)" fill="#22D3EE" />
+  
+  <!-- Person meditating -->
+  <circle cx="100" cy="95" r="10" fill="white" />
+  <path d="M100 105V125" stroke="white" stroke-width="4" stroke-linecap="round" />
+  <path d="M80 135C80 135 90 125 100 125C110 125 120 135 120 135" stroke="white" stroke-width="4" stroke-linecap="round" />
+  <path d="M85 115H115" stroke="white" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Leaves -->
+  <path d="M30 70C30 70 40 60 50 70C60 80 50 90 50 90C50 90 40 80 30 70Z" fill="#10B981" />
+  <path d="M170 70C170 70 160 60 150 70C140 80 150 90 150 90C150 90 160 80 170 70Z" fill="#10B981" />
+  
+  <path d="M60 30C60 30 65 20 75 25C85 30 80 40 80 40C80 40 70 35 60 30Z" fill="#10B981" />
+  <path d="M140 30C140 30 135 20 125 25C115 30 120 40 120 40C120 40 130 35 140 30Z" fill="#10B981" />
+  
+  <!-- Health measurements -->
+  <circle cx="35" cy="150" r="15" fill="white" stroke="#22D3EE" stroke-width="2" />
+  <path d="M30 150H40 M35 145V155" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" />
+  
+  <rect x="150" y="145" width="20" height="10" rx="5" fill="#22D3EE" />
+  <rect x="165" y="142" width="5" height="16" rx="2.5" fill="#22D3EE" />
+</svg>

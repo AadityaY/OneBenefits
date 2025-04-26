@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="300" viewBox="0 0 600 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <rect width="600" height="300" rx="20" fill="url(#paint0_linear)" />
+  
+  <!-- Abstract shape elements -->
+  <circle cx="100" cy="220" r="50" fill="#8A2BE2" opacity="0.2" />
+  <circle cx="500" cy="80" r="70" fill="#FF4785" opacity="0.2" />
+  <circle cx="350" cy="250" r="40" fill="#00CED1" opacity="0.3" />
+  
+  <!-- People silhouettes -->
+  <!-- Person 1 -->
+  <circle cx="180" cy="120" r="30" fill="#A78BFA" />
+  <rect x="165" y="150" width="30" height="60" rx="10" fill="#A78BFA" />
+  <!-- Arms -->
+  <rect x="140" y="160" width="25" height="10" rx="5" fill="#A78BFA" />
+  <rect x="195" y="160" width="25" height="10" rx="5" fill="#A78BFA" />
+  
+  <!-- Person 2 -->
+  <circle cx="300" cy="110" r="30" fill="#F472B6" />
+  <rect x="285" y="140" width="30" height="60" rx="10" fill="#F472B6" />
+  <!-- Arms -->
+  <rect x="260" y="150" width="25" height="10" rx="5" fill="#F472B6" />
+  <rect x="315" y="150" width="25" height="10" rx="5" fill="#F472B6" />
+  
+  <!-- Person 3 -->
+  <circle cx="420" cy="130" r="30" fill="#22D3EE" />
+  <rect x="405" y="160" width="30" height="60" rx="10" fill="#22D3EE" />
+  <!-- Arms -->
+  <rect x="380" y="170" width="25" height="10" rx="5" fill="#22D3EE" />
+  <rect x="435" y="170" width="25" height="10" rx="5" fill="#22D3EE" />
+  
+  <!-- Benefits icons -->
+  <!-- Health icon -->
+  <circle cx="140" cy="70" r="20" fill="white" stroke="#FF4785" stroke-width="3" />
+  <path d="M130 70H150 M140 60V80" stroke="#FF4785" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Retirement icon -->
+  <circle cx="460" cy="75" r="20" fill="white" stroke="#8A2BE2" stroke-width="3" />
+  <path d="M450 70L460 60L470 70 M460 60V85" stroke="#8A2BE2" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Wellbeing icon -->
+  <circle cx="300" cy="55" r="20" fill="white" stroke="#22D3EE" stroke-width="3" />
+  <path d="M290 55C290 55 295 65 300 65C305 65 310 55 310 55" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" />
+  
+  <!-- Defs for gradient -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="600" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAF5FF" />
+      <stop offset="1" stop-color="#EDE9FE" />
+    </linearGradient>
+  </defs>
+</svg>

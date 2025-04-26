@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="#FDECEF" />
+  
+  <!-- Heart shape -->
+  <path d="M100 150C100 150 60 130 60 90C60 70 75 60 90 60C98.2843 60 100 65 100 65C100 65 101.716 60 110 60C125 60 140 70 140 90C140 130 100 150 100 150Z" fill="#F472B6" />
+  
+  <!-- Cross shape (medical symbol) -->
+  <rect x="90" y="75" width="20" height="50" rx="5" fill="white" />
+  <rect x="75" y="90" width="50" height="20" rx="5" fill="white" />
+  
+  <!-- Pills -->
+  <ellipse cx="60" cy="50" rx="15" ry="8" transform="rotate(-30 60 50)" fill="#A78BFA" />
+  <ellipse cx="60" cy="50" rx="10" ry="4" transform="rotate(-30 60 50)" fill="white" />
+  
+  <ellipse cx="140" cy="50" rx="15" ry="8" transform="rotate(30 140 50)" fill="#22D3EE" />
+  <ellipse cx="140" cy="50" rx="10" ry="4" transform="rotate(30 140 50)" fill="white" />
+  
+  <!-- Stethoscope -->
+  <circle cx="50" cy="150" r="12" fill="#9333EA" />
+  <path d="M50 138C50 138 50 130 50 125C50 120 60 120 70 120C80 120 85 120 95 120" stroke="#9333EA" stroke-width="6" stroke-linecap="round" />
+  <path d="M95 120C95 120 110 120 110 135C110 150 110 160 110 160" stroke="#9333EA" stroke-width="6" stroke-linecap="round" />
+  <circle cx="50" cy="150" r="6" fill="white" />
+  
+  <!-- Abstract dots -->
+  <circle cx="150" cy="150" r="8" fill="#22D3EE" opacity="0.7" />
+  <circle cx="165" cy="135" r="6" fill="#22D3EE" opacity="0.5" />
+  <circle cx="175" cy="125" r="4" fill="#22D3EE" opacity="0.3" />
+</svg>
