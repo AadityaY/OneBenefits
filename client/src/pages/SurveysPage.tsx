@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
-import { PageHeader } from "@/components/ui/page-header.tsx";
+import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pencil, BarChart, CheckSquare, Clock } from "lucide-react";
