@@ -794,10 +794,17 @@ Include specific details from the document in the questions, and make sure quest
   // Calendar events routes
   app.get("/api/events", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
     try {
-      const companyId = parseInt(req.query.companyId as string);
+      // Use the user's companyId if no companyId is provided in the query
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "No company ID provided" });
+      }
+      
       const events = await storage.getCalendarEvents(companyId);
       res.json(events);
     } catch (error) {
+      console.error("Error fetching calendar events:", error);
       res.status(500).json({ message: error.message });
     }
   });
