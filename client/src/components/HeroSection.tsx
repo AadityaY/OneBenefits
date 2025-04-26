@@ -116,7 +116,7 @@ export function HeroSection() {
             </div>
           </a>
           
-          <a href="/calendar" target="_blank" rel="noopener noreferrer" className="block">
+          <Link href="/calendar" className="block">
             <div className="bg-white rounded-xl shadow-md p-6 hover-lift border-gradient transition-all duration-300 h-full">
               <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
                 <svg className="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +126,7 @@ export function HeroSection() {
               <h3 className="text-xl font-semibold mb-2">Benefits Calendar</h3>
               <p className="text-gray-600">Stay informed about upcoming benefits events, enrollment periods, and important deadlines.</p>
             </div>
-          </a>
+          </Link>
         </div>
         
         {/* Testimonials section with real people */}

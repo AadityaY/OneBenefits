@@ -67,12 +67,12 @@ export default function HomeTab() {
             </CardHeader>
             
             <CardFooter className="pt-1">
-              <a href={card.link} target="_blank" rel="noopener noreferrer" className="w-full">
+              <Link href={card.link}>
                 <Button variant="outline" className="w-full group">
                   <span>Go to {card.title}</span>
                   <ChevronRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </a>
+              </Link>
             </CardFooter>
           </Card>
         ))}

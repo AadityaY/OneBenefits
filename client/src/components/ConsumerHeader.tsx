@@ -86,41 +86,20 @@ export function ConsumerHeader() {
             
             {/* Desktop Navigation */}
             <nav className="ml-10 hidden md:flex items-center space-x-1">
-              {navLinks.map((link) => {
-                if (link.href === '/surveys' || link.href === '/chat' || link.href === '/calendar' || link.href === '/content') {
-                  return (
-                    <a 
-                      key={link.name} 
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
-                        link.active 
-                          ? "text-primary bg-primary/5" 
-                          : "text-gray-700 hover:bg-gray-50 hover:text-primary"
-                      }`}
-                    >
-                      {link.icon}
-                      <span>{link.name}</span>
-                    </a>
-                  );
-                } else {
-                  return (
-                    <Link 
-                      key={link.name} 
-                      href={link.href}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
-                        link.active 
-                          ? "text-primary bg-primary/5" 
-                          : "text-gray-700 hover:bg-gray-50 hover:text-primary"
-                      }`}
-                    >
-                      {link.icon}
-                      <span>{link.name}</span>
-                    </Link>
-                  );
-                }
-              })}
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.name} 
+                  href={link.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
+                    link.active 
+                      ? "text-primary bg-primary/5" 
+                      : "text-gray-700 hover:bg-gray-50 hover:text-primary"
+                  }`}
+                >
+                  {link.icon}
+                  <span>{link.name}</span>
+                </Link>
+              ))}
             </nav>
           </div>
 
@@ -143,45 +122,22 @@ export function ConsumerHeader() {
                     </Link>
                   </div>
                   <nav className="flex flex-col space-y-2">
-                    {navLinks.map((link) => {
-                      if (link.href === '/surveys' || link.href === '/chat' || link.href === '/calendar' || link.href === '/content') {
-                        return (
-                          <a 
-                            key={link.name} 
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`px-3 py-3 rounded-md text-base font-medium transition-colors flex items-center ${
-                              link.active 
-                                ? "text-primary bg-primary/5" 
-                                : "text-gray-700 hover:bg-gray-50 hover:text-primary"
-                            }`}
-                          >
-                            <div className="mr-3 text-primary opacity-80">
-                              {link.icon}
-                            </div>
-                            <span>{link.name}</span>
-                          </a>
-                        );
-                      } else {
-                        return (
-                          <Link 
-                            key={link.name} 
-                            href={link.href}
-                            className={`px-3 py-3 rounded-md text-base font-medium transition-colors flex items-center ${
-                              link.active 
-                                ? "text-primary bg-primary/5" 
-                                : "text-gray-700 hover:bg-gray-50 hover:text-primary"
-                            }`}
-                          >
-                            <div className="mr-3 text-primary opacity-80">
-                              {link.icon}
-                            </div>
-                            <span>{link.name}</span>
-                          </Link>
-                        );
-                      }
-                    })}
+                    {navLinks.map((link) => (
+                      <Link 
+                        key={link.name} 
+                        href={link.href}
+                        className={`px-3 py-3 rounded-md text-base font-medium transition-colors flex items-center ${
+                          link.active 
+                            ? "text-primary bg-primary/5" 
+                            : "text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        }`}
+                      >
+                        <div className="mr-3 text-primary opacity-80">
+                          {link.icon}
+                        </div>
+                        <span>{link.name}</span>
+                      </Link>
+                    ))}
                   </nav>
                   <div className="mt-auto">
                     <Button onClick={handleLogout} variant="destructive" className="w-full">
