@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { useCompanyTheme } from '@/hooks/use-company-theme';
+import { PeopleImageGallery, TestimonialGrid } from '@/components/PeopleImageGallery';
 import benefitsHeroSvg from '../assets/benefits_hero.svg';
 import healthBenefitSvg from '../assets/health_benefit.svg';
 import retirementBenefitSvg from '../assets/retirement_benefit.svg';
@@ -46,35 +47,29 @@ export function HeroSection() {
           </div>
           
           <div className="flex justify-center md:justify-end relative">
-            <div className="relative">
-              {/* Main hero image */}
+            {/* People images gallery instead of illustration */}
+            <PeopleImageGallery />
+            
+            {/* Keep decorative floating images as accents */}
+            <div className="absolute -top-8 -left-12 w-16 h-16 opacity-80 animate-float-slow z-20 hidden md:block">
               <img 
-                src={benefitsHeroSvg}
-                alt="Benefits illustration" 
-                className="w-full max-w-md z-10 relative drop-shadow-lg"
+                src={healthBenefitSvg}
+                alt="Health benefits" 
+                className="w-full h-full drop-shadow-md"
               />
-              
-              {/* Decorative floating images */}
-              <div className="absolute -top-8 -left-12 w-20 h-20 opacity-90 animate-float-slow z-20">
-                <img 
-                  src={healthBenefitSvg}
-                  alt="Health benefits" 
-                  className="w-full h-full drop-shadow-md"
-                />
-              </div>
-              
-              <div className="absolute bottom-0 -right-8 w-24 h-24 opacity-90 animate-float z-20">
-                <img 
-                  src={retirementBenefitSvg}
-                  alt="Retirement benefits" 
-                  className="w-full h-full drop-shadow-md"
-                />
-              </div>
-              
-              {/* Background decoration */}
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-50 blur-2xl"></div>
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-cyan-200 to-purple-200 rounded-full opacity-50 blur-2xl"></div>
             </div>
+            
+            <div className="absolute bottom-0 -right-8 w-16 h-16 opacity-80 animate-float z-20 hidden md:block">
+              <img 
+                src={retirementBenefitSvg}
+                alt="Retirement benefits" 
+                className="w-full h-full drop-shadow-md"
+              />
+            </div>
+            
+            {/* Background decoration */}
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-50 blur-2xl"></div>
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-gradient-to-br from-cyan-200 to-purple-200 rounded-full opacity-50 blur-2xl"></div>
           </div>
         </div>
         
@@ -109,6 +104,16 @@ export function HeroSection() {
             <h3 className="text-xl font-semibold mb-2">Benefits Calendar</h3>
             <p className="text-gray-600">Stay informed about upcoming benefits events, enrollment periods, and important deadlines.</p>
           </div>
+        </div>
+        
+        {/* Testimonials section with real people */}
+        <div className="mt-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-2">What Our Users Say</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Real feedback from employees using our benefits platform</p>
+          </div>
+          
+          <TestimonialGrid />
         </div>
       </div>
     </div>
