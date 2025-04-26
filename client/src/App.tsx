@@ -12,6 +12,8 @@ import SurveysPage from "@/pages/SurveysPage";
 import ChatPage from "@/pages/ChatPage";
 import CalendarPage from "@/pages/CalendarPage";
 import ContentPage from "@/pages/ContentPage";
+import ExplorePage from "@/pages/ExplorePage";
+import VideosPage from "@/pages/VideosPage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -102,11 +104,17 @@ function Router() {
         </Route>
         
         {/* User Dashboard Routes */}
-        <Route path="/surveys">
-          {user ? <SurveysPage /> : <Redirect to="/auth" />}
+        <Route path="/explore">
+          {user ? <ExplorePage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/chat">
           {user ? <ChatPage /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/surveys">
+          {user ? <SurveysPage /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/videos">
+          {user ? <VideosPage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/calendar">
           {user ? <CalendarPage /> : <Redirect to="/auth" />}

@@ -12,13 +12,34 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
 
+// Define category types
+type CategoryKey = "medical" | "dental" | "vision" | "retirement" | "fsa" | "life" | "disability" | "wellness" | "perks";
+
+type BenefitPlan = {
+  name: string;
+  cost: string;
+  coverage: string;
+  details: string;
+  highlights: string[];
+};
+
+type CategoryContent = {
+  title: string;
+  description: string;
+  plans: BenefitPlan[];
+};
+
+type CategoryContentMap = {
+  [key in CategoryKey]: CategoryContent;
+};
+
 export default function ExplorePage() {
   const { user } = useAuth();
   const { companySettings } = useCompanyTheme();
-  const [activeCategory, setActiveCategory] = useState("medical");
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>("medical");
 
   // Define benefit categories
-  const categories = [
+  const categories: Array<{id: CategoryKey, name: string}> = [
     { id: "medical", name: "Medical Plans" },
     { id: "dental", name: "Dental Coverage" },
     { id: "vision", name: "Vision Plans" },
@@ -31,7 +52,7 @@ export default function ExplorePage() {
   ];
 
   // Define dummy content for each category
-  const categoryContent = {
+  const categoryContent: CategoryContentMap = {
     medical: {
       title: "Medical Insurance Plans",
       description: "Comprehensive healthcare coverage options for you and your family.",
@@ -261,7 +282,7 @@ export default function ExplorePage() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() => setActiveCategory(category.id)}
+                    onClick={() => setActiveCategory(category.id as CategoryKey)}
                     className={`w-full text-left py-2 px-3 rounded-md transition-colors ${
                       activeCategory === category.id
                         ? "bg-primary/10 text-primary font-medium"
