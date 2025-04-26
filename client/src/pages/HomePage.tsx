@@ -49,11 +49,11 @@ export default function HomePage() {
           </p>
         </div>
         <div className="flex-1 flex justify-center lg:justify-end">
-          <div className="relative">
+          <div className="relative w-[130%]">
             <img 
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" 
+              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=650&q=80" 
               alt="Family enjoying benefits" 
-              className="rounded-xl shadow-lg hover-lift object-cover max-w-full"
+              className="rounded-xl shadow-lg hover-lift object-cover w-full"
             />
             <div className="absolute -bottom-2 -right-2 bg-primary/20 rounded-full p-1 animate-pulse">
               <div className="bg-white rounded-full p-2">
