@@ -49,7 +49,7 @@ export function Sidebar() {
       href: "/",
       open: true,
       submenu: [
-        { title: "Take Survey", href: "/take-survey" },
+        { title: "Take Survey", href: "/surveys" },
         { title: "Benefits Chat", href: "/chat" },
         { title: "Calendar", href: "/calendar" },
         { title: "Benefits Documents", href: "/content" },
