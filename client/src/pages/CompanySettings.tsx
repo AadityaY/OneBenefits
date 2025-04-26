@@ -111,16 +111,55 @@ export default function CompanySettings() {
     reader.readAsDataURL(file);
   };
   
-  // Handle hero image upload
-  const handleHeroImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle hero image upload with resize functionality
+  const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData(prev => ({ ...prev, heroImageUrl: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        // Get the base64 data of the image
+        const base64Data = reader.result as string;
+        
+        // Compress and resize image on the server
+        const res = await apiRequest(
+          "POST", 
+          "/api/resize-image", 
+          { 
+            image: base64Data,
+            maxWidth: 1200,
+            maxHeight: 600
+          }
+        );
+        
+        if (res.ok) {
+          const data = await res.json();
+          setFormData(prev => ({ ...prev, heroImageUrl: data.resizedImage }));
+          toast({
+            title: "Image processed",
+            description: "Your image has been optimized for web display.",
+          });
+        } else {
+          // If server processing fails, use the original image
+          console.warn("Image processing failed, using original");
+          setFormData(prev => ({ ...prev, heroImageUrl: base64Data }));
+          toast({
+            title: "Image processing warning",
+            description: "We couldn't optimize your image. Using original size.",
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error processing image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process the image. Please try again with a smaller image.",
+        variant: "destructive",
+      });
+    }
   };
   
   if (isLoading) {

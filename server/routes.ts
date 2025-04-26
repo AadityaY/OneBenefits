@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
+import { resizeImageFromBase64 } from "./image-utils";
 import * as fs from "fs/promises";
 import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess } from "./auth";
 import { z } from "zod";
