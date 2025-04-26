@@ -35,19 +35,7 @@ export function HeroSection() {
               Access information, take surveys, and get personalized support with your {companyName} employee benefits - all in one place.
             </p>
             
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/take-survey">
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md">
-                  Take Survey
-                </Button>
-              </Link>
-              
-              <Link href="/chat">
-                <Button variant="outline" size="lg" className="shadow-sm">
-                  Chat with Benefits AI
-                </Button>
-              </Link>
-            </div>
+            {/* Buttons removed as requested */}
           </div>
           
           <div className="flex justify-center md:justify-end relative">
