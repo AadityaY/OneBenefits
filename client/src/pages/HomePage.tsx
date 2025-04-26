@@ -10,20 +10,16 @@ export default function HomePage() {
   const { user } = useAuth();
   const { companySettings } = useCompanyTheme();
 
-
-
   return (
     <div className="space-y-16 p-6 pt-1">
-      {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row items-center gap-8 py-4">
-        <div className="flex-1 space-y-4">
+      {/* Welcome Header */}
+      <section className="py-4 mb-8">
+        <div className="space-y-4">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gradient-primary">
-            {companySettings?.heroTitle || "Awesome"} <br/>
-            {companySettings?.heroSubtitle || "Benefits Experience"}
+            {companySettings?.name ? `${companySettings.name} Benefits` : "Employee Benefits"}
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg">
-            {companySettings?.heroDescription || 
-              "Access information, take surveys, and get personalized support with your employee benefits - all in one place."}
+            Access information, take surveys, and get personalized support with your benefits - all in one place.
           </p>
           {companySettings?.website && (
             <div className="pt-2">
@@ -34,29 +30,6 @@ export default function HomePage() {
               </Button>
             </div>
           )}
-        </div>
-        <div className="flex-1 flex justify-center lg:justify-end">
-          <div className="relative w-[130%]">
-            <img 
-              src={companySettings?.heroImageUrl || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=650&q=80"} 
-              alt={`${companySettings?.name || 'Company'} benefits image`} 
-              className="rounded-xl shadow-lg hover-lift object-cover w-full"
-            />
-            <div className="absolute -bottom-2 -right-2 bg-primary/20 rounded-full p-1 animate-pulse">
-              <div className="bg-white rounded-full p-2">
-                <div className="h-10 w-10 rounded-full animated-gradient-bg flex items-center justify-center text-primary-foreground font-bold shadow-md">
-                  ❤️
-                </div>
-              </div>
-            </div>
-            <div className="absolute -top-2 -left-2 bg-secondary/20 rounded-full p-1 animate-pulse">
-              <div className="bg-white rounded-full p-2">
-                <div className="h-8 w-8 rounded-full animated-gradient-bg flex items-center justify-center text-primary-foreground font-bold shadow-md">
-                  💜
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -119,8 +92,6 @@ export default function HomePage() {
           </CardFooter>
         </Card>
       </section>
-
-
 
       {/* Quick Links Section */}
       <section className="space-y-4">
