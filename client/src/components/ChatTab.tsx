@@ -207,11 +207,12 @@ export default function ChatTab() {
                           </div>
                           
                           <h3 className="font-bold text-xl mb-3 gradient-text">
-                            Your OpenAI-Powered {assistantName}
+                            {companySettings?.name ? `${companySettings.name}'s` : 'Your'} OpenAI-Powered {assistantName}
                           </h3>
                           <p className="text-muted-foreground text-sm mb-6">
-                            Ask me questions about your employee benefits, company policies, and more. 
-                            I use OpenAI technology to provide accurate, personalized answers based on your company's documents!
+                            Ask me questions about {companySettings?.name ? `${companySettings.name}` : "your"} employee benefits, company policies, and more. 
+                            I use OpenAI technology to provide accurate, personalized answers based on 
+                            {companySettings?.name ? ` ${companySettings.name}'s` : " your company's"} documents!
                           </p>
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -346,9 +347,11 @@ export default function ChatTab() {
                   <Search className="h-4 w-4 text-background" />
                 </div>
                 <div>
-                  <CardTitle className="text-base gradient-heading">Benefits Document Search</CardTitle>
+                  <CardTitle className="text-base gradient-heading">
+                    {companySettings?.name ? `${companySettings.name} ` : ''}Benefits Document Search
+                  </CardTitle>
                   <CardDescription className="text-xs">
-                    Search through company benefits documents and policies
+                    Search through {companySettings?.name ? `${companySettings.name}` : 'company'} benefits documents and policies
                   </CardDescription>
                 </div>
               </div>
