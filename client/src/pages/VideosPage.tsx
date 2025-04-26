@@ -15,13 +15,30 @@ import { Play, Clock, Info, Calendar, Heart, Shield, PiggyBank, Activity } from 
 import { useCompanyTheme } from "@/hooks/use-company-theme";
 
 export default function VideosPage() {
+  // Define types for videos
+  type VideoCategory = "featured" | "overview" | "medical" | "retirement" | "wellness" | "enrollment";
+  
+  type Video = {
+    id: number;
+    title: string;
+    description: string;
+    duration: string;
+    thumbnail: string;
+    views: number;
+    date: string;
+  };
+  
+  type VideoMap = {
+    [key in VideoCategory]: Video[];
+  };
+
   const { user } = useAuth();
   const { companySettings } = useCompanyTheme();
-  const [activeTab, setActiveTab] = useState("featured");
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [activeTab, setActiveTab] = useState<VideoCategory>("featured");
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   // Categories for videos
-  const categories = [
+  const categories: Array<{id: VideoCategory, name: string, icon: React.ReactNode}> = [
     { id: "featured", name: "Featured", icon: <Heart className="h-4 w-4" /> },
     { id: "overview", name: "Benefits Overview", icon: <Info className="h-4 w-4" /> },
     { id: "medical", name: "Medical", icon: <Shield className="h-4 w-4" /> },
@@ -31,7 +48,7 @@ export default function VideosPage() {
   ];
 
   // Dummy videos data
-  const videosData = {
+  const videosData: VideoMap = {
     featured: [
       {
         id: 1,
@@ -182,7 +199,7 @@ export default function VideosPage() {
   };
 
   // Video player component (simulated)
-  const VideoPlayer = ({ video }) => {
+  const VideoPlayer = ({ video }: { video: Video }) => {
     return (
       <Card className="w-full border-gradient-soft shadow-md">
         <CardHeader className="pb-0">
@@ -219,7 +236,7 @@ export default function VideosPage() {
   };
 
   // Video grid component
-  const VideoGrid = ({ videos }) => {
+  const VideoGrid = ({ videos }: { videos: Video[] }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.map((video) => (
@@ -283,7 +300,7 @@ export default function VideosPage() {
             <Tabs 
               defaultValue="featured" 
               value={activeTab} 
-              onValueChange={setActiveTab}
+              onValueChange={(value) => setActiveTab(value as VideoCategory)}
               className="space-y-6"
             >
               <div className="bg-white p-1 rounded-md border w-fit mx-auto">
@@ -302,8 +319,12 @@ export default function VideosPage() {
               </div>
 
               {Object.keys(videosData).map((categoryId) => (
-                <TabsContent key={categoryId} value={categoryId} className="space-y-6 mt-6">
-                  <VideoGrid videos={videosData[categoryId]} />
+                <TabsContent 
+                  key={categoryId} 
+                  value={categoryId} 
+                  className="space-y-6 mt-6"
+                >
+                  <VideoGrid videos={videosData[categoryId as VideoCategory]} />
                 </TabsContent>
               ))}
             </Tabs>

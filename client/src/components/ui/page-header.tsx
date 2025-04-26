@@ -7,11 +7,11 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description }: PageHeaderProps) {
   return (
-    <div>
-      <h1 className="text-2xl md:text-3xl font-bold mb-2 text-foreground">
+    <div className="space-y-1">
+      <h1 className="text-3xl font-bold tracking-tight text-gradient-primary">
         {title}
       </h1>
-      <p className="text-muted-foreground">
+      <p className="text-lg text-muted-foreground">
         {description}
       </p>
     </div>
