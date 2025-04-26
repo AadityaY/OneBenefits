@@ -72,7 +72,11 @@
 @layer components {
   /* Custom utility classes */
   .gradient-heading {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
   }
   
   .gradient-border {
@@ -90,7 +94,19 @@
   }
   
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600;
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-gradient-primary {
+    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
   }
   
   .animated-gradient-bg {
@@ -107,12 +123,14 @@
     @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg;
   }
   
-  .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary/90 to-primary/70;
-  }
+  /* Removed duplicate text-gradient-primary class */
   
   .text-gradient-accent {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent/90 to-accent/70;
+    background-image: linear-gradient(to right, hsl(var(--accent)), hsl(var(--accent)/0.7));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
   }
   
   .border-gradient {

@@ -89,8 +89,10 @@ export function ConsumerHeader() {
           <div className="flex items-center">
             <div className="flex items-center">
               <Link href="/home" className="flex items-center">
-                <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
-                <span className="text-xl font-bold text-gradient-primary">
+                <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
+                  <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {companySettings?.name || "Benefits Portal"}
                 </span>
               </Link>
@@ -127,8 +129,10 @@ export function ConsumerHeader() {
                 <div className="flex flex-col py-6 h-full">
                   <div className="flex items-center mb-8">
                     <Link href="/home" className="flex items-center">
-                      <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
-                      <span className="text-xl font-bold text-gradient-primary">
+                      <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
+                        <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                      </div>
+                      <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                         {companySettings?.name || "Benefits Portal"}
                       </span>
                     </Link>
