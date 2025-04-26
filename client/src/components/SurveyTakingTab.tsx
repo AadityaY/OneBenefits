@@ -1,9 +1,9 @@
 import { useState } from "react";
-import benefitsHeroSvg from '@assets/benefits_hero.svg';
-import benefitsSurveySvg from '@assets/benefits_survey.svg';
-import healthBenefitSvg from '@assets/health_benefit.svg';
-import retirementBenefitSvg from '@assets/retirement_benefit.svg';
-import wellbeingBenefitSvg from '@assets/wellbeing_benefit.svg';
+import benefitsHeroSvg from '../assets/benefits_hero.svg';
+import benefitsSurveySvg from '../assets/benefits_survey.svg';
+import healthBenefitSvg from '../assets/health_benefit.svg';
+import retirementBenefitSvg from '../assets/retirement_benefit.svg';
+import wellbeingBenefitSvg from '../assets/wellbeing_benefit.svg';
 
 // Helper function to safely handle options that could be string or string[]
 const getOptionsArray = (options: string | string[] | null): string[] => {
@@ -287,19 +287,42 @@ export default function SurveyTakingTab() {
   // Render success screen after submission
   if (submitSuccess) {
     return (
-      <div className="max-w-2xl mx-auto py-8 text-center space-y-6">
-        <div className="flex justify-center">
-          <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <CheckCircle className="h-12 w-12" />
+      <div className="max-w-3xl mx-auto py-12 text-center">
+        <div className="bg-gradient-to-br from-purple-50 to-cyan-50 p-8 rounded-xl shadow-sm">
+          <div className="flex flex-col items-center space-y-8">
+            {/* Success animation with gradient */}
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 blur-lg opacity-30 animate-pulse"></div>
+              <div className="relative h-28 w-28 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 flex items-center justify-center">
+                <CheckCircle className="h-14 w-14 text-white" />
+              </div>
+            </div>
+            
+            <div className="space-y-3 max-w-xl">
+              <h2 className="text-3xl font-bold gradient-text">Thank You for Your Feedback!</h2>
+              <p className="text-gray-600 text-lg">
+                Your responses have been successfully submitted and will help us enhance your benefits experience.
+              </p>
+            </div>
+            
+            <div className="pt-4 flex gap-4">
+              <Button 
+                onClick={handleReturnToList} 
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              >
+                Return to Surveys
+              </Button>
+            </div>
+            
+            {/* Decorative illustrations */}
+            <div className="flex items-center justify-center gap-8 mt-4">
+              <img src={healthBenefitSvg} alt="" className="w-20 h-20 opacity-80" />
+              <img src={retirementBenefitSvg} alt="" className="w-20 h-20 opacity-80" />
+              <img src={wellbeingBenefitSvg} alt="" className="w-20 h-20 opacity-80" />
+            </div>
           </div>
         </div>
-        <h2 className="text-2xl font-bold">Thank You for Your Feedback!</h2>
-        <p className="text-muted-foreground">
-          Your responses have been successfully submitted and will help us improve.
-        </p>
-        <Button onClick={handleReturnToList} size="lg">
-          Return to Surveys
-        </Button>
       </div>
     );
   }
@@ -308,18 +331,25 @@ export default function SurveyTakingTab() {
   if (surveyStarted && selectedTemplate && questions) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Survey Header */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">{selectedTemplate.title}</h2>
-          <p className="text-muted-foreground">{selectedTemplate.description}</p>
-          
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm">
-              Question {currentQuestionIndex + 1} of {sortedQuestions.length}
+        {/* Survey Header with gradient styling */}
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-purple-50 to-cyan-50 p-6 rounded-xl">
+            <h2 className="text-2xl font-bold gradient-text">{selectedTemplate.title}</h2>
+            <p className="text-gray-600 mt-2">{selectedTemplate.description}</p>
+            
+            <div className="flex items-center space-x-4 mt-6">
+              <img src={benefitsSurveySvg} alt="Survey" className="w-16 h-16" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium text-purple-700">
+                    Question {currentQuestionIndex + 1} of {sortedQuestions.length}
+                  </div>
+                  <div className="text-sm font-medium text-pink-600">{progressPercentage}% Complete</div>
+                </div>
+                <Progress value={progressPercentage} className="h-3 mt-1 bg-gray-100 rounded-full progress-gradient" />
+              </div>
             </div>
-            <div className="text-sm font-medium">{progressPercentage}% Complete</div>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
         </div>
         
         {/* Current Question */}
@@ -412,10 +442,7 @@ export default function SurveyTakingTab() {
               
               {currentQuestion.questionType === "checkbox" && currentQuestion.options && (
                 <div className="space-y-3">
-                  {(Array.isArray(currentQuestion.options) 
-                    ? currentQuestion.options 
-                    : currentQuestion.options.split('\n')
-                  ).map((option, i) => (
+                  {getOptionsArray(currentQuestion.options).map((option: string, i: number) => (
                     <div key={i} className="flex items-center space-x-2">
                       <Checkbox
                         id={`check-${currentQuestion.id}-${i}`}
