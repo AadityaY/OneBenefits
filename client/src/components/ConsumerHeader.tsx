@@ -90,7 +90,11 @@ export function ConsumerHeader() {
             <div className="flex items-center">
               <Link href="/home" className="flex items-center">
                 <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
-                  <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                  {companySettings?.logo ? (
+                    <img src={companySettings.logo} alt={`${companySettings.name} logo`} className="h-8 w-8 object-contain" />
+                  ) : (
+                    <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                  )}
                 </div>
                 <span className="text-xl font-bold gradient-heading">
                   {companySettings?.name || "Benefits Portal"}
@@ -130,7 +134,11 @@ export function ConsumerHeader() {
                   <div className="flex items-center mb-8">
                     <Link href="/home" className="flex items-center">
                       <div className="h-10 w-10 flex items-center justify-center mr-2 bg-primary/5 rounded">
-                        <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                        {companySettings?.logo ? (
+                          <img src={companySettings.logo} alt={`${companySettings.name} logo`} className="h-8 w-8 object-contain" />
+                        ) : (
+                          <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                        )}
                       </div>
                       <span className="text-xl font-bold gradient-heading">
                         {companySettings?.name || "Benefits Portal"}

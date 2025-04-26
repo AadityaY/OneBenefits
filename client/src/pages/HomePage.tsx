@@ -41,18 +41,28 @@ export default function HomePage() {
       <section className="flex flex-col lg:flex-row items-center gap-8 py-4">
         <div className="flex-1 space-y-4">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gradient-primary">
-            Awesome <br/>Benefits Experience
+            {companySettings?.heroTitle || "Awesome"} <br/>
+            {companySettings?.heroSubtitle || "Benefits Experience"}
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg">
-            Access information, take surveys, and get personalized support with 
-            your employee benefits - all in one place.
+            {companySettings?.heroDescription || 
+              "Access information, take surveys, and get personalized support with your employee benefits - all in one place."}
           </p>
+          {companySettings?.website && (
+            <div className="pt-2">
+              <Button asChild variant="outline" className="hover-lift">
+                <a href={companySettings.website} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                  Visit {companySettings.name} Website <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
         <div className="flex-1 flex justify-center lg:justify-end">
           <div className="relative w-[130%]">
             <img 
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=650&q=80" 
-              alt="Family enjoying benefits" 
+              src={companySettings?.heroImageUrl || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=650&q=80"} 
+              alt={`${companySettings?.name || 'Company'} benefits image`} 
               className="rounded-xl shadow-lg hover-lift object-cover w-full"
             />
             <div className="absolute -bottom-2 -right-2 bg-primary/20 rounded-full p-1 animate-pulse">
@@ -136,8 +146,8 @@ export default function HomePage() {
       {/* Testimonials Section */}
       <section className="space-y-8">
         <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">What Our Users Say</h2>
-          <p className="text-muted-foreground">Real feedback from employees using our benefits platform</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">What {companySettings?.name || "Our"} Users Say</h2>
+          <p className="text-muted-foreground">Real feedback from employees using {companySettings?.name ? `the ${companySettings.name}` : "our"} benefits platform</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
