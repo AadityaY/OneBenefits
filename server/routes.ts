@@ -1046,6 +1046,31 @@ Include specific details from the document in the questions, and make sure quest
       res.status(500).json({ message: error.message });
     }
   });
+  
+  // Image processing endpoint for resizing and optimizing images
+  app.post("/api/resize-image", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { image, maxWidth, maxHeight, quality } = req.body;
+      
+      if (!image) {
+        return res.status(400).json({ message: "No image provided" });
+      }
+      
+      const options = {
+        maxWidth: maxWidth || 1200,
+        maxHeight: maxHeight || 600,
+        quality: quality || 80
+      };
+      
+      // Process the image
+      const resizedImage = await resizeImageFromBase64(image, options);
+      
+      res.json({ resizedImage });
+    } catch (error) {
+      console.error("Image resize error:", error);
+      res.status(500).json({ message: "Failed to process image" });
+    }
+  });
 
   // Create and return HTTP server
   const httpServer = createServer(app);
