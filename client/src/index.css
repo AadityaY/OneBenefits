@@ -72,11 +72,15 @@
 @layer components {
   /* Custom utility classes */
   .gradient-heading {
-    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+    background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent !important;
+    display: inline-block;
     -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    text-shadow: none;
   }
   
   .gradient-border {
@@ -94,19 +98,27 @@
   }
   
   .gradient-text {
-    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .text-gradient-primary {
-    background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+    background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent !important;
+    display: inline-block;
     -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    text-shadow: none;
+  }
+  
+  .text-gradient-primary {
+    background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    display: inline-block;
+    -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    text-shadow: none;
   }
   
   .animated-gradient-bg {
@@ -126,11 +138,15 @@
   /* Removed duplicate text-gradient-primary class */
   
   .text-gradient-accent {
-    background-image: linear-gradient(to right, hsl(var(--accent)), hsl(var(--accent)/0.7));
+    background: linear-gradient(to right, hsl(var(--accent)), hsl(var(--accent)/0.7));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent !important;
+    display: inline-block;
     -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    text-shadow: none;
   }
   
   .border-gradient {
