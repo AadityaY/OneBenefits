@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth, loginSchema, registerSchema } from "@/hooks/use-auth";
+import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { Redirect } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -11,9 +12,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import benefitsSurveySvg from '../assets/benefits_survey.svg';
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
+  const { companySettings } = useCompanyTheme();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
 
   // Redirect to dashboard if already logged in
@@ -21,15 +24,29 @@ export default function AuthPage() {
     return <Redirect to="/dashboard" />;
   }
 
+  // Use company assistant name or default
+  const assistantName = companySettings?.aiAssistantName || "Benefits Assistant";
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Form Section */}
       <div className="w-full md:w-1/2 p-6 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Welcome to Employee Engage</CardTitle>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 flex items-center justify-center bg-primary/5 rounded">
+                {companySettings?.logo ? (
+                  <img src={companySettings.logo} alt={`${companySettings.name} logo`} className="h-8 w-8 object-contain" />
+                ) : (
+                  <img src={benefitsSurveySvg} alt="Benefits logo" className="h-8 w-8 object-contain" />
+                )}
+              </div>
+              <CardTitle className="text-2xl font-bold gradient-heading">
+                {companySettings?.name ? `${companySettings.name} Benefits` : "Welcome to Employee Engage"}
+              </CardTitle>
+            </div>
             <CardDescription>
-              Sign in to your account or create a new one
+              Sign in to {companySettings?.name ? `your ${companySettings.name} benefits account` : "your account or create a new one"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -54,15 +71,24 @@ export default function AuthPage() {
       {/* Hero Section */}
       <div className="w-full md:w-1/2 bg-gradient-to-br from-primary to-primary-foreground text-white p-12 flex flex-col justify-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">
-          Enhance Your Workplace Experience
+          {companySettings?.name ? `${companySettings.name} Benefits Portal` : "Enhance Your Workplace Experience"}
         </h1>
         <p className="text-lg mb-8">
-          Access company surveys, benefits information, and organizational resources all in one place.
+          Access {companySettings?.name ? `${companySettings.name}` : "company"} surveys, benefits information, and organizational resources all in one place.
         </p>
         <div className="space-y-4">
-          <FeatureItem title="Benefits Documentation" description="Access your benefits information instantly" />
-          <FeatureItem title="Company Surveys" description="Provide valuable feedback to improve workplace culture" />
-          <FeatureItem title="AI-Powered Assistant" description="Get answers to your benefits questions immediately" />
+          <FeatureItem 
+            title="Benefits Documentation" 
+            description={`Access ${companySettings?.name ? `${companySettings.name}` : "your"} benefits information instantly`} 
+          />
+          <FeatureItem 
+            title="Company Surveys" 
+            description="Provide valuable feedback to improve workplace culture" 
+          />
+          <FeatureItem 
+            title={`AI-Powered ${assistantName}`} 
+            description="Get answers to your benefits questions immediately" 
+          />
         </div>
       </div>
     </div>
