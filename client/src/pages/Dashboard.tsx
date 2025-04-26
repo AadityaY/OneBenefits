@@ -7,6 +7,8 @@ import ChatTab from "@/components/ChatTab";
 import CalendarTab from "@/components/CalendarTab";
 import DocumentManagementTab from "@/components/DocumentManagementTab";
 import DocumentsListComponent from "@/components/DocumentsListComponent";
+import HomeTab from "@/components/HomeTab";
+import { PageHeader } from "@/components/ui/page-header";
 import { FileText } from "lucide-react";
 
 export default function Dashboard() {
@@ -133,13 +135,14 @@ export default function Dashboard() {
       );
     }
     
-    // Default or fallback content
+    // Default or home route
     return (
       <div className="space-y-8">
         <PageHeader 
-          title="Dashboard" 
-          description="Select an option from the sidebar to get started."
+          title="Your Benefits Portal" 
+          description="Welcome to your employee benefits portal. Get started by exploring the features below."
         />
+        <HomeTab />
       </div>
     );
   };
@@ -151,20 +154,3 @@ export default function Dashboard() {
   );
 }
 
-interface PageHeaderProps {
-  title: string;
-  description: string;
-}
-
-function PageHeader({ title, description }: PageHeaderProps) {
-  return (
-    <div>
-      <h1 className="text-2xl md:text-3xl font-bold mb-2 text-foreground">
-        {title}
-      </h1>
-      <p className="text-muted-foreground">
-        {description}
-      </p>
-    </div>
-  );
-}
