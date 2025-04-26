@@ -78,13 +78,16 @@ export default function SurveyTakingTab() {
   
   // Fetch all published survey templates
   const { 
-    data: templates, 
+    data: allTemplates, 
     isLoading: loadingTemplates 
   } = useQuery<SurveyTemplate[]>({ 
     queryKey: ["/api/survey-templates", companyId],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!companyId,
   });
+  
+  // Filter for only published templates
+  const templates = allTemplates?.filter(template => template.published === true);
   
   // Fetch survey questions when a template is selected
   const { 
