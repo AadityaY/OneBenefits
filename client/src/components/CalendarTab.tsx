@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
@@ -63,7 +63,39 @@ const eventSchema = z.object({
 
 type EventFormValues = z.infer<typeof eventSchema>;
 
-// Define categories and their colors
+// UI Event structure that the component expects
+interface UIEvent {
+  id: number;
+  companyId: number;
+  title: string;
+  description?: string;
+  location?: string;
+  startTime: Date;
+  endTime: Date;
+  allDay: boolean;
+  category: string;
+}
+
+// Function to adapt DB events to UI events format
+function adaptDBEventsToUIEvents(dbEvents: CalendarEvent[] | undefined): UIEvent[] {
+  if (!dbEvents) return [];
+  
+  return dbEvents.map(event => ({
+    id: event.id,
+    companyId: event.companyId,
+    title: event.title,
+    description: event.description || "",
+    location: "",
+    // Use the eventDate for both start and end times
+    startTime: new Date(event.eventDate),
+    endTime: new Date(event.eventDate),
+    allDay: true,
+    // Map eventType to category
+    category: event.eventType || "general",
+  }));
+}
+
+// Define categories and their colors (match with eventType in database)
 const EVENT_CATEGORIES = [
   { value: "general", label: "General", color: "bg-blue-100 text-blue-800" },
   { value: "benefits", label: "Benefits", color: "bg-green-100 text-green-800" },
@@ -112,10 +144,19 @@ export default function CalendarTab() {
   // Create a new calendar event
   const createEventMutation = useMutation({
     mutationFn: async (eventData: EventFormValues) => {
+      // Convert UI form data to database format
+      const dbEventData = {
+        title: eventData.title,
+        description: eventData.description,
+        eventDate: eventData.startTime, // Use the start time as the event date
+        eventType: eventData.category,  // Map category to eventType
+        color: EVENT_CATEGORIES.find(c => c.value === eventData.category)?.color.split(' ')[0] || "bg-blue-100"
+      };
+      
       const res = await apiRequest(
         "POST", 
         "/api/events", 
-        eventData
+        dbEventData
       );
       return res.json();
     },
@@ -140,10 +181,18 @@ export default function CalendarTab() {
   // Update calendar event
   const updateEventMutation = useMutation({
     mutationFn: async ({ id, eventData }: { id: number, eventData: EventFormValues }) => {
+      // Convert UI form data back to database format
+      const dbEventData = {
+        title: eventData.title,
+        description: eventData.description,
+        eventDate: eventData.startTime, // Use the start time as the event date
+        eventType: eventData.category   // Map category back to eventType
+      };
+      
       const res = await apiRequest(
         "PATCH", 
         `/api/events/${id}`, 
-        eventData
+        dbEventData
       );
       return res.json();
     },
@@ -207,15 +256,15 @@ export default function CalendarTab() {
   };
   
   // Handler to open edit event dialog
-  const handleEditEvent = (event: CalendarEvent) => {
+  const handleEditEvent = (event: UIEvent) => {
     form.reset({
       title: event.title,
       description: event.description || "",
       location: event.location || "",
-      startTime: new Date(event.startTime),
-      endTime: new Date(event.endTime),
+      startTime: event.startTime,
+      endTime: event.endTime,
       allDay: event.allDay,
-      category: event.category || "general",
+      category: event.category,
     });
     
     setEditEventId(event.id);
@@ -238,12 +287,14 @@ export default function CalendarTab() {
     }
   };
   
+  // Convert database events to UI events
+  const uiEvents = useMemo(() => adaptDBEventsToUIEvents(events), [events]);
+  
   // Get events for the selected date
   const eventsForSelectedDate = selectedDate 
-    ? events?.filter(event => {
-        const eventDate = new Date(event.startTime);
-        return isSameDay(eventDate, selectedDate);
-      }) || []
+    ? uiEvents.filter(event => {
+        return isSameDay(event.startTime, selectedDate);
+      })
     : [];
   
   // Get days in current month
@@ -377,7 +428,7 @@ export default function CalendarTab() {
                 {/* Days in current month */}
                 {daysInMonth.map((day) => {
                   // Get events for this day
-                  const dayEvents = events?.filter(event => isSameDay(new Date(event.startTime), day)) || [];
+                  const dayEvents = uiEvents.filter(event => isSameDay(event.startTime, day));
                   const isToday = isSameDay(day, new Date());
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   
