@@ -380,10 +380,7 @@ export default function SurveyTakingTab() {
                     <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(Array.isArray(currentQuestion.options) 
-                      ? currentQuestion.options 
-                      : currentQuestion.options.split('\n')
-                    ).map((option, i) => (
+                    {getOptionsArray(currentQuestion.options).map((option: string, i: number) => (
                       <SelectItem key={i} value={option}>{option}</SelectItem>
                     ))}
                   </SelectContent>
@@ -404,10 +401,7 @@ export default function SurveyTakingTab() {
                   onValueChange={(value) => handleResponseChange(currentQuestion.id, value)}
                   className="space-y-3"
                 >
-                  {(Array.isArray(currentQuestion.options) 
-                    ? currentQuestion.options 
-                    : currentQuestion.options.split('\n')
-                  ).map((option, i) => (
+                  {getOptionsArray(currentQuestion.options).map((option: string, i: number) => (
                     <div key={i} className="flex items-center space-x-2">
                       <RadioGroupItem value={option} id={`option-${currentQuestion.id}-${i}`} />
                       <Label htmlFor={`option-${currentQuestion.id}-${i}`}>{option}</Label>
