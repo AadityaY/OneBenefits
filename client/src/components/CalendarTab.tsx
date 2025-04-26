@@ -406,8 +406,16 @@ export default function CalendarTab() {
                 <Button variant="ghost" size="sm" onClick={previousMonth} className="hover-lift">
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="px-2 font-medium gradient-heading text-lg">
-                  {format(currentMonth, "MMMM yyyy")}
+                <h3 className="px-2 font-medium text-lg text-foreground">
+                  <span style={{ 
+                    backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    {format(currentMonth, "MMMM yyyy")}
+                  </span>
                 </h3>
                 <Button variant="ghost" size="sm" onClick={nextMonth} className="hover-lift">
                   <ChevronRight className="h-4 w-4" />
@@ -532,10 +540,18 @@ export default function CalendarTab() {
         {viewMode === "day" && (
           <Card className="col-span-1 frost-glass shadow-md">
             <CardHeader className="border-b bg-background/70">
-              <CardTitle className="gradient-heading text-xl">
-                {selectedDate 
-                  ? format(selectedDate, "MMMM d, yyyy") 
-                  : "Select a date"}
+              <CardTitle className="text-xl">
+                <span style={{ 
+                  backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  {selectedDate 
+                    ? format(selectedDate, "MMMM d, yyyy") 
+                    : "Select a date"}
+                </span>
               </CardTitle>
               <CardDescription>
                 {eventsForSelectedDate.length} scheduled events
@@ -567,7 +583,17 @@ export default function CalendarTab() {
                       <div key={event.id} className="relative border rounded-md p-3 hover:bg-muted/20 gradient-border card-hover frost-glass">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium gradient-heading text-base">{event.title}</h4>
+                            <h4 className="font-medium text-base">
+                              <span style={{ 
+                                backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
+                                WebkitBackgroundClip: 'text',
+                                backgroundClip: 'text',
+                                color: 'transparent',
+                                WebkitTextFillColor: 'transparent'
+                              }}>
+                                {event.title}
+                              </span>
+                            </h4>
                             <div className="flex items-center text-sm text-muted-foreground mt-1">
                               <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />
                               <span>
@@ -654,8 +680,16 @@ export default function CalendarTab() {
       <Dialog open={createEventOpen} onOpenChange={setCreateEventOpen}>
         <DialogContent className="sm:max-w-[500px] frost-glass">
           <DialogHeader className="border-b pb-4">
-            <DialogTitle className="gradient-heading text-xl">
-              {editEventId ? "Edit Event" : "Create New Event"}
+            <DialogTitle className="text-xl">
+              <span style={{ 
+                backgroundImage: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                {editEventId ? "Edit Event" : "Create New Event"}
+              </span>
             </DialogTitle>
             <DialogDescription>
               {editEventId 
