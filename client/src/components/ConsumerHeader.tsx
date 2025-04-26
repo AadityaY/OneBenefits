@@ -34,6 +34,12 @@ export function ConsumerHeader() {
   // Navigation links with icons for consumer experience - ordered per requirement
   const navLinks = [
     { 
+      name: "Home", 
+      href: "/home", 
+      active: location === "/home",
+      icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🏠</div>
+    },
+    { 
       name: "Explore", 
       href: "/explore", 
       active: location === "/explore",
@@ -82,7 +88,7 @@ export function ConsumerHeader() {
           {/* Logo and navigation */}
           <div className="flex items-center">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center">
+              <Link href="/home" className="flex items-center">
                 <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
                 <span className="text-xl font-bold text-gradient-primary">
                   {companySettings?.name || "Benefits Portal"}
@@ -120,7 +126,7 @@ export function ConsumerHeader() {
               <SheetContent side="right" className="w-[80%] sm:w-[350px]">
                 <div className="flex flex-col py-6 h-full">
                   <div className="flex items-center mb-8">
-                    <Link href="/" className="flex items-center">
+                    <Link href="/home" className="flex items-center">
                       <img src={benefitsSurveySvg} alt="Benefits logo" className="h-10 w-10 mr-2" />
                       <span className="text-xl font-bold text-gradient-primary">
                         {companySettings?.name || "Benefits Portal"}

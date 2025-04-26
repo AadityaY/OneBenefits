@@ -14,6 +14,7 @@ import CalendarPage from "@/pages/CalendarPage";
 import ContentPage from "@/pages/ContentPage";
 import ExplorePage from "@/pages/ExplorePage";
 import VideosPage from "@/pages/VideosPage";
+import HomePage from "@/pages/HomePage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -37,7 +38,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   // Use consumer layout for regular users
   if (user && user.role === 'user') {
     return (
-      <ConsumerLayout showHero={location === '/' || location === '/surveys'}>
+      <ConsumerLayout showHero={location === '/' || location === '/home'}>
         {children}
       </ConsumerLayout>
     );
@@ -77,8 +78,8 @@ function Router() {
     if (isAdmin) {
       return <Redirect to="/admin/surveys" />;
     } else {
-      // Regular users go to explore page per tab order requirement
-      return <Redirect to="/explore" />;
+      // Regular users go to home page 
+      return <Redirect to="/home" />;
     }
   }
   
@@ -99,13 +100,16 @@ function Router() {
           ) : user ? (
             user.role === "admin" || user.role === "superadmin" ? 
             <Redirect to="/admin/surveys" /> : 
-            <Redirect to="/explore" />
+            <Redirect to="/home" />
           ) : (
             <Redirect to="/auth" />
           )}
         </Route>
         
         {/* User Dashboard Routes */}
+        <Route path="/home">
+          {user ? <HomePage /> : <Redirect to="/auth" />}
+        </Route>
         <Route path="/explore">
           {user ? <ExplorePage /> : <Redirect to="/auth" />}
         </Route>
