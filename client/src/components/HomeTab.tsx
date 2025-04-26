@@ -12,11 +12,11 @@ export default function HomeTab() {
   // Cards for different features
   const featureCards = [
     {
-      title: "Take a Survey",
-      description: "Complete surveys to share your feedback on benefits programs.",
-      icon: <ClipboardCheck className="h-10 w-10 text-purple-500" />,
-      link: "/surveys",
-      color: "from-purple-500 to-pink-500"
+      title: "Explore Benefits",
+      description: "Browse through all your benefits options and categories.",
+      icon: <div className="h-10 w-10 text-indigo-500 flex items-center justify-center text-3xl">🔍</div>,
+      link: "/explore",
+      color: "from-indigo-500 to-violet-500"
     },
     {
       title: "Benefits Chat",
@@ -24,6 +24,20 @@ export default function HomeTab() {
       icon: <MessageCircle className="h-10 w-10 text-cyan-500" />,
       link: "/chat",
       color: "from-cyan-500 to-blue-500"
+    },
+    {
+      title: "Take a Survey",
+      description: "Complete surveys to share your feedback on benefits programs.",
+      icon: <ClipboardCheck className="h-10 w-10 text-purple-500" />,
+      link: "/surveys",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      title: "Benefits Videos",
+      description: "Watch informational videos about your benefits options.",
+      icon: <div className="h-10 w-10 text-rose-500 flex items-center justify-center text-3xl">🎬</div>,
+      link: "/videos",
+      color: "from-rose-500 to-red-500"
     },
     {
       title: "Events Calendar",

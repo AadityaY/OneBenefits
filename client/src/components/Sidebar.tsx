@@ -49,8 +49,10 @@ export function Sidebar() {
       href: "/",
       open: true,
       submenu: [
-        { title: "Take Survey", href: "/surveys" },
+        { title: "Explore Benefits", href: "/explore" },
         { title: "Benefits Chat", href: "/chat" },
+        { title: "Take Survey", href: "/surveys" },
+        { title: "Benefits Videos", href: "/videos" },
         { title: "Calendar", href: "/calendar" },
         { title: "Benefits Documents", href: "/content" },
       ]

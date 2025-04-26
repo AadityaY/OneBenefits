@@ -40,16 +40,28 @@ export function ConsumerHeader() {
       icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🏠</div>
     },
     { 
-      name: "Surveys", 
-      href: "/surveys", 
-      active: location === "/surveys",
-      icon: <ClipboardCheck className="h-4 w-4 mr-1" />
+      name: "Explore Benefits", 
+      href: "/explore", 
+      active: location === "/explore",
+      icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🔍</div>
     },
     { 
       name: "Benefits Chat", 
       href: "/chat", 
       active: location === "/chat",
       icon: <MessageCircle className="h-4 w-4 mr-1" />
+    },
+    { 
+      name: "Surveys", 
+      href: "/surveys", 
+      active: location === "/surveys",
+      icon: <ClipboardCheck className="h-4 w-4 mr-1" />
+    },
+    { 
+      name: "Videos", 
+      href: "/videos", 
+      active: location === "/videos",
+      icon: <div className="h-4 w-4 mr-1 flex items-center justify-center">🎬</div>
     },
     { 
       name: "Calendar", 
