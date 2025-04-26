@@ -53,12 +53,16 @@ export default function CompanySettings() {
         logo: companySettings.logo || "",
         aiAssistantName: companySettings.aiAssistantName || "Benefits Assistant",
         surveyGenerationPrompt: companySettings.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
+        heroTitle: companySettings.heroTitle || "Simplified",
+        heroSubtitle: companySettings.heroSubtitle || "Benefits Experience",
+        heroDescription: companySettings.heroDescription || "Access information, take surveys, and get personalized support with your employee benefits - all in one place.",
+        heroImageUrl: companySettings.heroImageUrl || "",
       });
     }
   }, [companySettings]);
   
   // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -103,6 +107,18 @@ export default function CompanySettings() {
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData(prev => ({ ...prev, logo: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Handle hero image upload
+  const handleHeroImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, heroImageUrl: reader.result as string }));
     };
     reader.readAsDataURL(file);
   };
@@ -306,6 +322,152 @@ export default function CompanySettings() {
                         className="h-12 w-12 rounded-md"
                         style={{ backgroundColor: formData.accentColor || "#f59e0b" }}
                       />
+                    </div>
+                  </div>
+                </CardContent>
+              </TabsContent>
+              
+              <TabsContent value="hero" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>Hero Section Settings</CardTitle>
+                  <CardDescription>
+                    Customize the hero section on your home page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="heroTitle">Hero Title</Label>
+                        <Input
+                          id="heroTitle"
+                          name="heroTitle"
+                          value={formData.heroTitle || ""}
+                          onChange={handleChange}
+                          placeholder="Main heading for hero section"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This text will be displayed as the main title in gradient colors
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="heroSubtitle">Hero Subtitle</Label>
+                        <Input
+                          id="heroSubtitle"
+                          name="heroSubtitle"
+                          value={formData.heroSubtitle || ""}
+                          onChange={handleChange}
+                          placeholder="Subtitle for hero section"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          This text will appear below the main title
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="heroDescription">Hero Description</Label>
+                        <Textarea
+                          id="heroDescription"
+                          name="heroDescription"
+                          value={formData.heroDescription || ""}
+                          onChange={handleChange}
+                          placeholder="Brief description text for the hero section"
+                          className="h-24"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          A short paragraph that explains your benefits platform
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <Label htmlFor="heroImageUrl">Hero Image</Label>
+                      <div className="border rounded-md p-4 space-y-4">
+                        {formData.heroImageUrl ? (
+                          <div className="relative rounded-md overflow-hidden h-52 w-full">
+                            <img
+                              src={formData.heroImageUrl}
+                              alt="Hero image"
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-red-500 p-1 rounded-full hover:bg-white/90 transition-colors"
+                              onClick={() => setFormData(prev => ({ ...prev, heroImageUrl: "" }))}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
+                              <svg className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2" />
+                              </svg>
+                              <p className="mt-2 text-sm text-gray-600">No image selected</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex justify-center">
+                          <Input
+                            id="hero-image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleHeroImageUpload}
+                            className="hidden"
+                          />
+                          <Label
+                            htmlFor="hero-image-upload"
+                            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium bg-white hover:bg-gray-50 cursor-pointer"
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            {formData.heroImageUrl ? "Change Image" : "Upload Image"}
+                          </Label>
+                        </div>
+                        
+                        <p className="text-xs text-center text-muted-foreground mt-2">
+                          Recommended size: 1200x600px. JPG or PNG format.<br />
+                          If no image is provided, the default gallery will be shown.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-6 mt-2">
+                    <h3 className="text-lg font-medium mb-3">Hero Section Preview</h3>
+                    <div className="bg-gray-100 rounded-md p-4 overflow-hidden">
+                      <div className="rounded shadow bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h1 className="text-2xl font-bold">
+                              <span className="gradient-text">{formData.heroTitle || "Simplified"}</span><br />
+                              <span>{formData.heroSubtitle || "Benefits Experience"}</span>
+                            </h1>
+                            <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+                              {formData.heroDescription || "Access information, take surveys, and get personalized support with your employee benefits - all in one place."}
+                            </p>
+                          </div>
+                          <div className="flex justify-center">
+                            {formData.heroImageUrl ? (
+                              <div className="rounded-md overflow-hidden w-full h-24 shadow">
+                                <img 
+                                  src={formData.heroImageUrl} 
+                                  alt="Hero preview" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="text-center rounded-md bg-gray-200 w-full h-24 flex items-center justify-center text-gray-400">
+                                <span>People Gallery (Default)</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
