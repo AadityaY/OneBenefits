@@ -1,58 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="600" height="300" viewBox="0 0 600 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
-  <rect width="600" height="300" rx="20" fill="url(#paint0_linear)" />
-  
-  <!-- Abstract shape elements -->
-  <circle cx="500" cy="150" r="80" fill="#F472B6" opacity="0.2" />
-  <circle cx="100" cy="100" r="60" fill="#22D3EE" opacity="0.2" />
-  <circle cx="300" cy="250" r="40" fill="#A78BFA" opacity="0.2" />
-  
-  <!-- Survey form illustration -->
-  <rect x="150" y="50" width="300" height="200" rx="10" fill="white" stroke="#9333EA" stroke-width="2" />
-  
-  <!-- Form header -->
-  <rect x="150" y="50" width="300" height="40" rx="10" fill="#9333EA" />
-  <text x="210" y="75" font-family="Arial" font-size="16" fill="white">Benefits Survey</text>
-  
-  <!-- Form lines -->
-  <line x1="170" y1="110" x2="430" y2="110" stroke="#E9D5FF" stroke-width="2" />
-  <line x1="170" y1="150" x2="430" y2="150" stroke="#E9D5FF" stroke-width="2" />
-  <line x1="170" y1="190" x2="430" y2="190" stroke="#E9D5FF" stroke-width="2" />
-  
-  <!-- Checkmarks -->
-  <circle cx="180" cy="130" r="10" fill="#22D3EE" fill-opacity="0.3" stroke="#22D3EE" stroke-width="2" />
-  <path d="M175 130L180 135L185 125" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-  
-  <circle cx="180" cy="170" r="10" fill="#F472B6" fill-opacity="0.3" stroke="#F472B6" stroke-width="2" />
-  <path d="M175 170L180 175L185 165" stroke="#F472B6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-  
-  <circle cx="180" cy="210" r="10" fill="#A78BFA" fill-opacity="0.3" stroke="#A78BFA" stroke-width="2" />
-  <path d="M175 210L180 215L185 205" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-  
-  <!-- Form text placeholders -->
-  <line x1="200" y1="130" x2="380" y2="130" stroke="#9333EA" stroke-width="2" stroke-opacity="0.3" />
-  <line x1="200" y1="170" x2="320" y2="170" stroke="#9333EA" stroke-width="2" stroke-opacity="0.3" />
-  <line x1="200" y1="210" x2="350" y2="210" stroke="#9333EA" stroke-width="2" stroke-opacity="0.3" />
-  
-  <!-- Benefits icons -->
-  <!-- Health icon -->
-  <circle cx="390" cy="130" r="10" fill="white" stroke="#F472B6" stroke-width="2" />
-  <path d="M385 130H395 M390 125V135" stroke="#F472B6" stroke-width="2" stroke-linecap="round" />
-  
-  <!-- Retirement icon -->
-  <circle cx="330" cy="170" r="10" fill="white" stroke="#A78BFA" stroke-width="2" />
-  <path d="M325 168L330 163L335 168 M330 163V175" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" />
-  
-  <!-- Wellbeing icon -->
-  <circle cx="360" cy="210" r="10" fill="white" stroke="#22D3EE" stroke-width="2" />
-  <path d="M355 210C355 210 357.5 215 360 215C362.5 215 365 210 365 210" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" />
-  
-  <!-- Defs for gradient -->
-  <defs>
-    <linearGradient id="paint0_linear" x1="0" y1="0" x2="600" y2="300" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F5EFFF" />
-      <stop offset="1" stop-color="#DBEAFE" />
-    </linearGradient>
-  </defs>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Benefits Survey Icon</title>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient">
+            <stop stop-color="#A855F7" offset="0%"></stop>
+            <stop stop-color="#EC4899" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Benefits-Survey-Icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Background shape -->
+        <circle id="Background" fill="#FFFFFF" cx="100" cy="100" r="90"></circle>
+        
+        <!-- Survey form outline -->
+        <rect id="Form" fill="#FFFFFF" x="40" y="30" width="120" height="140" rx="8" stroke="url(#linearGradient)" stroke-width="4"></rect>
+        
+        <!-- Form header -->
+        <rect id="Header" fill="url(#linearGradient)" x="50" y="40" width="100" height="20" rx="4"></rect>
+        
+        <!-- Form lines -->
+        <rect id="Line-1" fill="#E2E8F0" x="50" y="70" width="100" height="6" rx="3"></rect>
+        <rect id="Line-2" fill="#E2E8F0" x="50" y="86" width="100" height="6" rx="3"></rect>
+        <rect id="Line-3" fill="#E2E8F0" x="50" y="102" width="70" height="6" rx="3"></rect>
+        
+        <!-- Checkboxes -->
+        <rect id="Checkbox-1" stroke="url(#linearGradient)" stroke-width="2" x="50" y="120" width="16" height="16" rx="3"></rect>
+        <path d="M54,128 L58,132 L62,124" id="Check-1" stroke="#A855F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        
+        <rect id="Checkbox-2" stroke="url(#linearGradient)" stroke-width="2" x="50" y="145" width="16" height="16" rx="3"></rect>
+        
+        <!-- Checkbox labels -->
+        <rect id="Label-1" fill="#E2E8F0" x="75" y="125" width="60" height="6" rx="3"></rect>
+        <rect id="Label-2" fill="#E2E8F0" x="75" y="150" width="60" height="6" rx="3"></rect>
+        
+        <!-- Decorative elements -->
+        <circle id="Dot-1" fill="#A855F7" opacity="0.2" cx="30" cy="40" r="10"></circle>
+        <circle id="Dot-2" fill="#EC4899" opacity="0.2" cx="170" cy="40" r="15"></circle>
+        <circle id="Dot-3" fill="#A855F7" opacity="0.2" cx="30" cy="160" r="15"></circle>
+        <circle id="Dot-4" fill="#EC4899" opacity="0.2" cx="170" cy="160" r="10"></circle>
+    </g>
 </svg>

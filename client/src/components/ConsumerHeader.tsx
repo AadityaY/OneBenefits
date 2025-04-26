@@ -12,7 +12,11 @@ import {
   LogOut, 
   User as UserIcon,
   ChevronDown,
-  Menu
+  Menu,
+  ClipboardCheck,
+  MessageCircle,
+  Calendar,
+  FileText
 } from "lucide-react";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
@@ -26,12 +30,32 @@ export function ConsumerHeader() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Navigation links - customize for consumer experience
+  // Navigation links with icons for consumer experience
   const navLinks = [
-    { name: "Home", href: "/take-survey", active: location === "/take-survey" },
-    { name: "Benefits Chat", href: "/chat", active: location === "/chat" },
-    { name: "Calendar", href: "/calendar", active: location === "/calendar" },
-    { name: "Resources", href: "/content", active: location === "/content" },
+    { 
+      name: "Home", 
+      href: "/take-survey", 
+      active: location === "/take-survey",
+      icon: <ClipboardCheck className="h-4 w-4 mr-1" />
+    },
+    { 
+      name: "Benefits Chat", 
+      href: "/chat", 
+      active: location === "/chat",
+      icon: <MessageCircle className="h-4 w-4 mr-1" />
+    },
+    { 
+      name: "Calendar", 
+      href: "/calendar", 
+      active: location === "/calendar",
+      icon: <Calendar className="h-4 w-4 mr-1" />
+    },
+    { 
+      name: "Resources", 
+      href: "/content", 
+      active: location === "/content",
+      icon: <FileText className="h-4 w-4 mr-1" />
+    },
   ];
 
   const handleLogout = () => {
@@ -55,12 +79,13 @@ export function ConsumerHeader() {
             <nav className="ml-10 hidden md:flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link key={link.name} href={link.href}>
-                  <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  <a className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
                     link.active 
                       ? "text-primary bg-primary/5" 
                       : "text-gray-700 hover:bg-gray-50 hover:text-primary"
                   }`}>
-                    {link.name}
+                    {link.icon}
+                    <span>{link.name}</span>
                   </a>
                 </Link>
               ))}
@@ -86,12 +111,15 @@ export function ConsumerHeader() {
                   <nav className="flex flex-col space-y-2">
                     {navLinks.map((link) => (
                       <Link key={link.name} href={link.href}>
-                        <a className={`px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                        <a className={`px-3 py-3 rounded-md text-base font-medium transition-colors flex items-center ${
                           link.active 
                             ? "text-primary bg-primary/5" 
                             : "text-gray-700 hover:bg-gray-50 hover:text-primary"
                         }`}>
-                          {link.name}
+                          <div className="mr-3 text-primary opacity-80">
+                            {link.icon}
+                          </div>
+                          <span>{link.name}</span>
                         </a>
                       </Link>
                     ))}

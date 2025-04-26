@@ -1,53 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="600" height="300" viewBox="0 0 600 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
-  <rect width="600" height="300" rx="20" fill="url(#paint0_linear)" />
-  
-  <!-- Abstract shape elements -->
-  <circle cx="100" cy="220" r="50" fill="#8A2BE2" opacity="0.2" />
-  <circle cx="500" cy="80" r="70" fill="#FF4785" opacity="0.2" />
-  <circle cx="350" cy="250" r="40" fill="#00CED1" opacity="0.3" />
-  
-  <!-- People silhouettes -->
-  <!-- Person 1 -->
-  <circle cx="180" cy="120" r="30" fill="#A78BFA" />
-  <rect x="165" y="150" width="30" height="60" rx="10" fill="#A78BFA" />
-  <!-- Arms -->
-  <rect x="140" y="160" width="25" height="10" rx="5" fill="#A78BFA" />
-  <rect x="195" y="160" width="25" height="10" rx="5" fill="#A78BFA" />
-  
-  <!-- Person 2 -->
-  <circle cx="300" cy="110" r="30" fill="#F472B6" />
-  <rect x="285" y="140" width="30" height="60" rx="10" fill="#F472B6" />
-  <!-- Arms -->
-  <rect x="260" y="150" width="25" height="10" rx="5" fill="#F472B6" />
-  <rect x="315" y="150" width="25" height="10" rx="5" fill="#F472B6" />
-  
-  <!-- Person 3 -->
-  <circle cx="420" cy="130" r="30" fill="#22D3EE" />
-  <rect x="405" y="160" width="30" height="60" rx="10" fill="#22D3EE" />
-  <!-- Arms -->
-  <rect x="380" y="170" width="25" height="10" rx="5" fill="#22D3EE" />
-  <rect x="435" y="170" width="25" height="10" rx="5" fill="#22D3EE" />
-  
-  <!-- Benefits icons -->
-  <!-- Health icon -->
-  <circle cx="140" cy="70" r="20" fill="white" stroke="#FF4785" stroke-width="3" />
-  <path d="M130 70H150 M140 60V80" stroke="#FF4785" stroke-width="3" stroke-linecap="round" />
-  
-  <!-- Retirement icon -->
-  <circle cx="460" cy="75" r="20" fill="white" stroke="#8A2BE2" stroke-width="3" />
-  <path d="M450 70L460 60L470 70 M460 60V85" stroke="#8A2BE2" stroke-width="3" stroke-linecap="round" />
-  
-  <!-- Wellbeing icon -->
-  <circle cx="300" cy="55" r="20" fill="white" stroke="#22D3EE" stroke-width="3" />
-  <path d="M290 55C290 55 295 65 300 65C305 65 310 55 310 55" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" />
-  
-  <!-- Defs for gradient -->
-  <defs>
-    <linearGradient id="paint0_linear" x1="0" y1="0" x2="600" y2="300" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FAF5FF" />
-      <stop offset="1" stop-color="#EDE9FE" />
-    </linearGradient>
-  </defs>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Benefits Hero Illustration</title>
+    <g id="Benefits-Hero" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Background elements -->
+        <circle id="Circle-1" fill="#E9D5FF" opacity="0.5" cx="400" cy="300" r="200"></circle>
+        <circle id="Circle-2" fill="#F0ABFC" opacity="0.3" cx="300" cy="400" r="100"></circle>
+        <circle id="Circle-3" fill="#A5F3FC" opacity="0.4" cx="500" cy="200" r="150"></circle>
+        
+        <!-- Document stack -->
+        <g id="Document-Stack" transform="translate(250, 150)">
+            <rect id="Doc-3" fill="#FFFFFF" x="0" y="20" width="300" height="200" rx="10"></rect>
+            <rect id="Doc-2" fill="#F5F5F5" x="20" y="10" width="300" height="200" rx="10"></rect>
+            <rect id="Doc-1" fill="#FFFFFF" x="40" y="0" width="300" height="200" rx="10" stroke="#E2E8F0" stroke-width="2"></rect>
+            
+            <!-- Document content -->
+            <rect id="Header" fill="#A855F7" x="70" y="30" width="150" height="20" rx="4"></rect>
+            <rect id="Line-1" fill="#E2E8F0" x="70" y="70" width="240" height="8" rx="4"></rect>
+            <rect id="Line-2" fill="#E2E8F0" x="70" y="90" width="240" height="8" rx="4"></rect>
+            <rect id="Line-3" fill="#E2E8F0" x="70" y="110" width="180" height="8" rx="4"></rect>
+            
+            <!-- Checkboxes -->
+            <rect id="Checkbox-1" stroke="#A855F7" stroke-width="2" x="70" y="140" width="20" height="20" rx="4"></rect>
+            <path d="M75,150 L80,155 L85,145" stroke="#A855F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <rect id="Checkbox-2" stroke="#A855F7" stroke-width="2" x="70" y="170" width="20" height="20" rx="4"></rect>
+            
+            <!-- Labels -->
+            <rect id="Label-1" fill="#E2E8F0" x="100" y="145" width="120" height="8" rx="4"></rect>
+            <rect id="Label-2" fill="#E2E8F0" x="100" y="175" width="120" height="8" rx="4"></rect>
+        </g>
+        
+        <!-- Person with clipboard -->
+        <g id="Person" transform="translate(150, 300)">
+            <!-- Person body -->
+            <ellipse id="Shadow" fill="#E2E8F0" opacity="0.5" cx="100" cy="240" rx="80" ry="20"></ellipse>
+            <path d="M100,240 C130,240 150,200 150,160 L150,100 C150,55 130,20 100,20 C70,20 50,55 50,100 L50,160 C50,200 70,240 100,240 Z" id="Body" fill="#F0ABFC"></path>
+            
+            <!-- Head -->
+            <circle id="Head" fill="#FFCDD2" cx="100" cy="60" r="40"></circle>
+            
+            <!-- Face -->
+            <circle id="Eye-1" fill="#333333" cx="85" cy="50" r="5"></circle>
+            <circle id="Eye-2" fill="#333333" cx="115" cy="50" r="5"></circle>
+            <path d="M90,70 C90,75 110,75 110,70" id="Smile" stroke="#333333" stroke-width="2" stroke-linecap="round"></path>
+            
+            <!-- Hair -->
+            <path d="M70,30 C50,20 50,60 60,70 M130,30 C150,20 150,60 140,70" id="Hair" fill="#333333"></path>
+            <path d="M60,40 C60,10 140,10 140,40" id="Hair-Top" fill="#333333"></path>
+            
+            <!-- Arms -->
+            <path d="M50,120 C30,140 20,180 30,200" id="Arm-1" stroke="#F0ABFC" stroke-width="20" stroke-linecap="round"></path>
+            <path d="M150,120 C170,130 180,160 160,180" id="Arm-2" stroke="#F0ABFC" stroke-width="20" stroke-linecap="round"></path>
+            
+            <!-- Clipboard -->
+            <rect id="Clipboard" fill="#FFFFFF" x="140" y="140" width="80" height="100" rx="5" stroke="#A855F7" stroke-width="2"></rect>
+            <rect id="Clip" fill="#A855F7" x="170" y="130" width="20" height="15" rx="5"></rect>
+            <rect id="Paper" fill="#F5F5F5" x="150" y="150" width="60" height="80" rx="2"></rect>
+            <rect id="Line-1" fill="#E2E8F0" x="160" y="170" width="40" height="4" rx="2"></rect>
+            <rect id="Line-2" fill="#E2E8F0" x="160" y="180" width="40" height="4" rx="2"></rect>
+            <rect id="Line-3" fill="#E2E8F0" x="160" y="190" width="30" height="4" rx="2"></rect>
+            <circle id="Checkbox" fill="#A855F7" cx="165" cy="210" r="5"></circle>
+        </g>
+        
+        <!-- Floating elements -->
+        <g id="Floating-Elements">
+            <!-- Health icon -->
+            <circle id="Health-Icon-Bg" fill="#F0ABFC" opacity="0.7" cx="600" cy="150" r="40"></circle>
+            <path d="M585,150 L615,150 M600,135 L600,165" id="Health-Cross" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"></path>
+            
+            <!-- Money icon -->
+            <circle id="Money-Icon-Bg" fill="#A5F3FC" opacity="0.7" cx="150" cy="200" r="30"></circle>
+            <text id="$" font-family="Arial-BoldMT, Arial" font-size="36" font-weight="bold" fill="#FFFFFF">
+                <tspan x="142" y="212">$</tspan>
+            </text>
+            
+            <!-- Chart icon -->
+            <circle id="Chart-Icon-Bg" fill="#BBF7D0" opacity="0.7" cx="650" cy="350" r="35"></circle>
+            <path d="M630,350 L640,340 L650,345 L670,325" id="Chart-Line" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
 </svg>
