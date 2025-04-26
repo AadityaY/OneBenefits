@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import AuthPage from "@/pages/auth-page";
 import CompanySettings from "@/pages/CompanySettings";
 import DocumentViewerPage from "@/pages/DocumentViewerPage";
+import SurveysPage from "@/pages/SurveysPage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -31,7 +32,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   // Use consumer layout for regular users
   if (user && user.role === 'user') {
     return (
-      <ConsumerLayout showHero={location === '/' || location === '/take-survey'}>
+      <ConsumerLayout showHero={location === '/' || location === '/surveys'}>
         {children}
       </ConsumerLayout>
     );
@@ -98,6 +99,9 @@ function Router() {
         </Route>
         
         {/* User Dashboard Routes */}
+        <Route path="/surveys">
+          {user ? <SurveysPage /> : <Redirect to="/auth" />}
+        </Route>
         <Route path="/take-survey">
           {user ? <Dashboard /> : <Redirect to="/auth" />}
         </Route>
