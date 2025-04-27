@@ -33,6 +33,10 @@ export default function CompanySettings() {
     logo: companySettings?.logo || "",
     aiAssistantName: companySettings?.aiAssistantName || "Benefits Assistant",
     surveyGenerationPrompt: companySettings?.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
+    emailCampaignPrompt: companySettings?.emailCampaignPrompt || "Generate engaging email content for benefits campaigns. Focus on clear communication, explaining benefits value, and encouraging employee participation.",
+    eventsPrompt: companySettings?.eventsPrompt || "Create descriptive event content for benefits-related meetings, webinars and enrollment periods. Include clear objectives and benefits of attendance.",
+    websitePrompt: companySettings?.websitePrompt || "Generate website content that clearly explains employee benefits and resources. Use simple language that enhances understanding and accessibility.",
+    videosPrompt: companySettings?.videosPrompt || "Create video script outlines explaining various benefits topics. Include key talking points, visual suggestions, and audience engagement tips.",
     heroTitle: companySettings?.heroTitle || "Simplified",
     heroSubtitle: companySettings?.heroSubtitle || "Benefits Experience",
     heroDescription: companySettings?.heroDescription || "Access information, take surveys, and get personalized support with your employee benefits - all in one place.",
@@ -53,6 +57,10 @@ export default function CompanySettings() {
         logo: companySettings.logo || "",
         aiAssistantName: companySettings.aiAssistantName || "Benefits Assistant",
         surveyGenerationPrompt: companySettings.surveyGenerationPrompt || "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement.",
+        emailCampaignPrompt: companySettings.emailCampaignPrompt || "Generate engaging email content for benefits campaigns. Focus on clear communication, explaining benefits value, and encouraging employee participation.",
+        eventsPrompt: companySettings.eventsPrompt || "Create descriptive event content for benefits-related meetings, webinars and enrollment periods. Include clear objectives and benefits of attendance.",
+        websitePrompt: companySettings.websitePrompt || "Generate website content that clearly explains employee benefits and resources. Use simple language that enhances understanding and accessibility.",
+        videosPrompt: companySettings.videosPrompt || "Create video script outlines explaining various benefits topics. Include key talking points, visual suggestions, and audience engagement tips.",
         heroTitle: companySettings.heroTitle || "Simplified",
         heroSubtitle: companySettings.heroSubtitle || "Benefits Experience",
         heroDescription: companySettings.heroDescription || "Access information, take surveys, and get personalized support with your employee benefits - all in one place.",
@@ -197,6 +205,11 @@ export default function CompanySettings() {
             <TabsTrigger value="ai">
               <div className="flex items-center gap-1">
                 <span className="gradient-text">AI Assistant</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="aiPrompts">
+              <div className="flex items-center gap-1">
+                <span className="gradient-text">AI Prompts</span>
               </div>
             </TabsTrigger>
             <TabsTrigger value="notifications">
@@ -614,6 +627,139 @@ export default function CompanySettings() {
                         </p>
                       </div>
                     </div>
+                  </div>
+                </CardContent>
+              </TabsContent>
+              
+              <TabsContent value="aiPrompts" className="space-y-4 p-0">
+                <CardHeader>
+                  <CardTitle>AI Prompts Management</CardTitle>
+                  <CardDescription>
+                    Configure prompts for generating different types of content
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  <div className="rounded-lg p-4 border-gradient animated-gradient-bg">
+                    <div className="bg-background rounded-md p-6">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="h-12 w-12 rounded-full overflow-hidden bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 9h-1a6 6 0 0 0-12 0H5a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a3 3 0 0 0-3-3Z"/><path d="M12 18v4"/><path d="M8 18v4"/><path d="M16 18v4"/></svg>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold gradient-text">
+                            AI Content Generation
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Customize prompts for AI-generated content across your platform
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Surveys Prompt */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M8 10h8"/><path d="M8 14h4"/><path d="M8 18h2"/></svg>
+                      </div>
+                      <h3 className="text-md font-semibold">1. Surveys</h3>
+                    </div>
+                    <Textarea
+                      id="surveyGenerationPrompt"
+                      name="surveyGenerationPrompt"
+                      value={formData.surveyGenerationPrompt || ""}
+                      onChange={handleChange}
+                      placeholder="Enter instructions for generating survey templates and questions"
+                      className="min-h-[120px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This prompt is used to generate survey templates and questions based on uploaded documents and benefits information.
+                    </p>
+                  </div>
+
+                  {/* Email Campaigns Prompt */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                      </div>
+                      <h3 className="text-md font-semibold">2. Email Campaigns</h3>
+                    </div>
+                    <Textarea
+                      id="emailCampaignPrompt"
+                      name="emailCampaignPrompt"
+                      value={formData.emailCampaignPrompt || ""}
+                      onChange={handleChange}
+                      placeholder="Enter instructions for generating email campaign content"
+                      className="min-h-[120px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This prompt helps generate engaging email content for benefits campaigns and announcements.
+                    </p>
+                  </div>
+
+                  {/* Events Prompt */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+                      </div>
+                      <h3 className="text-md font-semibold">3. Events</h3>
+                    </div>
+                    <Textarea
+                      id="eventsPrompt"
+                      name="eventsPrompt"
+                      value={formData.eventsPrompt || ""}
+                      onChange={handleChange}
+                      placeholder="Enter instructions for generating events content"
+                      className="min-h-[120px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This prompt is used to create descriptions for benefits events, webinars, and enrollment periods.
+                    </p>
+                  </div>
+
+                  {/* Website Content Prompt */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M5 4h14c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H9l-5 3v-3H3.57A2 2 0 0 1 2 16.14V6c0-1.1.9-2 2-2Z"/><path d="M10 10h4"/><path d="M7 15h3"/></svg>
+                      </div>
+                      <h3 className="text-md font-semibold">4. Website</h3>
+                    </div>
+                    <Textarea
+                      id="websitePrompt"
+                      name="websitePrompt"
+                      value={formData.websitePrompt || ""}
+                      onChange={handleChange}
+                      placeholder="Enter instructions for generating website content"
+                      className="min-h-[120px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This prompt helps generate clear website content that explains employee benefits and resources.
+                    </p>
+                  </div>
+
+                  {/* Videos Prompt */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="bg-primary/10 p-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="m14 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L11 9"/><path d="M16 6V4a2 2 0 0 0-4 0v2l-3 3 4 4 3-3h7"/></svg>
+                      </div>
+                      <h3 className="text-md font-semibold">5. Videos</h3>
+                    </div>
+                    <Textarea
+                      id="videosPrompt"
+                      name="videosPrompt"
+                      value={formData.videosPrompt || ""}
+                      onChange={handleChange}
+                      placeholder="Enter instructions for generating video script content"
+                      className="min-h-[120px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This prompt creates video script outlines explaining various benefits topics.
+                    </p>
                   </div>
                 </CardContent>
               </TabsContent>
