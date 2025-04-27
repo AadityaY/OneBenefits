@@ -240,8 +240,21 @@ export const companySettings = pgTable("company_settings", {
   contactEmail: text("contact_email"),
   address: text("address"),
   aiAssistantName: text("ai_assistant_name").default("Benefits Assistant"),
+  // AI prompts for different content sections
   surveyGenerationPrompt: text("survey_generation_prompt").default(
     "As a benefits administrator I would like to create quarterly and annual benefits surveys. Create the questions based on your knowledge as well as the contents of the document uploaded to the assistant. Focus on employee satisfaction, understanding of benefits, and areas for improvement."
+  ),
+  emailCampaignPrompt: text("email_campaign_prompt").default(
+    "Generate engaging email content for benefits campaigns. Focus on clear communication, explaining benefits value, and encouraging employee participation."
+  ),
+  eventsPrompt: text("events_prompt").default(
+    "Create descriptive event content for benefits-related meetings, webinars and enrollment periods. Include clear objectives and benefits of attendance."
+  ),
+  websitePrompt: text("website_prompt").default(
+    "Generate website content that clearly explains employee benefits and resources. Use simple language that enhances understanding and accessibility."
+  ),
+  videosPrompt: text("videos_prompt").default(
+    "Create video script outlines explaining various benefits topics. Include key talking points, visual suggestions, and audience engagement tips."
   ),
   heroTitle: text("hero_title").default("Simplified"),
   heroSubtitle: text("hero_subtitle").default("Benefits Experience"),
