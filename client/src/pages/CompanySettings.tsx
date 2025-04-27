@@ -204,12 +204,12 @@ export default function CompanySettings() {
             <TabsTrigger value="contact">Contact Info</TabsTrigger>
             <TabsTrigger value="ai">
               <div className="flex items-center gap-1">
-                <span className="gradient-text">AI Assistant</span>
+                <span className="text-primary">AI Assistant</span>
               </div>
             </TabsTrigger>
             <TabsTrigger value="aiPrompts">
               <div className="flex items-center gap-1">
-                <span className="gradient-text">AI Prompts</span>
+                <span className="text-primary">AI Prompts</span>
               </div>
             </TabsTrigger>
             <TabsTrigger value="notifications">
@@ -576,7 +576,7 @@ export default function CompanySettings() {
                           />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold gradient-text">OpenAI GPT-4o Integration</h3>
+                          <h3 className="text-lg font-semibold text-primary">OpenAI GPT-4o Integration</h3>
                           <p className="text-sm text-muted-foreground">
                             Powered by OpenAI's latest large language model
                           </p>
@@ -646,7 +646,7 @@ export default function CompanySettings() {
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 9h-1a6 6 0 0 0-12 0H5a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a3 3 0 0 0-3-3Z"/><path d="M12 18v4"/><path d="M8 18v4"/><path d="M16 18v4"/></svg>
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold gradient-text">
+                          <h3 className="text-lg font-semibold text-primary">
                             AI Content Generation
                           </h3>
                           <p className="text-sm text-muted-foreground">
