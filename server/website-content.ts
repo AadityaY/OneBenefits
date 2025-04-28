@@ -74,13 +74,16 @@ Your response must be valid JSON that can be parsed using JSON.parse().
       max_tokens: 2500,
     });
 
-    // Extract the JSON content
-    const content = response.choices[0].message.content || '';
+    // Extract the JSON content and ensure it's a string
+    const content = response.choices[0].message.content;
     
     // Parse the JSON to validate it
-    const parsedContent = JSON.parse(content);
+    if (typeof content === 'string') {
+      const parsedContent = JSON.parse(content);
+      return parsedContent;
+    }
     
-    return parsedContent;
+    throw new Error("Invalid response format from OpenAI");
   } catch (error) {
     console.error("Error generating website content with OpenAI:", error);
     

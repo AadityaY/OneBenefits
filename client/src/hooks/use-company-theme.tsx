@@ -7,6 +7,11 @@ import { CompanySettings } from "@shared/schema";
 type CompanyThemeContextType = {
   companySettings: CompanySettings | null;
   isLoading: boolean;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
 };
 
 export const CompanyThemeContext = createContext<CompanyThemeContextType | null>(null);
@@ -50,11 +55,19 @@ export function CompanyThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [companySettings]);
 
+  // Create a colors object with defaults
+  const colors = {
+    primary: companySettings?.primaryColor || '#0f766e',
+    secondary: companySettings?.secondaryColor || '#0369a1',
+    accent: companySettings?.accentColor || '#7c3aed'
+  };
+
   return (
     <CompanyThemeContext.Provider
       value={{
         companySettings: companySettings || null,
         isLoading,
+        colors
       }}
     >
       {children}
