@@ -1,5 +1,4 @@
-const axios = require('axios');
-const qs = require('querystring');
+import axios from 'axios';
 
 async function testWebsiteContent() {
   try {
