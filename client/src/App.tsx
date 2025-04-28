@@ -13,6 +13,7 @@ import ChatPage from "@/pages/ChatPage";
 import CalendarPage from "@/pages/CalendarPage";
 import ContentPage from "@/pages/ContentPage";
 import ExplorePage from "@/pages/ExplorePage";
+import BenefitDetailPage from "@/pages/BenefitDetailPage";
 import VideosPage from "@/pages/VideosPage";
 import HomePage from "@/pages/HomePage";
 import { ThemeProvider } from "next-themes";
@@ -112,6 +113,9 @@ function Router() {
         </Route>
         <Route path="/explore">
           {user ? <ExplorePage /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/benefits/:benefitId">
+          {user ? <BenefitDetailPage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/chat">
           {user ? <ChatPage /> : <Redirect to="/auth" />}

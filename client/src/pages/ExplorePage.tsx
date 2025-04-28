@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'wouter';
 import { WebsiteContent, WebsitePlan } from '@/lib/websiteContentApi';
 import { 
   Card, 
@@ -155,14 +156,27 @@ export default function ExplorePage() {
                       ))}
                     </ul>
                     
-                    <Button
-                      variant="ghost"
-                      className="mt-4 text-sm font-medium"
-                      style={{ color: colors.primary }}
-                      onClick={() => handlePlanClick(plan, section.title)}
-                    >
-                      View Details
-                    </Button>
+                    <div className="flex space-x-2 mt-4">
+                      <Button
+                        variant="ghost"
+                        className="text-sm font-medium"
+                        style={{ color: colors.primary }}
+                        onClick={() => handlePlanClick(plan, section.title)}
+                      >
+                        Quick View
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="text-sm font-medium"
+                        style={{ borderColor: colors.primary, color: colors.primary }}
+                        asChild
+                      >
+                        <Link href={`/benefits/${section.id}`}>
+                          Learn More <span className="inline-block ml-1">→</span>
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </CardContent>
