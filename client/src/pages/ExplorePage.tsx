@@ -172,7 +172,7 @@ export default function ExplorePage() {
                         style={{ borderColor: colors.primary, color: colors.primary }}
                         asChild
                       >
-                        <Link href={`/benefits/${section.id}`}>
+                        <Link href={`/benefits/${section.id.replace('-plans', '').replace('-coverage', '').replace('-options', '')}`}>
                           Learn More <span className="inline-block ml-1">→</span>
                         </Link>
                       </Button>
