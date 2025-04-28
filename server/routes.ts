@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
+import { generateWebsiteContent } from "./website-content";
 import { resizeImageFromBase64 } from "./image-utils";
 import * as fs from "fs/promises";
 import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess } from "./auth";
@@ -1055,6 +1056,38 @@ Include specific details from the document in the questions, and make sure quest
   });
   
   // Image processing endpoint for resizing and optimizing images
+  // Generate website content based on company settings
+  app.get("/api/website-content", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      // Get company settings for website prompt
+      const companySettings = await storage.getCompanySettings(companyId);
+      
+      if (!companySettings) {
+        return res.status(404).json({ message: "Company settings not found" });
+      }
+      
+      const websitePrompt = companySettings.websitePrompt || 
+        "Generate website content that clearly explains employee benefits and resources. Use simple language that enhances understanding and accessibility.";
+      
+      // Generate content using OpenAI
+      const websiteContent = await generateWebsiteContent(
+        websitePrompt,
+        companySettings.name
+      );
+      
+      res.json(websiteContent);
+    } catch (error) {
+      console.error("Error generating website content:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   app.post("/api/resize-image", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const { image, maxWidth, maxHeight, quality } = req.body;
