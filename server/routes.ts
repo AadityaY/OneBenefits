@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
-import { generateWebsiteContent } from "./website-content";
+import { generateWebsiteContent, generateBenefitDetailContent } from "./website-content";
 import { resizeImageFromBase64 } from "./image-utils";
 import * as fs from "fs/promises";
 import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess } from "./auth";
@@ -1085,6 +1085,46 @@ Include specific details from the document in the questions, and make sure quest
     } catch (error) {
       console.error("Error generating website content:", error);
       res.status(500).json({ message: error.message });
+    }
+  });
+  
+  app.get("/api/benefit-details/:id", isAuthenticated, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const benefitId = req.params.id;
+      
+      // Validate that benefitId is allowed
+      const allowedBenefitTypes = ["medical", "dental", "vision", "retirement", "additional", "wellness"];
+      if (!allowedBenefitTypes.includes(benefitId)) {
+        return res.status(400).json({ message: "Invalid benefit type" });
+      }
+      
+      const companyId = parseInt(req.query.companyId as string) || req.user.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "User has no associated company" });
+      }
+      
+      // Get company settings for website prompt
+      const companySettings = await storage.getCompanySettings(companyId);
+      
+      if (!companySettings) {
+        return res.status(404).json({ message: "Company settings not found" });
+      }
+      
+      const websitePrompt = companySettings.websitePrompt || 
+        "Generate website content that clearly explains employee benefits and resources. Use simple language that enhances understanding and accessibility.";
+      
+      // Generate detailed benefit content with OpenAI
+      const benefitContent = await generateBenefitDetailContent(
+        benefitId,
+        companySettings.name,
+        websitePrompt
+      );
+      
+      res.json(benefitContent);
+    } catch (error) {
+      console.error(`Error retrieving benefit details for ${req.params.id}:`, error);
+      res.status(500).json({ message: "Failed to retrieve benefit details" });
     }
   });
   
