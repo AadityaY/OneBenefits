@@ -1151,6 +1151,161 @@ Include specific details from the document in the questions, and make sure quest
       res.status(500).json({ message: "Failed to process image" });
     }
   });
+  
+  // User management endpoints
+  
+  // Get all users for a company
+  app.get("/api/users", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const companyId = req.user.companyId;
+      // Use the storage layer to get all users for a company
+      const companyUsers = await storage.getUsersByCompanyId(companyId);
+      
+      // Return users without password fields
+      const usersWithoutPasswords = companyUsers.map(user => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      
+      res.json(usersWithoutPasswords);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+  
+  // Get a single user by ID
+  app.get("/api/users/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const companyId = req.user.companyId;
+      
+      // Get the user
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user belongs to the admin's company
+      if (user.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied to this user" });
+      }
+      
+      // Return user without password field
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+  
+  // Create a new user
+  app.post("/api/users", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const companyId = req.user.companyId;
+      
+      // Validate user data
+      const userData = req.body;
+      userData.companyId = companyId; // Ensure user is created for admin's company
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(userData.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Hash the password
+      if (userData.password) {
+        userData.password = await hashPassword(userData.password);
+      }
+      
+      // Create the user
+      const newUser = await storage.createUser(userData);
+      
+      // Return user without password field
+      const { password, ...userWithoutPassword } = newUser;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+  
+  // Update a user
+  app.patch("/api/users/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const companyId = req.user.companyId;
+      
+      // Get the existing user
+      const existingUser = await storage.getUser(userId);
+      
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user belongs to the admin's company
+      if (existingUser.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied to this user" });
+      }
+      
+      // Update user data
+      const userData = req.body;
+      
+      // Don't allow changing company ID
+      delete userData.companyId;
+      
+      // If changing password, hash it
+      if (userData.password) {
+        userData.password = await hashPassword(userData.password);
+      }
+      
+      // Update the user
+      const updatedUser = await storage.updateUser(userId, userData);
+      
+      // Return user without password field
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+  
+  // Delete a user
+  app.delete("/api/users/:id", isAdmin, companyAccess, async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const companyId = req.user.companyId;
+      
+      // Get the user
+      const existingUser = await storage.getUser(userId);
+      
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user belongs to the admin's company
+      if (existingUser.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied to this user" });
+      }
+      
+      // Don't allow deleting yourself
+      if (userId === req.user.id) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
+      // Delete the user
+      await storage.deleteUser(userId);
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
 
   // Create and return HTTP server
   const httpServer = createServer(app);
