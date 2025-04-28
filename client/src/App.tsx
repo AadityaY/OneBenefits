@@ -16,6 +16,7 @@ import ExplorePage from "@/pages/ExplorePage";
 import BenefitDetailPage from "@/pages/BenefitDetailPage";
 import VideosPage from "@/pages/VideosPage";
 import HomePage from "@/pages/HomePage";
+import UsersPage from "@/pages/UsersPage";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -157,6 +158,10 @@ function Router() {
         <Route path="/admin/company-settings">
           {user && (user.role === "admin" || user.role === "superadmin") ? 
             <CompanySettings /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/admin/users">
+          {user && (user.role === "admin" || user.role === "superadmin") ? 
+            <UsersPage /> : <Redirect to="/auth" />}
         </Route>
         
         {/* Document Viewer Page */}

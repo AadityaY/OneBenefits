@@ -69,6 +69,7 @@ export function Sidebar() {
         { title: "Email Campaigns", href: "/admin/email" },
         { title: "Events", href: "/admin/events" },
         { title: "Documents", href: "/admin/documents" },
+        { title: "User Management", href: "/admin/users" },
         { title: "Company Settings", href: "/admin/company-settings" },
       ]
     }
