@@ -43,10 +43,7 @@ export const BENEFIT_IMAGES = {
 };
 
 /**
- * Generate website content based on a company's website prompt
- * @param websitePrompt The prompt to use for generating website content
- * @param companyName The name of the company
- * @returns Generated website content in JSON format with sections and data
+ * Interface for detailed benefit content
  */
 export interface BenefitDetailContent {
   id: string;
@@ -61,6 +58,8 @@ export interface BenefitDetailContent {
   additionalResources: Array<{title: string, description: string, url: string}>;
   images: string[];
 }
+
+
 
 /**
  * Generate detailed content for a specific benefit type
@@ -170,6 +169,12 @@ Include realistic but fictional names for contacts and resources.
   }
 }
 
+/**
+ * Generate website content based on a company's website prompt
+ * @param websitePrompt The prompt to use for generating website content
+ * @param companyName The name of the company
+ * @returns Generated website content in JSON format with sections and data
+ */
 export async function generateWebsiteContent(
   websitePrompt: string,
   companyName: string
