@@ -6,7 +6,7 @@ import { processDocumentContent, chatWithDocuments } from "./openai";
 import { generateWebsiteContent, generateBenefitDetailContent } from "./website-content";
 import { resizeImageFromBase64 } from "./image-utils";
 import * as fs from "fs/promises";
-import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess } from "./auth";
+import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess, hashPassword } from "./auth";
 import { z } from "zod";
 import { insertCompanySchema, InsertDocument } from "@shared/schema";
 
