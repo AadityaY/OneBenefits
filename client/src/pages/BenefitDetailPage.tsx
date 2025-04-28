@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { BenefitDetail, WebsiteContent } from "@/lib/websiteContentApi";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { 

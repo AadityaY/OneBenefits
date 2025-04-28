@@ -6,7 +6,11 @@ const openai = new OpenAI({
 });
 
 // Model for completions
-const OPENAI_MODEL = "gpt-4o-mini";
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+const OPENAI_MODEL = "gpt-4o";
+
+// Used for generating comprehensive benefit details - using rich content
+const OPENAI_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
 
 // Define benefit type images for the detail pages
 export const BENEFIT_IMAGES = {
@@ -118,6 +122,13 @@ Format your response as a valid JSON object with the following structure:
   ]
 }
 
+For the HTML-formatted content fields (overview, eligibility, howToEnroll):
+- Use paragraph tags <p> for text blocks
+- Use heading tags <h3>, <h4> for sub-sections
+- Use list elements <ul>, <li> for bullet points
+- Use <strong> or <em> for emphasis
+- Structure content with proper spacing and organization
+
 Your response must be valid JSON that can be parsed using JSON.parse().
 Make the content feel authentic and specific to ${companyName}.
 Include realistic but fictional names for contacts and resources.
@@ -135,9 +146,22 @@ Include realistic but fictional names for contacts and resources.
     
     if (typeof content === 'string') {
       const parsedContent = JSON.parse(content);
-      // Add images to the response
+      
+      // Format HTML content if needed
+      const formatHtmlContent = (html: string) => {
+        if (!html.includes('<')) {
+          // If no HTML tags, wrap in paragraph tags
+          return `<p>${html}</p>`;
+        }
+        return html;
+      };
+      
+      // Add images to the response and ensure HTML formatting
       return {
         ...parsedContent,
+        overview: formatHtmlContent(parsedContent.overview),
+        eligibility: formatHtmlContent(parsedContent.eligibility),
+        howToEnroll: formatHtmlContent(parsedContent.howToEnroll),
         images: BENEFIT_IMAGES[benefitType as keyof typeof BENEFIT_IMAGES] || []
       };
     }
@@ -152,17 +176,20 @@ Include realistic but fictional names for contacts and resources.
       title: `${benefitType.charAt(0).toUpperCase() + benefitType.slice(1)} Benefits`,
       subtitle: `Your ${companyName} ${benefitType} benefits information`,
       description: `Learn about your ${benefitType} benefits options and how to make the most of them.`,
-      overview: `${companyName} offers comprehensive ${benefitType} benefits.`,
-      eligibility: "All full-time employees are eligible for benefits.",
-      howToEnroll: "Enroll through the HR portal during open enrollment.",
+      overview: `<p>${companyName} offers comprehensive ${benefitType} benefits to support our employees' health and wellbeing.</p>`,
+      eligibility: "<p>All full-time employees are eligible for benefits after completing 30 days of employment.</p>",
+      howToEnroll: "<p>Enroll through the HR portal during open enrollment or within 30 days of a qualifying life event.</p>",
       faq: [
-        {question: "When can I enroll?", answer: "During open enrollment or after a qualifying life event."}
+        {question: "When can I enroll?", answer: "During open enrollment or after a qualifying life event."},
+        {question: "Where can I find more information?", answer: "Contact the HR Benefits Team or visit the benefits portal."}
       ],
       keyContacts: [
-        {name: "HR Benefits Team", role: "Benefits Administrators", contact: "benefits@example.com"}
+        {name: "HR Benefits Team", role: "Benefits Administrators", contact: "benefits@example.com"},
+        {name: "Jane Smith", role: "Benefits Specialist", contact: "jsmith@example.com"}
       ],
       additionalResources: [
-        {title: "Benefits Guide", description: "Download the complete benefits guide", url: "#"}
+        {title: "Benefits Guide", description: "Download the complete benefits guide", url: "#"},
+        {title: "Enrollment Tutorial", description: "Video walkthrough of the enrollment process", url: "#"}
       ],
       images: BENEFIT_IMAGES[benefitType as keyof typeof BENEFIT_IMAGES] || []
     };
