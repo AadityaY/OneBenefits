@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { WebsiteContent } from '@/lib/websiteContentApi';
+import { WebsiteContent, WebsitePlan } from '@/lib/websiteContentApi';
 import { 
   Card, 
   CardContent, 
@@ -18,11 +18,13 @@ import {
   Smile, 
   Activity,
   AlignJustify,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCompanyTheme } from '@/hooks/use-company-theme';
+import PlanDetailsModal from '@/components/PlanDetailsModal';
 
 // Map section IDs to icons
 const sectionIcons: Record<string, React.ReactNode> = {
@@ -36,6 +38,9 @@ const sectionIcons: Record<string, React.ReactNode> = {
 
 export default function ExplorePage() {
   const { colors } = useCompanyTheme();
+  const [selectedPlan, setSelectedPlan] = useState<WebsitePlan | null>(null);
+  const [selectedSectionTitle, setSelectedSectionTitle] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const { data: websiteContent, isLoading, error } = useQuery<WebsiteContent>({
     queryKey: ['/api/website-content'],
@@ -44,6 +49,18 @@ export default function ExplorePage() {
   // Function to get icon by section ID
   const getIconForSection = (sectionId: string) => {
     return sectionIcons[sectionId] || <AlignJustify className="h-6 w-6" />;
+  };
+  
+  // Handle plan click to open details modal
+  const handlePlanClick = (plan: WebsitePlan, sectionTitle: string) => {
+    setSelectedPlan(plan);
+    setSelectedSectionTitle(sectionTitle);
+    setIsModalOpen(true);
+  };
+  
+  // Close the modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   if (isLoading) {
@@ -111,11 +128,19 @@ export default function ExplorePage() {
                   <div 
                     key={plan.name} 
                     className={cn(
-                      "pt-4", 
+                      "pt-4 relative", 
                       index > 0 && "mt-4 border-t border-border"
                     )}
                   >
-                    <h3 className="font-semibold text-lg mb-1">{plan.name}</h3>
+                    <h3 className="font-semibold text-lg mb-1 group flex items-center cursor-pointer" 
+                      onClick={() => handlePlanClick(plan, section.title)}
+                    >
+                      {plan.name}
+                      <ExternalLink 
+                        className="ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" 
+                        style={{ color: colors.primary }}
+                      />
+                    </h3>
                     <p className="text-muted-foreground mb-3">{plan.description}</p>
                     
                     <ul className="space-y-2">
@@ -129,6 +154,15 @@ export default function ExplorePage() {
                         </li>
                       ))}
                     </ul>
+                    
+                    <Button
+                      variant="ghost"
+                      className="mt-4 text-sm font-medium"
+                      style={{ color: colors.primary }}
+                      onClick={() => handlePlanClick(plan, section.title)}
+                    >
+                      View Details
+                    </Button>
                   </div>
                 ))}
               </CardContent>
@@ -150,6 +184,16 @@ export default function ExplorePage() {
           Learn More About Your Benefits
         </Button>
       </div>
+      
+      {/* Plan Details Modal */}
+      {selectedPlan && (
+        <PlanDetailsModal
+          plan={selectedPlan}
+          sectionTitle={selectedSectionTitle}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
