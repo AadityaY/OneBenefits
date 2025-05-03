@@ -1,33 +1,46 @@
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { InsertSurveyResponse, SurveyResponse } from "@shared/schema";
 
 /**
  * Get all survey responses
  */
 export async function getSurveyResponses(): Promise<SurveyResponse[]> {
-  return apiRequest({
-    method: "GET",
-    url: "/api/survey",
+  const response = await fetch('/api/survey', {
+    credentials: 'include',
   });
+  
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${response.status}: ${text || response.statusText}`);
+  }
+  
+  return response.json();
 }
 
 /**
  * Get survey responses for a specific template
  */
 export async function getSurveyResponsesByTemplateId(templateId: number): Promise<SurveyResponse[]> {
-  return apiRequest({
-    method: "GET",
-    url: `/api/survey?templateId=${templateId}`,
+  const response = await fetch(`/api/survey?templateId=${templateId}`, {
+    credentials: 'include',
   });
+  
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${response.status}: ${text || response.statusText}`);
+  }
+  
+  return response.json();
 }
 
 /**
  * Submit a new survey response
  */
 export async function submitSurveyResponse(response: InsertSurveyResponse): Promise<SurveyResponse> {
-  return apiRequest({
-    method: "POST",
-    url: "/api/survey",
-    data: response,
-  });
+  const apiResponse = await apiRequest('POST', '/api/survey', response);
+  
+  // Invalidate cache after submission
+  queryClient.invalidateQueries({ queryKey: ['/api/survey'] });
+  
+  return apiResponse.json();
 }

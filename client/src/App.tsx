@@ -9,6 +9,7 @@ import AuthPage from "@/pages/auth-page";
 import CompanySettings from "@/pages/CompanySettings";
 import DocumentViewerPage from "@/pages/DocumentViewerPage";
 import SurveysPage from "@/pages/SurveysPage";
+import SurveyPage from "@/pages/SurveyPage";
 import ChatPage from "@/pages/ChatPage";
 import CalendarPage from "@/pages/CalendarPage";
 import ContentPage from "@/pages/ContentPage";
@@ -123,6 +124,9 @@ function Router() {
         </Route>
         <Route path="/surveys">
           {user ? <SurveysPage /> : <Redirect to="/auth" />}
+        </Route>
+        <Route path="/survey/:id">
+          {user ? <SurveyPage /> : <Redirect to="/auth" />}
         </Route>
         <Route path="/videos">
           {user ? <VideosPage /> : <Redirect to="/auth" />}
