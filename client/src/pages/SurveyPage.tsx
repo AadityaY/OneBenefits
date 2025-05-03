@@ -15,7 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 import { getSurveyTemplate } from "@/lib/surveyAdminApi";
 import { getSurveyQuestionsByTemplateId } from "@/lib/surveyAdminApi";
 import { submitSurveyResponse } from "@/lib/surveyApi";
-import { SurveyQuestion, SurveyTemplate, InsertSurveyResponse } from "@shared/schema";
+import { 
+  SurveyQuestion, 
+  SurveyTemplate, 
+  InsertSurveyResponse,
+  surveyResponseItem,
+  SurveyResponseItem 
+} from "@shared/schema";
 
 export default function SurveyPage() {
   const { id } = useParams<{ id: string }>();
@@ -114,19 +120,36 @@ export default function SurveyPage() {
     
     setIsSubmitting(true);
     
-    // Format survey responses
-    const response: InsertSurveyResponse = {
+    // Format survey responses according to the schema
+    // First prepare the API parameters correctly
+    const responseData = {
       templateId: template.id,
-      userId: user.id,
       companyId: user.companyId,
-      responses: Array.from(answers.entries()).map(([questionId, answer]) => ({
-        questionId,
-        response: answer
-      })),
+      userId: user.id,
+      responses: Array.from(answers.entries()).map(([questionId, answer]) => {
+        // Find the question to get its text and type
+        const question = questions.find(q => q.id === questionId);
+        if (!question) {
+          throw new Error(`Question with ID ${questionId} not found`);
+        }
+        
+        return {
+          questionId,
+          questionText: question.questionText,
+          questionType: question.questionType,
+          response: answer
+        };
+      }),
       submittedAt: new Date().toISOString()
     };
     
-    submitMutation.mutate(response);
+    // Pull just the required fields for InsertSurveyResponse
+    const surveyResponse: InsertSurveyResponse = {
+      templateId: responseData.templateId,
+      responses: responseData.responses
+    };
+    
+    submitMutation.mutate(surveyResponse);
   };
   
   // When submission is successful, redirect after a delay
@@ -240,13 +263,10 @@ export default function SurveyPage() {
             <CardTitle className="text-gradient-primary">
               {currentQuestion.questionText}
             </CardTitle>
-            {currentQuestion.description && (
-              <CardDescription>{currentQuestion.description}</CardDescription>
-            )}
           </CardHeader>
           <CardContent>
-            <Form>
-              {currentQuestion.type === 'text' ? (
+            <div>
+              {currentQuestion.questionType === 'text' ? (
                 <div className="space-y-3">
                   <Label htmlFor="answer">Your Answer</Label>
                   <Textarea
@@ -273,7 +293,7 @@ export default function SurveyPage() {
                   ))}
                 </RadioGroup>
               )}
-            </Form>
+            </div>
           </CardContent>
           <Separator />
           <CardFooter className="flex justify-between pt-6">

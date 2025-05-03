@@ -139,7 +139,7 @@ export default function SurveysPage() {
                     <div className="text-sm">
                       Available until: <span className="font-medium">
                         {survey.publishedAt 
-                          ? getDeadlineDate(survey.publishedAt as string) 
+                          ? getDeadlineDate(String(survey.publishedAt)) 
                           : "Available now"}
                       </span>
                     </div>
@@ -202,7 +202,7 @@ export default function SurveysPage() {
                       <div className="text-sm text-muted-foreground">
                         Completed: <span>
                           {userResponse?.submittedAt 
-                            ? formatDate(userResponse.submittedAt as string) 
+                            ? formatDate(String(userResponse.submittedAt)) 
                             : "Recently"}
                         </span>
                       </div>
