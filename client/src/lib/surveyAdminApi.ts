@@ -7,8 +7,12 @@ import {
 } from "@shared/schema";
 
 // Survey Template API
-export async function getSurveyTemplates(): Promise<SurveyTemplate[]> {
-  const response = await fetch('/api/survey-templates', {
+export async function getSurveyTemplates(companyId?: number): Promise<SurveyTemplate[]> {
+  const url = companyId 
+    ? `/api/survey-templates?companyId=${companyId}`
+    : '/api/survey-templates';
+    
+  const response = await fetch(url, {
     credentials: 'include',
   });
   
@@ -20,8 +24,12 @@ export async function getSurveyTemplates(): Promise<SurveyTemplate[]> {
   return response.json();
 }
 
-export async function getSurveyTemplate(id: number): Promise<SurveyTemplate> {
-  const response = await fetch(`/api/survey-templates/${id}`, {
+export async function getSurveyTemplate(id: number, companyId?: number): Promise<SurveyTemplate> {
+  const url = companyId 
+    ? `/api/survey-templates/${id}?companyId=${companyId}`
+    : `/api/survey-templates/${id}`;
+    
+  const response = await fetch(url, {
     credentials: 'include',
   });
   
@@ -54,8 +62,12 @@ export async function publishSurveyTemplate(id: number, companyId: number): Prom
 }
 
 // Survey Question API
-export async function getSurveyQuestions(): Promise<SurveyQuestion[]> {
-  const response = await fetch('/api/survey-questions', {
+export async function getSurveyQuestions(companyId?: number): Promise<SurveyQuestion[]> {
+  const url = companyId 
+    ? `/api/survey-questions?companyId=${companyId}`
+    : '/api/survey-questions';
+    
+  const response = await fetch(url, {
     credentials: 'include',
   });
   
@@ -67,8 +79,12 @@ export async function getSurveyQuestions(): Promise<SurveyQuestion[]> {
   return response.json();
 }
 
-export async function getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]> {
-  const response = await fetch(`/api/survey-templates/${templateId}/questions`, {
+export async function getSurveyQuestionsByTemplateId(templateId: number, companyId?: number): Promise<SurveyQuestion[]> {
+  const url = companyId 
+    ? `/api/survey-templates/${templateId}/questions?companyId=${companyId}`
+    : `/api/survey-templates/${templateId}/questions`;
+    
+  const response = await fetch(url, {
     credentials: 'include',
   });
   
@@ -80,8 +96,12 @@ export async function getSurveyQuestionsByTemplateId(templateId: number): Promis
   return response.json();
 }
 
-export async function getSurveyQuestion(id: number): Promise<SurveyQuestion> {
-  const response = await fetch(`/api/survey-questions/${id}`, {
+export async function getSurveyQuestion(id: number, companyId?: number): Promise<SurveyQuestion> {
+  const url = companyId 
+    ? `/api/survey-questions/${id}?companyId=${companyId}`
+    : `/api/survey-questions/${id}`;
+    
+  const response = await fetch(url, {
     credentials: 'include',
   });
   
@@ -94,15 +114,17 @@ export async function getSurveyQuestion(id: number): Promise<SurveyQuestion> {
 }
 
 export async function createSurveyQuestion(data: InsertSurveyQuestion): Promise<SurveyQuestion> {
-  const response = await apiRequest('POST', '/api/survey-questions', data);
+  const companyId = data.companyId || 0;
+  const response = await apiRequest('POST', `/api/survey-questions?companyId=${companyId}`, data);
   return response.json();
 }
 
 export async function updateSurveyQuestion(id: number, data: Partial<InsertSurveyQuestion>): Promise<SurveyQuestion> {
-  const response = await apiRequest('PATCH', `/api/survey-questions/${id}`, data);
+  const companyId = data.companyId || 0;
+  const response = await apiRequest('PATCH', `/api/survey-questions/${id}?companyId=${companyId}`, data);
   return response.json();
 }
 
-export async function deleteSurveyQuestion(id: number): Promise<void> {
-  await apiRequest('DELETE', `/api/survey-questions/${id}`);
+export async function deleteSurveyQuestion(id: number, companyId: number): Promise<void> {
+  await apiRequest('DELETE', `/api/survey-questions/${id}?companyId=${companyId}`);
 }
