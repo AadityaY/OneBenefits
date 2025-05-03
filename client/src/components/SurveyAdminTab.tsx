@@ -128,6 +128,7 @@ export default function SurveyAdminTab() {
   const templateSchema = insertSurveyTemplateSchema.extend({
     title: z.string().min(3, { message: "Title must be at least 3 characters" }),
     description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+    status: z.string().default("draft"),  // Ensure status is always a string
   });
 
   // Create a form for new templates
@@ -513,13 +514,11 @@ export default function SurveyAdminTab() {
   
   // Initialize template form with selected template data
   const editTemplate = (template: SurveyTemplateType) => {
-    // Ensure the status is a valid string even if it's null in the database
-    const statusValue = template.status || 'draft';
-    
+    // Ensure all values are valid and not null
     templateForm.reset({
       title: template.title,
       description: template.description || '',
-      status: statusValue,
+      status: template.status || 'draft',
       companyId: template.companyId,
     });
     setIsEditing(true);
