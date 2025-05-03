@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCompanyTheme } from "@/hooks/use-company-theme";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { generateSurveysFromDocument } from "@/lib/surveyAdminApi";
 import {
   Dialog,
   DialogContent,
@@ -122,13 +123,9 @@ export default function QuickSetupModal({ open, onOpenChange }: QuickSetupProps)
       createQuarterly: boolean;
       createAnnual: boolean;
       prompt: string;
+      companyId: number;
     }) => {
-      const res = await apiRequest(
-        "POST",
-        "/api/survey-templates/generate",
-        data
-      );
-      return res.json();
+      return await generateSurveysFromDocument(data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/survey-templates"] });
@@ -224,6 +221,7 @@ export default function QuickSetupModal({ open, onOpenChange }: QuickSetupProps)
       createQuarterly,
       createAnnual,
       prompt: generationPrompt,
+      companyId: companySettings?.companyId || 0,
     });
   };
   
