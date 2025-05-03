@@ -310,7 +310,7 @@ export default function SurveyAdminTab() {
       try {
         const res = await apiRequest(
           "POST", 
-          `/api/survey-questions`, 
+          `/api/survey-questions?companyId=${companyId}`, 
           processedQuestion
         );
         const data = await res.json();
@@ -352,7 +352,7 @@ export default function SurveyAdminTab() {
     mutationFn: async (id: number) => {
       const res = await apiRequest(
         "DELETE", 
-        `/api/survey-questions/${id}`
+        `/api/survey-questions/${id}?companyId=${companyId}`
       );
       return res.json();
     },
@@ -416,7 +416,7 @@ export default function SurveyAdminTab() {
     mutationFn: async ({ templateId, questionId, order }: { templateId: number, questionId: number, order: number }) => {
       const res = await apiRequest(
         "POST",
-        `/api/survey-templates/${templateId}/questions`,
+        `/api/survey-templates/${templateId}/questions?companyId=${companyId}`,
         { questionId, order }
       );
       return res.json();
@@ -442,7 +442,7 @@ export default function SurveyAdminTab() {
     mutationFn: async ({ templateId, questionId }: { templateId: number, questionId: number }) => {
       const res = await apiRequest(
         "DELETE",
-        `/api/survey-templates/${templateId}/questions/${questionId}`
+        `/api/survey-templates/${templateId}/questions/${questionId}?companyId=${companyId}`
       );
       return res.json();
     },
@@ -516,7 +516,7 @@ export default function SurveyAdminTab() {
     templateForm.reset({
       title: template.title,
       description: template.description,
-      status: template.status,
+      status: template.status || 'draft',  // Default to 'draft' if status is null
       companyId: template.companyId,
     });
     setIsEditing(true);
