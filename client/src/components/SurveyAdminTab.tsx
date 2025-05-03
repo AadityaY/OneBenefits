@@ -513,10 +513,13 @@ export default function SurveyAdminTab() {
   
   // Initialize template form with selected template data
   const editTemplate = (template: SurveyTemplateType) => {
+    // Ensure the status is a valid string even if it's null in the database
+    const statusValue = template.status || 'draft';
+    
     templateForm.reset({
       title: template.title,
-      description: template.description,
-      status: template.status || 'draft',  // Default to 'draft' if status is null
+      description: template.description || '',
+      status: statusValue,
       companyId: template.companyId,
     });
     setIsEditing(true);
