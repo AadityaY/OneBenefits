@@ -5,7 +5,8 @@ import { upload, getFilePath } from "./multer";
 import { processDocumentContent, chatWithDocuments } from "./openai";
 import { generateWebsiteContent, generateBenefitDetailContent } from "./website-content";
 import { resizeImageFromBase64 } from "./image-utils";
-import * as fs from "fs/promises";
+import * as fsPromises from "fs/promises";
+import * as fs from "fs";
 import { setupAuth, isAuthenticated, isAdmin, isSuperAdmin, companyAccess, hashPassword } from "./auth";
 import { z } from "zod";
 import { insertCompanySchema, InsertDocument } from "@shared/schema";
@@ -84,7 +85,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Process content for text files and PDFs
             if (file.mimetype === "text/plain" || file.mimetype === "application/pdf") {
-              content = await processDocumentContent("");
+              try {
+                // Read the file content
+                const fileContent = fs.readFileSync(filePath, 'utf8');
+                // Process the content
+                content = await processDocumentContent(fileContent);
+                console.log(`Processed document content for ${file.originalname}, content length: ${content.length}`);
+              } catch (readError) {
+                console.error(`Error reading or processing file ${file.originalname}:`, readError);
+                // Set some content even if processing fails
+                content = "Document content could not be processed.";
+              }
             }
 
             // For multiple files, append index to title if provided
