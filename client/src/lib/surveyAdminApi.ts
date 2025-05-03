@@ -128,3 +128,34 @@ export async function updateSurveyQuestion(id: number, data: Partial<InsertSurve
 export async function deleteSurveyQuestion(id: number, companyId: number): Promise<void> {
   await apiRequest('DELETE', `/api/survey-questions/${id}?companyId=${companyId}`);
 }
+
+// AI Quick Setup
+export interface QuickSetupOptions {
+  documentId: number;
+  createQuarterly: boolean;
+  createAnnual: boolean;
+  prompt?: string;
+  companyId: number;
+}
+
+export interface QuickSetupResult {
+  success: boolean;
+  templatesCreated: number;
+  questionsCreated: number;
+  message: string;
+}
+
+export async function generateSurveysFromDocument(options: QuickSetupOptions): Promise<QuickSetupResult> {
+  const response = await apiRequest(
+    'POST',
+    `/api/survey-templates/generate?companyId=${options.companyId}`,
+    options
+  );
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to generate surveys');
+  }
+  
+  return response.json();
+}
