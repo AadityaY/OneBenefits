@@ -67,7 +67,7 @@ export async function getSurveyQuestions(): Promise<SurveyQuestion[]> {
 }
 
 export async function getSurveyQuestionsByTemplateId(templateId: number): Promise<SurveyQuestion[]> {
-  const response = await fetch(`/api/survey-questions?templateId=${templateId}`, {
+  const response = await fetch(`/api/survey-templates/${templateId}/questions`, {
     credentials: 'include',
   });
   
