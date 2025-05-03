@@ -34,21 +34,22 @@ export async function getSurveyTemplate(id: number): Promise<SurveyTemplate> {
 }
 
 export async function createSurveyTemplate(data: InsertSurveyTemplate): Promise<SurveyTemplate> {
-  const response = await apiRequest('POST', '/api/survey-templates', data);
+  const response = await apiRequest('POST', `/api/survey-templates?companyId=${data.companyId}`, data);
   return response.json();
 }
 
 export async function updateSurveyTemplate(id: number, data: Partial<InsertSurveyTemplate>): Promise<SurveyTemplate> {
-  const response = await apiRequest('PATCH', `/api/survey-templates/${id}`, data);
+  const companyId = data.companyId || 0;
+  const response = await apiRequest('PATCH', `/api/survey-templates/${id}?companyId=${companyId}`, data);
   return response.json();
 }
 
-export async function deleteSurveyTemplate(id: number): Promise<void> {
-  await apiRequest('DELETE', `/api/survey-templates/${id}`);
+export async function deleteSurveyTemplate(id: number, companyId: number): Promise<void> {
+  await apiRequest('DELETE', `/api/survey-templates/${id}?companyId=${companyId}`);
 }
 
-export async function publishSurveyTemplate(id: number): Promise<SurveyTemplate> {
-  const response = await apiRequest('POST', `/api/survey-templates/${id}/publish`);
+export async function publishSurveyTemplate(id: number, companyId: number): Promise<SurveyTemplate> {
+  const response = await apiRequest('POST', `/api/survey-templates/${id}/publish?companyId=${companyId}`);
   return response.json();
 }
 
