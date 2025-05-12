@@ -12,7 +12,7 @@ const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 // Ensure the uploads directory exists
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
+} //Temp
 
 /**
  * Resize and optimize an image from a base64 string
